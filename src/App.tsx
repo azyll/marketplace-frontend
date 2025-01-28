@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-import "./App.css";
 import { ConfigProvider } from "antd";
 import { themeConfig } from "./themes/theme";
 
