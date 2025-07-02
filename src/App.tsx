@@ -1,12 +1,8 @@
-import { ConfigProvider } from "antd";
-import { themeConfig } from "./themes/theme";
+import "@mantine/core/styles.css";
+import { MantineProvider } from "@mantine/core";
 
 const App: React.FC = () => {
-  return (
-    <ConfigProvider theme={themeConfig}>
-      <div></div>
-    </ConfigProvider>
-  );
+  return <MantineProvider>{}</MantineProvider>;
 };
 
 export default App;
