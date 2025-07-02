@@ -22,7 +22,7 @@
     "@mantine/nprogress": "^8.1.2",
     "@mantine/tiptap": "^8.1.2",
     "@supabase/supabase-js": "^2.49.1",
-    "@tailwindcss/vite": "^4.0.0",
+    "@tailwindcss/vite": "^4.1.11",
     "@tiptap/extension-link": "^2.23.1",
     "@tiptap/pm": "^2.23.1",
     "@tiptap/react": "^2.23.1",
@@ -35,7 +35,7 @@
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "recharts": "^2.15.4",
-    "tailwindcss": "^4.0.0"
+    "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
