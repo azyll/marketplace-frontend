@@ -10,10 +10,9 @@ const images = [
 export default function HeroCarousel() {
   return (
     <Carousel
-      // slideSize="70%"
-      // withControls={false}
+      controlsOffset={25}
       withIndicators
-      slideSize="70%"
+      slideSize={{ base: "93%", md: "80%" }}
       slideGap="lg"
       emblaOptions={{
         loop: true,
