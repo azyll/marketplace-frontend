@@ -4,7 +4,7 @@ import { AppShell, createTheme, MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import "@mantine/carousel/styles.css";
 import { Outlet } from "react-router";
-import AppHeader from "./components/Header";
+import Header from "./components/Header";
 
 const App: React.FC = () => {
   const theme = createTheme({
@@ -21,7 +21,7 @@ const App: React.FC = () => {
     <MantineProvider theme={theme}>
       <AppShell header={{ height: 60 }}>
         <AppShell.Header>
-          <AppHeader />
+          <Header />
         </AppShell.Header>
 
         <AppShell.Main>

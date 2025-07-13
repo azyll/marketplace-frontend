@@ -1,56 +1,34 @@
 import { Group, Button, ActionIcon, Input } from "@mantine/core";
-import {
-  IconShoppingBag,
-  IconBell,
-  IconSearch,
-  IconUser,
-} from "@tabler/icons-react";
-import { useFilters } from "../hooks/useFilters";
-import { useMediaQuery } from "@mantine/hooks";
+import { IconShoppingBag, IconBell, IconUser } from "@tabler/icons-react";
+import HeaderSearchBar from "./HeaderSearchBar";
+import Login from "../pages/login/Login";
+import { useNavigate } from "react-router";
 
-interface HeaderSearch {
-  search?: string;
-}
-
-export default function AppHeader() {
-  const [filter, setFilterValue] = useFilters<HeaderSearch>({
-    search: undefined,
-  });
-
-  const isDesktop = useMediaQuery("(min-width: 30rem)");
+export default function Header() {
+  const navigate = useNavigate();
 
   return (
     <nav className="">
       <Group
+        px={{ base: 16, md: 24 }}
         justify="space-between"
-        className="px-4 md:px-6"
+        wrap="nowrap"
       >
         <img
+          className="z-0"
           src="src\assets\logo.png"
           alt=""
           width={56}
         />
 
-        <b className="hidden md:block">STI Marketplace</b>
+        <b className="z-0">STI Marketplace</b>
 
-        <Group gap="sm">
-          {/* <ActionIcon
-            variant="subtle"
-            hiddenFrom="sm"
-          >
-            <IconSearch />
-          </ActionIcon> */}
-
-          <Input
-            // w={{ xs: 200, sm: 2 }}
-            className="w-22 sm:w-50"
-            rightSection={<IconSearch size={14} />}
-            // mr="sm"
-            radius="xl"
-            placeholder="Search Products"
-            value={filter.search}
-            onChange={(value) => setFilterValue("search", value.target.value)}
-          />
+        <Group
+          className="relative z-10"
+          gap="sm"
+          wrap="nowrap"
+        >
+          <HeaderSearchBar />
 
           <ActionIcon variant="subtle">
             <IconShoppingBag />
@@ -60,16 +38,21 @@ export default function AppHeader() {
             <IconBell />
           </ActionIcon>
 
-          {/* pano ioorganize to? */}
+          {/* visible on pc */}
           <Button
             variant="light"
             visibleFrom="md"
+            radius={"xl"}
+            onClick={() => navigate("/auth/login")}
           >
             Sign in
           </Button>
+
+          {/* only visible on mobile */}
           <ActionIcon
             variant="subtle"
             hiddenFrom="md"
+            onClick={() => navigate("/auth/login")}
           >
             <IconUser />
           </ActionIcon>
