@@ -1,4 +1,5 @@
 import { AppShell } from "@mantine/core";
+import Header from "../../components/Header";
 
 export default function Store() {
   return (
@@ -7,7 +8,9 @@ export default function Store() {
         padding="md"
         header={{ height: 60 }}
       >
-        <AppShell.Header>asdadjkl</AppShell.Header>
+        <AppShell.Header>
+          <Header></Header>
+        </AppShell.Header>
       </AppShell>
       ;
     </div>
