@@ -8,7 +8,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   return (
-    <nav className="">
+    <nav className="h-14">
       <Group
         px={{ base: 16, md: 24 }}
         justify="space-between"

@@ -10,9 +10,9 @@ const images = [
 export default function HeroCarousel() {
   return (
     <Carousel
-      controlsOffset={25}
+      controlsOffset={"md"}
       withIndicators
-      slideSize={{ base: "93%", md: "80%" }}
+      slideSize={{ base: "100%", md: "80%" }}
       slideGap="lg"
       emblaOptions={{
         loop: true,
@@ -22,10 +22,20 @@ export default function HeroCarousel() {
       {" "}
       {images.map((src, index) => (
         <Carousel.Slide key={index}>
+          {/* Desktop */}
           <Image
             src={src}
             alt={`Slide ${index + 1}`}
-            radius="xl"
+            radius={"xl"}
+            visibleFrom="md"
+          />
+
+          {/* Mobile */}
+          <Image
+            src={src}
+            alt={`Slide ${index + 1}`}
+            radius={0}
+            hiddenFrom="md"
           />
         </Carousel.Slide>
       ))}
