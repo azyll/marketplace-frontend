@@ -1,9 +1,9 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import Home from "../pages/home/Home";
-import Store from "../pages/store/Store";
 import App from "../App";
 import Login from "../pages/login/Login";
 import Cart from "../pages/cart/Cart";
+import Products from "../pages/products/Products";
 
 export const router = createBrowserRouter([
   {
@@ -12,8 +12,12 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: Home },
       {
-        path: "/store",
-        Component: Store,
+        path: "/products",
+        Component: Products,
+      },
+      {
+        path: "/products/:slug",
+        Component: Products,
       },
       {
         path: "/auth/login",

@@ -3,7 +3,7 @@ import "./styles/index.css";
 import { AppShell, createTheme, MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import "@mantine/carousel/styles.css";
-import { Outlet } from "react-router";
+import { Outlet, useLocation } from "react-router";
 import Header from "./components/Header";
 
 const App: React.FC = () => {
@@ -17,12 +17,18 @@ const App: React.FC = () => {
     },
   });
 
+  const location = useLocation();
+
+  const showHeader = ["/", "/store"];
+
   return (
     <MantineProvider theme={theme}>
-      <AppShell header={{ height: 60 }}>
-        <AppShell.Header>
-          <Header />
-        </AppShell.Header>
+      <AppShell>
+        {showHeader.includes(location.pathname) && (
+          <AppShell.Header>
+            <Header />
+          </AppShell.Header>
+        )}
 
         <AppShell.Main>
           <Outlet />

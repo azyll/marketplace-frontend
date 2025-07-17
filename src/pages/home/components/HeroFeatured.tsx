@@ -1,5 +1,6 @@
 import { Carousel } from "@mantine/carousel";
 import { Badge, Button, Card, Group, Image, Stack, Text } from "@mantine/core";
+import { Link } from "react-router";
 
 export default function HeroFeatured() {
   const uniforms = [
@@ -7,7 +8,7 @@ export default function HeroFeatured() {
       title: "ICT Polo",
       desc: "Information and Communication Technology Daily Polo...",
       price: "₱350.00 - ₱500.00",
-      category: "Upper Wear",
+      category: "Upperwear",
       image:
         "https://scontent.fmnl17-2.fna.fbcdn.net/v/t39.30808-6/485347630_28946239918323750_2000395837053000671_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=tDrXwP2__okQ7kNvwFIs8ro&_nc_oc=AdkA6NJTA8LI_5eKfzzv4IThqMIrsH91X3kUPy0qeoSKn_espsiXXFpOMlAAaFyhePQ&_nc_zt=23&_nc_ht=scontent.fmnl17-2.fna&_nc_gid=i3WDSeH7tqNUwMOuHeRU1w&oh=00_AfS4gKk7u84LGpEW6NFal6HqNWx42K3v71_6C3deGFW3Vg&oe=687982F8",
     },
@@ -15,7 +16,7 @@ export default function HeroFeatured() {
       title: "ICT Pants",
       desc: "Information and Communication Technology Daily Pants...",
       price: "₱350.00 - ₱500.00",
-      category: "Lower Wear",
+      category: "Lowerwear",
       image:
         "https://scontent.fmnl17-2.fna.fbcdn.net/v/t39.30808-6/485347630_28946239918323750_2000395837053000671_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=tDrXwP2__okQ7kNvwFIs8ro&_nc_oc=AdkA6NJTA8LI_5eKfzzv4IThqMIrsH91X3kUPy0qeoSKn_espsiXXFpOMlAAaFyhePQ&_nc_zt=23&_nc_ht=scontent.fmnl17-2.fna&_nc_gid=i3WDSeH7tqNUwMOuHeRU1w&oh=00_AfS4gKk7u84LGpEW6NFal6HqNWx42K3v71_6C3deGFW3Vg&oe=687982F8",
     },
@@ -29,9 +30,11 @@ export default function HeroFeatured() {
         justify="space-between"
         wrap="nowrap"
       >
-        <>Featured Products</>
+        <Text>Featured</Text>
 
         <Button
+          component={Link}
+          to="/products"
           variant="default"
           radius="xl"
         >
@@ -46,15 +49,21 @@ export default function HeroFeatured() {
         withIndicators={false}
       >
         {uniforms.map((item, index) => (
-          <Carousel.Slide key={index}>
+          <Carousel.Slide
+            key={index}
+            mt={7}
+            mb={7}
+          >
             <Card
+              className="transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-lg cursor-pointer"
+              component={Link}
+              to={`/products/${item.title.toLowerCase().replace(/\s+/g, "-")}`}
               shadow="sm"
               padding="sm"
               radius="md"
               withBorder
-              className="h-full"
             >
-              <Card.Section>
+              <Card.Section className="rounded-t-md overflow-hidden">
                 <Image
                   src={item.image}
                   height={180}
@@ -67,15 +76,6 @@ export default function HeroFeatured() {
                 gap={4}
                 mt="xs"
               >
-                <Badge
-                  color="blue"
-                  variant="filled"
-                  radius="sm"
-                  size="sm"
-                >
-                  {item.title.includes("Polo") ? "Upper Wear" : "Lower Wear"}
-                </Badge>
-
                 <Text
                   fw={500}
                   size="sm"
