@@ -1,28 +1,20 @@
 import { Carousel } from "@mantine/carousel";
 import { Badge, Button, Card, Group, Image, Stack, Text } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
+import { KEY } from "../../../constants/key";
+import { getProductList } from "../../../services/products.service";
+import { getImage } from "../../../services/media.service";
+import { FeaturedProductSkeleton } from "./FeaturedProductsSkeleton";
 
-export default function HeroFeatured() {
-  const uniforms = [
-    {
-      title: "ICT Polo",
-      desc: "Information and Communication Technology Daily Polo...",
-      price: "₱350.00 - ₱500.00",
-      category: "Upperwear",
-      image:
-        "https://scontent.fmnl17-2.fna.fbcdn.net/v/t39.30808-6/485347630_28946239918323750_2000395837053000671_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=tDrXwP2__okQ7kNvwFIs8ro&_nc_oc=AdkA6NJTA8LI_5eKfzzv4IThqMIrsH91X3kUPy0qeoSKn_espsiXXFpOMlAAaFyhePQ&_nc_zt=23&_nc_ht=scontent.fmnl17-2.fna&_nc_gid=i3WDSeH7tqNUwMOuHeRU1w&oh=00_AfS4gKk7u84LGpEW6NFal6HqNWx42K3v71_6C3deGFW3Vg&oe=687982F8",
-    },
-    {
-      title: "ICT Pants",
-      desc: "Information and Communication Technology Daily Pants...",
-      price: "₱350.00 - ₱500.00",
-      category: "Lowerwear",
-      image:
-        "https://scontent.fmnl17-2.fna.fbcdn.net/v/t39.30808-6/485347630_28946239918323750_2000395837053000671_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=tDrXwP2__okQ7kNvwFIs8ro&_nc_oc=AdkA6NJTA8LI_5eKfzzv4IThqMIrsH91X3kUPy0qeoSKn_espsiXXFpOMlAAaFyhePQ&_nc_zt=23&_nc_ht=scontent.fmnl17-2.fna&_nc_gid=i3WDSeH7tqNUwMOuHeRU1w&oh=00_AfS4gKk7u84LGpEW6NFal6HqNWx42K3v71_6C3deGFW3Vg&oe=687982F8",
-    },
-  ];
+export default function FeaturedProducts() {
+  const { data: products, isLoading } = useQuery({
+    queryKey: [KEY.PRODUCTS],
+    queryFn: () => getProductList({ department: "Proware", latest: true }),
+  });
+
   return (
-    <section>
+    <section className="max-w-[1200px] mx-auto">
       <Group
         pt={16}
         px={16}
@@ -48,16 +40,25 @@ export default function HeroFeatured() {
         slideGap="md"
         withIndicators={false}
       >
-        {uniforms.map((item, index) => (
+        {isLoading && (
+          <Carousel.Slide
+            key={0}
+            mt={7}
+            mb={7}
+          >
+            <FeaturedProductSkeleton />
+          </Carousel.Slide>
+        )}
+        {products?.data?.map((item, index) => (
           <Carousel.Slide
             key={index}
             mt={7}
             mb={7}
           >
             <Card
-              className="transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-lg cursor-pointer"
+              className="transition-all duration-200 ease-in-out hover:scale-105 cursor-pointer"
               component={Link}
-              to={`/products/${item.title.toLowerCase().replace(/\s+/g, "-")}`}
+              to={`/products/${item.productSlug}`}
               shadow="sm"
               padding="sm"
               radius="md"
@@ -65,10 +66,10 @@ export default function HeroFeatured() {
             >
               <Card.Section className="rounded-t-md overflow-hidden">
                 <Image
-                  src={item.image}
+                  src={getImage(item.image)}
                   height={180}
                   fit="contain"
-                  alt={item.title}
+                  alt={item.name}
                 />
               </Card.Section>
 
@@ -80,7 +81,7 @@ export default function HeroFeatured() {
                   fw={500}
                   size="sm"
                 >
-                  {item.title}
+                  {item.name}
                 </Text>
 
                 <Text
@@ -88,10 +89,10 @@ export default function HeroFeatured() {
                   c="dimmed"
                   className="line-clamp-2"
                 >
-                  {item.desc}
+                  {item.description}
                 </Text>
 
-                <Text fw={600}>{item.price}</Text>
+                <Text fw={600}>{item.productVariant?.[0].price}</Text>
 
                 <Text
                   size="xs"

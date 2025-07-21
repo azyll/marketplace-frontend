@@ -54,6 +54,7 @@ export default function FilterBar() {
       >
         {categoryOptions.map(({ label, value }) => (
           <Button
+            key={value}
             className="shrink-0"
             variant={filter.category === value ? "filled" : "outline"}
             radius="xl"
