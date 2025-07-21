@@ -1,0 +1,45 @@
+import { IPagination } from "./common.type";
+
+export interface IProductListFilters extends IPagination {
+  department?: string;
+  latest?: boolean;
+  name?: string;
+}
+
+export interface IProductAttribute {
+  id: string;
+  name: string;
+  createdAt: Date;
+  deletedAt: Date | null;
+  updatedAt: Date | null;
+}
+
+export interface IProductVariant {
+  id: string;
+  name: string;
+  createdAt: Date;
+  deletedAt: Date | null;
+  updatedAt: Date | null;
+  price: number;
+  productAttribute: IProductAttribute;
+  productAttributeId: string;
+  productId: string;
+  size: string;
+  stockCondition: string;
+  stockQuantity: number;
+}
+
+export interface IProduct {
+  category: string;
+  departmentId: string;
+  description: string;
+  id: string;
+  image: string;
+  name: string;
+  productSlug: string;
+  productVariant: IProductVariant[];
+  type: string;
+  createdAt: Date;
+  deletedAt: Date | null;
+  updatedAt: Date | null;
+}
