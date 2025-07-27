@@ -24,6 +24,7 @@ export default function HeroCarousel() {
         <Carousel.Slide key={index}>
           {/* Desktop */}
           <Image
+            h="550px"
             src={src}
             alt={`Slide ${index + 1}`}
             radius={"xl"}

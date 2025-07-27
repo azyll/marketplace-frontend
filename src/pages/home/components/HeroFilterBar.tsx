@@ -12,9 +12,9 @@ interface CategoryOption {
   value: string;
 }
 
-export default function FilterBar() {
+export default function HeroFilterBar() {
   const [filter, setFilterValue] = useFilters<HeroFilterForm>({
-    category: "all",
+    category: "",
   });
 
   const categoryOptions: CategoryOption[] = [
@@ -42,7 +42,7 @@ export default function FilterBar() {
 
   return (
     <Group
-      className="overflow-hidden"
+      className="overflow-hidden max-w-[1200px] mx-auto"
       wrap="wrap"
       justify="space-between"
     >
@@ -50,7 +50,8 @@ export default function FilterBar() {
         gap="sm"
         wrap="nowrap"
         className="overflow-auto hide-scrollbar"
-        p="sm"
+        py="sm"
+        px={{ base: "sm", xl: "0" }}
       >
         {categoryOptions.map(({ label, value }) => (
           <Button
