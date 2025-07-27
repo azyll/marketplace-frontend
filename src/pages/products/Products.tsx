@@ -1,11 +1,11 @@
-import { useParams } from "react-router";
+import HeroFilterBar from "../home/components/HeroFilterBar";
+import AllProducts from "./components/AllProducts";
 
 export default function Products() {
-  const { slug } = useParams();
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold">Product: {slug}</h1>
-      {/* You can fetch or filter your data based on slug here */}
-    </div>
+    <section className="max-w-[1200px] mx-auto pt-15">
+      <HeroFilterBar />
+      <AllProducts />
+    </section>
   );
 }
