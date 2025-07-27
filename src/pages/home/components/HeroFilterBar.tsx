@@ -1,7 +1,5 @@
-import { Button, Combobox, Group, Input, Select } from "@mantine/core";
-import { useState } from "react";
+import { Button, Group } from "@mantine/core";
 import { useFilters } from "../../../hooks/useFilters";
-import { IconSearch } from "@tabler/icons-react";
 
 interface HeroFilterForm {
   category?: string;
@@ -14,7 +12,7 @@ interface CategoryOption {
 
 export default function HeroFilterBar() {
   const [filter, setFilterValue] = useFilters<HeroFilterForm>({
-    category: "",
+    category: "all",
   });
 
   const categoryOptions: CategoryOption[] = [
@@ -42,7 +40,7 @@ export default function HeroFilterBar() {
 
   return (
     <Group
-      className="overflow-hidden max-w-[1200px] mx-auto"
+      className="overflow-hidden max-w-[1200px] mx-auto pt-15"
       wrap="wrap"
       justify="space-between"
     >

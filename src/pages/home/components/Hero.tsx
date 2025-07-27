@@ -4,7 +4,7 @@ import FeaturedProducts from "./FeaturedProducts";
 
 export default function Hero() {
   return (
-    <section className="pt-15">
+    <section>
       <HeroFilterBar />
       <HeroCarousel />
       <FeaturedProducts />
