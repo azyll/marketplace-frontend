@@ -1,5 +1,14 @@
 import { Carousel } from "@mantine/carousel";
-import { Badge, Button, Card, Group, Image, Stack, Text } from "@mantine/core";
+import {
+  Badge,
+  Button,
+  Card,
+  Group,
+  Image,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { KEY } from "../../../constants/key";
@@ -17,12 +26,12 @@ export default function FeaturedProducts() {
     <section className="max-w-[1200px] mx-auto">
       <Group
         pt={16}
-        px={16}
+        px={{ base: 16, xl: 0 }}
         pb={10}
         justify="space-between"
         wrap="nowrap"
       >
-        <Text>Featured</Text>
+        <Title order={2}>Featured</Title>
 
         <Button
           component={Link}
@@ -35,20 +44,22 @@ export default function FeaturedProducts() {
       </Group>
 
       <Carousel
-        px={16}
-        slideSize={{ base: "12rem", sm: "14rem" }}
+        px={{ base: 16, xl: 0 }}
+        slideSize={{ base: "80%", sm: "50%", md: "33.33%", lg: "25%" }}
         slideGap="md"
         withIndicators={false}
       >
-        {isLoading && (
-          <Carousel.Slide
-            key={0}
-            mt={7}
-            mb={7}
-          >
-            <FeaturedProductSkeleton />
-          </Carousel.Slide>
-        )}
+        {isLoading &&
+          [...Array(2)].map((_, index) => (
+            <Carousel.Slide
+              key={index}
+              mt={7}
+              mb={7}
+            >
+              <FeaturedProductSkeleton />
+            </Carousel.Slide>
+          ))}
+
         {products?.data?.map((item, index) => (
           <Carousel.Slide
             key={index}
@@ -67,7 +78,6 @@ export default function FeaturedProducts() {
               <Card.Section className="rounded-t-md overflow-hidden">
                 <Image
                   src={getImage(item.image)}
-                  height={180}
                   fit="contain"
                   alt={item.name}
                 />
@@ -92,7 +102,7 @@ export default function FeaturedProducts() {
                   {item.description}
                 </Text>
 
-                <Text fw={600}>{item.productVariant?.[0].price}</Text>
+                <Text fw={600}>{"₱" + item.productVariant?.[0].price}</Text>
 
                 <Text
                   size="xs"
