@@ -14,7 +14,7 @@ import { Link } from "react-router";
 import { KEY } from "../../../constants/key";
 import { getProductList } from "../../../services/products.service";
 import { getImage } from "../../../services/media.service";
-import { FeaturedProductSkeleton } from "./FeaturedProductsSkeleton";
+import { ProductsCarouselSkeleton } from "./ProductsCarouselSkeleton";
 
 export default function FeaturedProducts() {
   const { data: products, isLoading } = useQuery({
@@ -43,79 +43,72 @@ export default function FeaturedProducts() {
         </Button>
       </Group>
 
-      <Carousel
-        px={{ base: 16, xl: 0 }}
-        slideSize={{ base: "80%", sm: "50%", md: "33.33%", lg: "25%" }}
-        slideGap="md"
-        withIndicators={false}
-      >
-        {isLoading &&
-          [...Array(2)].map((_, index) => (
+      {isLoading ? (
+        <ProductsCarouselSkeleton />
+      ) : (
+        <Carousel
+          px={{ base: 16, xl: 0 }}
+          slideSize={{ base: "80%", sm: "50%", md: "33.33%", lg: "25%" }}
+          slideGap="md"
+          withIndicators={false}
+        >
+          {products?.data?.map((item, index) => (
             <Carousel.Slide
               key={index}
               mt={7}
               mb={7}
             >
-              <FeaturedProductSkeleton />
+              <Card
+                className="transition-all duration-200 ease-in-out hover:scale-105 cursor-pointer"
+                component={Link}
+                to={`/products/${item.productSlug}`}
+                shadow="sm"
+                padding="sm"
+                radius="md"
+                withBorder
+              >
+                <Card.Section className="rounded-t-md overflow-hidden">
+                  <Image
+                    src={getImage(item.image)}
+                    fit="contain"
+                    alt={item.name}
+                  />
+                </Card.Section>
+
+                <Stack
+                  gap={4}
+                  mt="xs"
+                >
+                  <Text
+                    fw={500}
+                    size="sm"
+                  >
+                    {item.name}
+                  </Text>
+
+                  <Text
+                    fz="xs"
+                    c="dimmed"
+                    className="line-clamp-2"
+                  >
+                    {item.description}
+                  </Text>
+
+                  <Text fw={600}>{"₱" + item.productVariant?.[0].price}</Text>
+
+                  <Text
+                    size="xs"
+                    c="gray.6"
+                    mt={-2}
+                  >
+                    {item.category}
+                  </Text>
+                </Stack>
+              </Card>
             </Carousel.Slide>
           ))}
-
-        {products?.data?.map((item, index) => (
-          <Carousel.Slide
-            key={index}
-            mt={7}
-            mb={7}
-          >
-            <Card
-              className="transition-all duration-200 ease-in-out hover:scale-105 cursor-pointer"
-              component={Link}
-              to={`/products/${item.productSlug}`}
-              shadow="sm"
-              padding="sm"
-              radius="md"
-              withBorder
-            >
-              <Card.Section className="rounded-t-md overflow-hidden">
-                <Image
-                  src={getImage(item.image)}
-                  fit="contain"
-                  alt={item.name}
-                />
-              </Card.Section>
-
-              <Stack
-                gap={4}
-                mt="xs"
-              >
-                <Text
-                  fw={500}
-                  size="sm"
-                >
-                  {item.name}
-                </Text>
-
-                <Text
-                  fz="xs"
-                  c="dimmed"
-                  className="line-clamp-2"
-                >
-                  {item.description}
-                </Text>
-
-                <Text fw={600}>{"₱" + item.productVariant?.[0].price}</Text>
-
-                <Text
-                  size="xs"
-                  c="gray.6"
-                  mt={-2}
-                >
-                  {item.category}
-                </Text>
-              </Stack>
-            </Card>
-          </Carousel.Slide>
-        ))}
-      </Carousel>
+        </Carousel>
+      )}
     </section>
   );
 }

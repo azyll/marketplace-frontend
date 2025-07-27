@@ -1,6 +1,6 @@
-import { Card, Group, Skeleton, Stack, Text } from "@mantine/core";
+import { Card, Skeleton, Stack } from "@mantine/core";
 
-export const FeaturedProductSkeleton = () => {
+export default function ProductCardSkeleton() {
   return (
     <Card
       shadow="sm"
@@ -47,4 +47,4 @@ export const FeaturedProductSkeleton = () => {
       </Stack>
     </Card>
   );
-};
+}
