@@ -21,7 +21,7 @@ const App: React.FC = () => {
 
   const location = useLocation();
 
-  const showHeader = ["/", "/store"];
+  const showHeader = ["/", "/products"];
 
   const queryClient = new QueryClient();
   console.log(import.meta.env);

@@ -1,4 +1,4 @@
-import { Group, Button, ActionIcon, Input } from "@mantine/core";
+import { Group, Button, ActionIcon, Input, Title } from "@mantine/core";
 import { IconShoppingBag, IconBell, IconUser } from "@tabler/icons-react";
 import HeaderSearchBar from "./HeaderSearchBar";
 import Login from "../pages/login/Login";
@@ -10,7 +10,8 @@ export default function Header() {
   return (
     <nav className="h-14">
       <Group
-        px={{ base: 16, md: 24 }}
+        className="max-w-[1200px] mx-auto"
+        px={{ base: 16, xl: 0 }}
         justify="space-between"
         wrap="nowrap"
       >
@@ -21,7 +22,13 @@ export default function Header() {
           width={56}
         />
 
-        <b className="z-0">STI Marketplace</b>
+        <Title
+          order={4}
+          className="z-0"
+          onClick={() => navigate("/")}
+        >
+          STI Marketplace
+        </Title>
 
         <Group
           className="relative z-10"
