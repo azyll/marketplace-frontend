@@ -8,3 +8,11 @@ export const getUsers = async () => {
     console.log(error);
   }
 };
+
+export const postUsers = async () => {
+  try {
+    const response = await axios.post("/api/user");
+  } catch (error) {
+    console.log(error);
+  }
+};

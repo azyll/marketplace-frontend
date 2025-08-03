@@ -16,15 +16,16 @@ export default function Header() {
         wrap="nowrap"
       >
         <img
-          className="z-0"
+          className="z-0 cursor-pointer"
           src="src\assets\logo.png"
           alt=""
           width={56}
+          onClick={() => navigate("/")}
         />
 
         <Title
           order={4}
-          className="z-0"
+          className="z-0 cursor-pointer"
           onClick={() => navigate("/")}
         >
           STI Marketplace

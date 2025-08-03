@@ -1,6 +1,7 @@
 import HeroCarousel from "./HeroCarousel";
-import HeroFilterBar from "./HeroFilterBar";
+import HeroFilterBar from "../../../components/FilterBar";
 import FeaturedProducts from "./FeaturedProducts";
+import UserProducts from "./UserProducts";
 
 export default function Hero() {
   return (
@@ -8,6 +9,7 @@ export default function Hero() {
       <HeroFilterBar />
       <HeroCarousel />
       <FeaturedProducts />
+      <UserProducts />
     </section>
   );
 }

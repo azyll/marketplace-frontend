@@ -10,8 +10,25 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
+import { AuthContext } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router";
+import { useContext, useState } from "react";
 
 export default function Login() {
+  const { setUser, setUserData } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleOnLoginSubmit = {};
+
+  // const {} = useQuery({
+  //   queryKey: "",
+  //   queryFn: ()
+  // })
+
   return (
     <section className="flex min-h-screen">
       <div className="w-full lg:w-1/2 flex items-center justify-center bg-[#0078D4] p-4">
@@ -27,17 +44,19 @@ export default function Login() {
             ta="center"
             m="xs"
           >
-            Login to your account
+            Sign in to your account
           </Title>
 
           <Text
+            px="sm"
             mb="sm"
+            ta="center"
             c="dimmed"
           >
             Enter your Microsoft 365 account
           </Text>
 
-          <Stack>
+          <Stack px="sm">
             <TextInput
               label="Email"
               labelProps={{ mb: "xs" }}
@@ -63,4 +82,7 @@ export default function Login() {
       </div>
     </section>
   );
+}
+function async(event: Event | undefined) {
+  throw new Error("Function not implemented.");
 }

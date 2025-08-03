@@ -1,5 +1,9 @@
 import { Button, Group } from "@mantine/core";
-import { useFilters } from "../../../hooks/useFilters";
+import { useFilters } from "../hooks/useFilters";
+import { useNavigate } from "react-router";
+import { useQuery } from "@tanstack/react-query";
+import { KEY } from "../constants/key";
+import { getProductList } from "../services/products.service";
 
 interface HeroFilterForm {
   category?: string;
@@ -38,6 +42,8 @@ export default function HeroFilterBar() {
     },
   ];
 
+  const navigate = useNavigate();
+
   return (
     <Group
       className="overflow-hidden max-w-[1200px] mx-auto pt-15"
@@ -57,7 +63,10 @@ export default function HeroFilterBar() {
             className="shrink-0"
             variant={filter.category === value ? "filled" : "outline"}
             radius="xl"
-            onClick={() => setFilterValue("category", value)}
+            onClick={() => {
+              setFilterValue("category", value);
+              navigate(`/products/${value}`);
+            }}
           >
             {label}
           </Button>

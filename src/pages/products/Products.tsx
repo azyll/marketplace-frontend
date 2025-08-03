@@ -1,4 +1,4 @@
-import HeroFilterBar from "../home/components/HeroFilterBar";
+import HeroFilterBar from "../../components/FilterBar";
 import AllProducts from "./components/AllProducts";
 
 export default function Products() {

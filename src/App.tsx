@@ -6,7 +6,7 @@ import "@mantine/core/styles.css";
 import "@mantine/carousel/styles.css";
 import { Outlet, useLocation } from "react-router";
 import Header from "./components/Header";
-import { CONFIG } from "./constants/config";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const App: React.FC = () => {
   const theme = createTheme({
@@ -28,17 +28,19 @@ const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <MantineProvider theme={theme}>
-        <AppShell>
-          {showHeader.includes(location.pathname) && (
-            <AppShell.Header>
-              <Header />
-            </AppShell.Header>
-          )}
+        <AuthProvider>
+          <AppShell>
+            {showHeader.includes(location.pathname) && (
+              <AppShell.Header>
+                <Header />
+              </AppShell.Header>
+            )}
 
-          <AppShell.Main>
-            <Outlet />
-          </AppShell.Main>
-        </AppShell>
+            <AppShell.Main>
+              <Outlet />
+            </AppShell.Main>
+          </AppShell>
+        </AuthProvider>
       </MantineProvider>
     </QueryClientProvider>
   );
