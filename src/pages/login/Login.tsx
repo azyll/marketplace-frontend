@@ -12,8 +12,11 @@ import {
 } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { AuthContext } from "../../contexts/AuthContext";
-import { useNavigate } from "react-router";
-import { useContext, useState } from "react";
+import { Form, useNavigate } from "react-router";
+import { FormEvent, useContext, useState } from "react";
+import axios from "../../utils/axios";
+import { notifications } from "@mantine/notifications";
+import { ILoginResponse } from "../../types/auth.type";
 
 export default function Login() {
   const { setUser, setUserData } = useContext(AuthContext);
@@ -22,15 +25,39 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleOnLoginSubmit = {};
+  const [isLoading, setIsLoading] = useState(false);
 
-  // const {} = useQuery({
-  //   queryKey: "",
-  //   queryFn: ()
-  // })
+  const handleOnLoginSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    await login(email, password);
+  };
+
+  const login = async (userEmail: string, userPassword: string) => {
+    try {
+      setIsLoading(true);
+
+      const response = await axios.post<ILoginResponse>("/auth/login", {
+        email: userEmail,
+        password: userPassword,
+      });
+
+      localStorage.setItem("accessToken", response.data.accessToken);
+
+      navigate("/");
+    } catch (error) {
+      setIsLoading(false);
+
+      notifications.show({
+        title: "Login error",
+        message: "Invalid email or password",
+        color: "red",
+      });
+    }
+  };
 
   return (
-    <section className="flex min-h-screen">
+    <main className="flex min-h-screen">
       <div className="w-full lg:w-1/2 flex items-center justify-center bg-[#0078D4] p-4">
         <Paper
           className="w-full max-w-md"
@@ -57,19 +84,35 @@ export default function Login() {
           </Text>
 
           <Stack px="sm">
-            <TextInput
-              label="Email"
-              labelProps={{ mb: "xs" }}
-              placeholder="last_name@fairview.sti.edu"
-            />
+            <form
+              onSubmit={(e) => handleOnLoginSubmit(e)}
+              className="flex flex-col gap-4"
+            >
+              <TextInput
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                label="Email"
+                labelProps={{ mb: "xs" }}
+                placeholder="last_name@fairview.sti.edu"
+                disabled={isLoading}
+              />
 
-            <PasswordInput
-              label="Password"
-              labelProps={{ mb: "xs" }}
-              placeholder="*********"
-            />
+              <PasswordInput
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                label="Password"
+                labelProps={{ mb: "xs" }}
+                placeholder="*********"
+                disabled={isLoading}
+              />
 
-            <Button>Sign In</Button>
+              <Button
+                type="submit"
+                loading={isLoading}
+              >
+                Sign In
+              </Button>
+            </form>
           </Stack>
         </Paper>
       </div>
@@ -80,7 +123,7 @@ export default function Login() {
           src={"https://www.sti.edu/uploads/pr-2024-thumbnail-horizantal.webp"}
         ></Image>
       </div>
-    </section>
+    </main>
   );
 }
 function async(event: Event | undefined) {

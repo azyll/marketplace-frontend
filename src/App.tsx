@@ -1,12 +1,13 @@
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import "@mantine/core/styles.css";
-import "./styles/index.css";
-import { AppShell, createTheme, MantineProvider } from "@mantine/core";
-import "@mantine/core/styles.css";
-import "@mantine/carousel/styles.css";
 import { Outlet, useLocation } from "react-router";
 import Header from "./components/Header";
 import { AuthProvider } from "./contexts/AuthContext";
+import { Notifications } from "@mantine/notifications";
+import { AppShell, createTheme, MantineProvider } from "@mantine/core";
+import "@mantine/core/styles.css";
+import "@mantine/carousel/styles.css";
+import "@mantine/notifications/styles.css";
+import "./styles/index.css";
 
 const App: React.FC = () => {
   const theme = createTheme({
@@ -28,6 +29,7 @@ const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <MantineProvider theme={theme}>
+        <Notifications position="top-right" />
         <AuthProvider>
           <AppShell>
             {showHeader.includes(location.pathname) && (

@@ -1,4 +1,5 @@
 import React, { createContext, useState } from "react";
+import { AuthContextType } from "../types/auth.type";
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
