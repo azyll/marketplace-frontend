@@ -1,15 +1,11 @@
+import { ILoginResponse } from "../types/auth.type";
 import axios from "../utils/axios";
 
-export const loginUser = async ({
-  email,
-  password,
-}: {
+export interface ILoginInput {
   email: string;
   password: string;
-}) => {
-  const response = await axios.post("/auth/login", {
-    email,
-    password,
-  });
-  return response.data;
+}
+
+export const authenticateUser = async (input: ILoginInput) => {
+  return axios.post<ILoginResponse>("/auth/login", input);
 };

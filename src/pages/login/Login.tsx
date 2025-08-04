@@ -1,7 +1,5 @@
 import {
-  AppShell,
   Button,
-  Divider,
   Image,
   Paper,
   PasswordInput,
@@ -10,16 +8,15 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
 import { AuthContext } from "../../contexts/AuthContext";
-import { Form, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { FormEvent, useContext, useState } from "react";
-import axios from "../../utils/axios";
 import { notifications } from "@mantine/notifications";
-import { ILoginResponse } from "../../types/auth.type";
+import { authenticateUser } from "../../services/auth.service";
 
 export default function Login() {
-  const { setUser, setUserData } = useContext(AuthContext);
+  const { fetchUser } = useContext(AuthContext);
+
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -30,19 +27,15 @@ export default function Login() {
   const handleOnLoginSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    await login(email, password);
-  };
-
-  const login = async (userEmail: string, userPassword: string) => {
     try {
       setIsLoading(true);
 
-      const response = await axios.post<ILoginResponse>("/auth/login", {
-        email: userEmail,
-        password: userPassword,
-      });
+      const response = await authenticateUser({ email, password });
 
       localStorage.setItem("accessToken", response.data.accessToken);
+
+      //Fetch User Details
+      fetchUser();
 
       navigate("/");
     } catch (error) {

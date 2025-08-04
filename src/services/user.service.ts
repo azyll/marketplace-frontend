@@ -1,4 +1,9 @@
+import { IUser } from "../types/user.type";
 import axios from "../utils/axios";
+
+export const getLoggedInUser = async () => {
+  return axios.get<IUser>("/me");
+};
 
 export const getUsers = async () => {
   try {

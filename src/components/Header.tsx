@@ -1,12 +1,4 @@
-import {
-  Group,
-  Button,
-  ActionIcon,
-  Input,
-  Title,
-  Avatar,
-  Menu,
-} from "@mantine/core";
+import { Group, Button, ActionIcon, Title, Avatar, Menu } from "@mantine/core";
 import {
   IconShoppingBag,
   IconBell,
@@ -14,42 +6,14 @@ import {
   IconLogout,
 } from "@tabler/icons-react";
 import HeaderSearchBar from "./HeaderSearchBar";
-import Login from "../pages/login/Login";
 import { useNavigate } from "react-router";
-import { useEffect, useMemo, useState } from "react";
-import axios from "../utils/axios";
-import { IUser } from "../types/auth.type";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
 
 export default function Header() {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState<IUser | null>(null);
-
-  // const isLoggedIn = useMemo(() => )
-
-  useEffect(() => {
-    const ACCESS_TOKEN = localStorage.getItem("accessToken");
-
-    const getUser = async () => {
-      try {
-        const response = await axios.get<IUser>("/me", {
-          headers: {
-            Authorization: "Bearer " + ACCESS_TOKEN,
-          },
-        });
-        setUser(response.data);
-      } catch (err) {}
-    };
-
-    getUser();
-  }, []);
-
-  const logout = () => {
-    localStorage.removeItem("accessToken");
-    navigate("/", {
-      replace: true,
-    });
-  };
+  const { user, logout } = useContext(AuthContext);
 
   return (
     <nav className="h-14">

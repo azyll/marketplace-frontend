@@ -1,29 +1,50 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { AuthContextType } from "../types/auth.type";
+import { IUser } from "../types/user.type";
+import { getLoggedInUser } from "../services/user.service";
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
-  userData: null,
-  setUser: () => {},
-  setUserData: () => {},
+  setUser: (user: IUser | null) => {},
+  logout: () => {},
+  fetchUser: () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUserState] = useState<any>(null);
-  const [userData, setUserDataState] = useState<any>(null);
+  const [user, setUser] = useState<IUser | null>(null);
 
-  const setUser = (id: string | null, role: string | null) => {
-    setUserState(`${id}-${role}`);
+  const handleOnSetUser = (user: IUser | null) => {
+    setUser(user);
   };
 
-  const setUserData = (data: any) => {
-    setUserDataState(data);
+  const handleOnLogout = () => {
+    localStorage.removeItem("accessToken");
+    setUser(null);
   };
+
+  const fetchUser = async () => {
+    try {
+      const response = await getLoggedInUser();
+      handleOnSetUser(response.data);
+    } catch (err) {}
+  };
+
+  // For retaining user data even on website reload
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, userData, setUser, setUserData }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser: handleOnSetUser,
+        logout: handleOnLogout,
+        fetchUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
