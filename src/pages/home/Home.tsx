@@ -1,11 +1,14 @@
 import { AppShell } from "@mantine/core";
 import Hero from "./components/Hero";
-import HeroFilterBar from "../../components/FilterBar";
+import FeaturedProducts from "./components/FeaturedProducts";
+import UserProducts from "./components/UserProducts";
 
 export default function Home() {
   return (
-    <main>
+    <main className="pt-4">
       <Hero />
+      <FeaturedProducts />
+      <UserProducts />
     </main>
   );
 }

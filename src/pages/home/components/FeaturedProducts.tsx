@@ -1,48 +1,66 @@
 import { Carousel } from "@mantine/carousel";
-import {
-  Badge,
-  Button,
-  Card,
-  Group,
-  Image,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Button, Group, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { KEY } from "../../../constants/key";
 import { getProductList } from "../../../services/products.service";
-import { getImage } from "../../../services/media.service";
 import { ProductsCarouselSkeleton } from "./ProductsCarouselSkeleton";
+import FilterBar from "../../../components/FilterBar";
+import { useFilters } from "../../../hooks/useFilters";
+import { IProductListFilters } from "../../../types/product.type";
+import { PRODUCT_CATEGORY } from "../../../constants/product-category";
+import ProductCard from "../../products/components/ProductCard";
 
 export default function FeaturedProducts() {
+  const [filter, setFilterValue] = useFilters<IProductListFilters>({
+    category: PRODUCT_CATEGORY.ALL,
+    latest: true,
+  });
+
   const { data: products, isLoading } = useQuery({
-    queryKey: [KEY.PRODUCTS],
-    queryFn: () => getProductList({ department: "Proware", latest: true }),
+    queryKey: [KEY.PRODUCTS, filter],
+    queryFn: () =>
+      getProductList({
+        ...filter,
+        category:
+          filter.category === PRODUCT_CATEGORY.ALL
+            ? undefined
+            : filter.category,
+      }),
   });
 
   return (
     <section className="max-w-[1200px] mx-auto">
-      <Group
+      <Title
         pt={16}
         px={{ base: 16, xl: 0 }}
-        pb={10}
+        order={2}
+      >
+        Featured
+      </Title>
+
+      {/*Filter & View All Section */}
+      <Group
+        px={{ base: 16, xl: 0 }}
+        py={10}
         justify="space-between"
         wrap="nowrap"
       >
-        <Title order={2}>Featured</Title>
+        <FilterBar
+          value={filter.category}
+          onSelect={(category) => setFilterValue("category", category)}
+        />
 
         <Button
+          className="shrink-0"
           component={Link}
-          to="/products"
+          to={`/products?category=${filter.category}`}
           variant="default"
           radius="xl"
         >
           View All
         </Button>
       </Group>
-
       {isLoading ? (
         <ProductsCarouselSkeleton />
       ) : (
@@ -52,59 +70,13 @@ export default function FeaturedProducts() {
           slideGap="md"
           withIndicators={false}
         >
-          {products?.data?.map((item, index) => (
+          {products?.data?.map((product, index) => (
             <Carousel.Slide
               key={index}
               mt={7}
               mb={7}
             >
-              <Card
-                className="transition-all duration-200 ease-in-out hover:scale-105 cursor-pointer"
-                component={Link}
-                to={`/products/${item.productSlug}`}
-                shadow="sm"
-                padding="sm"
-                radius="md"
-                withBorder
-              >
-                <Card.Section className="rounded-t-md overflow-hidden">
-                  <Image
-                    src={getImage(item.image)}
-                    fit="contain"
-                    alt={item.name}
-                  />
-                </Card.Section>
-
-                <Stack
-                  gap={4}
-                  mt="xs"
-                >
-                  <Text
-                    fw={500}
-                    size="sm"
-                  >
-                    {item.name}
-                  </Text>
-
-                  <Text
-                    fz="xs"
-                    c="dimmed"
-                    className="line-clamp-2"
-                  >
-                    {item.description}
-                  </Text>
-
-                  <Text fw={600}>{"₱" + item.productVariant?.[0].price}</Text>
-
-                  <Text
-                    size="xs"
-                    c="gray.6"
-                    mt={-2}
-                  >
-                    {item.category}
-                  </Text>
-                </Stack>
-              </Card>
+              <ProductCard product={product} />
             </Carousel.Slide>
           ))}
         </Carousel>

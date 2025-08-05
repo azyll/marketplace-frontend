@@ -4,6 +4,7 @@ export interface IProductListFilters extends IPagination {
   department?: string;
   latest?: boolean;
   name?: string;
+  category?: string;
 }
 
 export interface IProductAttribute {
