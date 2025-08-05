@@ -9,7 +9,7 @@ export const ProductsCarouselSkeleton = () => {
       slideGap="md"
       withIndicators={false}
     >
-      {[...Array(2)].map((_, index) => (
+      {[...Array(4)].map((_, index) => (
         <Carousel.Slide
           key={index}
           mt={7}

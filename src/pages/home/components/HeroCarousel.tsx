@@ -3,9 +3,11 @@ import { Image } from "@mantine/core";
 import { getImage } from "../../../services/media.service";
 
 const images = [
-  getImage("ict.jpg"),
-  "https://pageone.ph/wp-content/uploads/2023/07/20230713-PAGEONE-STI-1068x601.jpg",
-  "https://pageone.ph/wp-content/uploads/2023/07/20230713-PAGEONE-STI-1068x601.jpg",
+  getImage("carousel-1.png"),
+  getImage("carousel-2.png"),
+  getImage("carousel-3.png"),
+  getImage("carousel-4.png"),
+  getImage("carousel-5.png"),
 ];
 
 export default function HeroCarousel() {
