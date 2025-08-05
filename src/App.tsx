@@ -25,7 +25,7 @@ const App: React.FC = () => {
   const showHeader = ["/", "/products"];
 
   const queryClient = new QueryClient();
-  console.log(import.meta.env);
+
   return (
     <QueryClientProvider client={queryClient}>
       <MantineProvider theme={theme}>
@@ -39,7 +39,9 @@ const App: React.FC = () => {
             )}
 
             <AppShell.Main>
-              <Outlet />
+              <div className="mt-[56px]">
+                <Outlet />
+              </div>
             </AppShell.Main>
           </AppShell>
         </AuthProvider>

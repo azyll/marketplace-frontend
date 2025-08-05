@@ -24,7 +24,7 @@ export default function Header() {
         wrap="nowrap"
       >
         <img
-          className="z-0 cursor-pointer"
+          className="z-0 cursor-pointer  grayscale-50"
           src="src\assets\logo.png"
           alt=""
           width={56}
@@ -68,6 +68,7 @@ export default function Header() {
             <Menu width={200}>
               <Menu.Target>
                 <Avatar
+                  className="cursor-pointer"
                   key={user.id}
                   name={user.firstName + " " + user.lastName}
                   color="initials"
