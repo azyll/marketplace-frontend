@@ -1,7 +1,7 @@
 import { Grid } from "@mantine/core";
 import CardSkeleton from "../../../components/ProductCardSkeleton";
 
-export default function AllProductsSkeleton() {
+export default function ProductsSkeleton() {
   return (
     <>
       <Grid px={{ base: 16, xl: 0 }}>

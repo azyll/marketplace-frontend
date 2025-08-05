@@ -3,7 +3,8 @@ import Home from "../pages/home/Home";
 import App from "../App";
 import Login from "../pages/login/Login";
 import Cart from "../pages/cart/Cart";
-import Products from "../pages/products/Products";
+import ProductList from "../pages/products/ProductList";
+import ProductDetails from "../pages/products/components/ProductDetails";
 
 export const router = createBrowserRouter([
   {
@@ -13,11 +14,11 @@ export const router = createBrowserRouter([
       { index: true, Component: Home },
       {
         path: "/products",
-        Component: Products,
+        Component: ProductList,
       },
       {
-        path: "/products/:slug",
-        Component: Products,
+        path: "/products/slug/:slug",
+        Component: ProductDetails,
       },
       {
         path: "/auth/login",

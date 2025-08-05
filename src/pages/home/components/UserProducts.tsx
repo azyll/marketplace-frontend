@@ -6,6 +6,7 @@ import { Carousel } from "@mantine/carousel";
 import { getImage } from "../../../services/media.service";
 import { Link } from "react-router";
 import { ProductsCarouselSkeleton } from "./ProductsCarouselSkeleton";
+import ProductCard from "../../products/components/ProductCard";
 
 export default function UserProducts() {
   const { data: products, isLoading } = useQuery({
@@ -33,59 +34,13 @@ export default function UserProducts() {
           slideGap="md"
           withIndicators={false}
         >
-          {products?.data?.map((item, index) => (
+          {products?.data?.map((product, index) => (
             <Carousel.Slide
               key={index}
               mt={7}
               mb={7}
             >
-              <Card
-                className="transition-all duration-200 ease-in-out hover:scale-105 cursor-pointer"
-                component={Link}
-                to={`/products/${item.productSlug}`}
-                shadow="sm"
-                padding="sm"
-                radius="md"
-                withBorder
-              >
-                <Card.Section className="rounded-t-md overflow-hidden">
-                  <Image
-                    src={getImage(item.image)}
-                    fit="contain"
-                    alt={item.name}
-                  />
-                </Card.Section>
-
-                <Stack
-                  gap={4}
-                  mt="xs"
-                >
-                  <Text
-                    fw={500}
-                    size="sm"
-                  >
-                    {item.name}
-                  </Text>
-
-                  <Text
-                    fz="xs"
-                    c="dimmed"
-                    className="line-clamp-2"
-                  >
-                    {item.description}
-                  </Text>
-
-                  <Text fw={600}>{"₱" + item.productVariant?.[0].price}</Text>
-
-                  <Text
-                    size="xs"
-                    c="gray.6"
-                    mt={-2}
-                  >
-                    {item.category}
-                  </Text>
-                </Stack>
-              </Card>
+              <ProductCard product={product} />
             </Carousel.Slide>
           ))}
         </Carousel>
