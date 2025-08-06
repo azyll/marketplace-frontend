@@ -2,14 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
 import { KEY } from "../../constants/key";
 import { getProductList } from "../../services/products.service";
-import { Grid, Pagination, Space } from "@mantine/core";
+import { Card, Grid, Pagination, Space, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { useFilters } from "../../hooks/useFilters";
-import ProductsSkeleton from "./components/ProductsSkeleton";
 import FilterBar from "../../components/FilterBar";
 import { PRODUCT_CATEGORY } from "../../constants/product-category";
 import { IProductListFilters } from "../../types/product.type";
 import ProductCard from "./components/ProductCard";
+import ProductCardSkeleton from "../../components/ProductCardSkeleton";
+import { IconMoodSad } from "@tabler/icons-react";
 
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -43,6 +44,10 @@ export default function Products() {
     return Math.ceil(totalItems / itemsPerPage);
   }, [products]);
 
+  const showCarousel = useMemo(() => {
+    return isLoading || (products?.data && products.data.length > 0);
+  }, [isLoading, products]);
+
   return (
     <main className="max-w-[1200px] mx-auto">
       <Space h="sm" />
@@ -56,22 +61,51 @@ export default function Products() {
       <Space h="sm" />
 
       <section>
-        {isLoading ? (
-          <ProductsSkeleton />
-        ) : (
+        {showCarousel ? (
           <Grid
             px={{ base: 16, xl: 0 }}
             mt=""
           >
-            {products?.data?.map((product, index) => (
-              <Grid.Col
-                key={index}
-                span={{ base: 12, sm: 6, md: 3 }}
-              >
-                <ProductCard product={product} />
-              </Grid.Col>
-            ))}
+            {isLoading
+              ? [...Array(4)].map((_, index) => (
+                  <Grid.Col
+                    key={index}
+                    span={{ base: 12, sm: 6, md: 3 }}
+                  >
+                    <ProductCardSkeleton />
+                  </Grid.Col>
+                ))
+              : products?.data?.map((product, index) => (
+                  <Grid.Col
+                    key={index}
+                    span={{ base: 12, sm: 6, md: 3 }}
+                  >
+                    <ProductCard product={product} />
+                  </Grid.Col>
+                ))}
           </Grid>
+        ) : (
+          <Card
+            h={340}
+            bg="#e9edf3"
+            padding="sm"
+            radius="lg"
+            mx={{ base: 16, xl: 0 }}
+          >
+            <div className="flex justify-center items-center flex-col h-full">
+              <IconMoodSad
+                color="gray"
+                size={32}
+                stroke={1.5}
+              />
+              <Text
+                ta="center"
+                c="dimmed"
+              >
+                No products found.
+              </Text>
+            </div>
+          </Card>
         )}
 
         <Pagination

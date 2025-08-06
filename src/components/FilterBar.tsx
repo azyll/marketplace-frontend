@@ -43,8 +43,8 @@ export default function FilterBar({ onSelect, value }: Props) {
     <Group
       gap="sm"
       wrap="nowrap"
-      className="overflow-auto hide-scrollbar"
-      // px={{ base: "sm", xl: "0" }}
+      className="overflow-x-auto hide-scrollbar"
+      p={{ base: 4 }}
     >
       {categoryOptions.map(({ label, value }) => (
         <Button

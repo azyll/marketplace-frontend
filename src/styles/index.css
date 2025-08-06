@@ -8,6 +8,17 @@
   --breakpoint-xl: 80rem;
 }
 
+@layer base {
+  body,
+  html {
+    background: #f2f5f9 !important;
+  }
+
+  .mantine-Skeleton-root::after {
+    background-color: #d4dae3 !important;
+  }
+}
+
 .hide-scrollbar {
   -ms-overflow-style: none; /* Internet Explorer 10+ */
   scrollbar-width: none; /* Firefox, Safari 18.2+, Chromium 121+ */

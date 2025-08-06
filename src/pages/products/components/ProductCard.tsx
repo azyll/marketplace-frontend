@@ -14,10 +14,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         className="transition-all duration-200 ease-in-out hover:scale-105 cursor-pointer"
         component={Link}
         to={`/products/slug/${product.productSlug}`}
-        shadow="sm"
         padding="sm"
         radius="md"
-        withBorder
+        mih={428}
       >
         <Card.Section className="rounded-t-md aspect-square overflow-hidden">
           <Image

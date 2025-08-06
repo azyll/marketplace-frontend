@@ -3,10 +3,9 @@ import { Card, Skeleton, Stack } from "@mantine/core";
 export default function ProductCardSkeleton() {
   return (
     <Card
-      shadow="sm"
       padding="sm"
       radius="md"
-      withBorder
+      mih={428}
     >
       {/* Image Skeleton */}
       <Card.Section className="rounded-t-md overflow-hidden">
