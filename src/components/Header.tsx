@@ -25,7 +25,7 @@ export default function Header() {
       >
         <img
           className="z-0 cursor-pointer  grayscale-50"
-          src="src\assets\logo.png"
+          src="logo.png"
           alt=""
           width={56}
           onClick={() => navigate("/")}
