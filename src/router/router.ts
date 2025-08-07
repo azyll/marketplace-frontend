@@ -4,7 +4,7 @@ import App from "../App";
 import Login from "../pages/login/Login";
 import Cart from "../pages/cart/Cart";
 import ProductList from "../pages/products/ProductList";
-import ProductDetails from "../pages/products/components/ProductDetails";
+import ProductPage from "../pages/products/ProductPage";
 
 export const router = createBrowserRouter([
   {
@@ -17,8 +17,8 @@ export const router = createBrowserRouter([
         Component: ProductList,
       },
       {
-        path: "/products/slug/:slug",
-        Component: ProductDetails,
+        path: "/products/:slug",
+        Component: ProductPage,
       },
       {
         path: "/auth/login",

@@ -13,7 +13,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <Card
         className="transition-all duration-200 ease-in-out hover:scale-105 cursor-pointer"
         component={Link}
-        to={`/products/slug/${product.productSlug}`}
+        to={`/products/${product.productSlug}`}
         padding="sm"
         radius="md"
         mih={428}
