@@ -1,7 +1,7 @@
 import { Card, Image, Stack, Text } from "@mantine/core";
-import { IProduct } from "../../../types/product.type";
+import { IProduct } from "@/types/product.type";
 import { Link } from "react-router";
-import { getImage } from "../../../services/media.service";
+import { getImage } from "@/services/media.service";
 
 interface ProductCardProps {
   product: IProduct;

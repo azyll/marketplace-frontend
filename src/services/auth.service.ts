@@ -1,5 +1,5 @@
-import { ILoginResponse } from "../types/auth.type";
-import axios from "../utils/axios";
+import { ILoginResponse } from "@/types/auth.type";
+import axios from "@/utils/axios";
 
 export interface ILoginInput {
   email: string;

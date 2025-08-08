@@ -8,11 +8,11 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { AuthContext } from "../../contexts/AuthContext";
+import { AuthContext } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router";
 import { FormEvent, useContext, useState } from "react";
 import { notifications } from "@mantine/notifications";
-import { authenticateUser } from "../../services/auth.service";
+import { authenticateUser } from "@/services/auth.service";
 
 export default function Login() {
   const { fetchUser } = useContext(AuthContext);

@@ -1,16 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
-import { KEY } from "../../constants/key";
-import { getProductList } from "../../services/products.service";
+import { KEY } from "@/constants/key";
+import { getProductList } from "@/services/products.service";
 import { Card, Grid, Pagination, Space, Text } from "@mantine/core";
 import { useMemo } from "react";
-import { useFilters } from "../../hooks/useFilters";
-import FilterBar from "../../components/FilterBar";
-import { PRODUCT_CATEGORY } from "../../constants/product-category";
-import { IProductListFilters } from "../../types/product.type";
-import ProductCard from "./components/ProductCard";
-import ProductCardSkeleton from "../../components/ProductCardSkeleton";
+import { useFilters } from "@/hooks/useFilters";
+import FilterBar from "@/components/FilterBar";
+import { PRODUCT_CATEGORY } from "@/constants/product-category";
+import { IProductListFilters } from "@/types/product.type";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { IconMoodSad } from "@tabler/icons-react";
+import ProductCard from "@/components/ProductCard";
 
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();

@@ -1,6 +1,6 @@
 import { ActionIcon, Button, Drawer, Group, Input } from "@mantine/core";
-import { IconSearch, IconX } from "@tabler/icons-react";
-import { useFilters } from "../hooks/useFilters";
+import { IconSearch } from "@tabler/icons-react";
+import { useFilters } from "@/hooks/useFilters";
 import { useState } from "react";
 
 interface HeaderSearch {

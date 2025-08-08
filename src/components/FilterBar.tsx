@@ -1,7 +1,5 @@
 import { Button, Group } from "@mantine/core";
-import { useFilters } from "../hooks/useFilters";
-import { useNavigate } from "react-router";
-import { PRODUCT_CATEGORY } from "../constants/product-category";
+import { PRODUCT_CATEGORY } from "@/constants/product-category";
 import { useEffect, useState } from "react";
 
 interface CategoryOption {

@@ -1,17 +1,17 @@
 import { Carousel } from "@mantine/carousel";
-import { Button, Card, Container, Group, Text, Title } from "@mantine/core";
+import { Button, Card, Group, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
-import { KEY } from "../../../constants/key";
-import { getProductList } from "../../../services/products.service";
-import FilterBar from "../../../components/FilterBar";
-import { useFilters } from "../../../hooks/useFilters";
-import { IProductListFilters } from "../../../types/product.type";
-import { PRODUCT_CATEGORY } from "../../../constants/product-category";
-import ProductCard from "../../products/components/ProductCard";
-import ProductCardSkeleton from "../../../components/ProductCardSkeleton";
+import { KEY } from "@/constants/key";
+import { getProductList } from "@/services/products.service";
+import FilterBar from "@/components/FilterBar";
+import { useFilters } from "@/hooks/useFilters";
+import { IProductListFilters } from "@/types/product.type";
+import { PRODUCT_CATEGORY } from "@/constants/product-category";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { useMemo } from "react";
 import { IconMoodSad } from "@tabler/icons-react";
+import ProductCard from "@/components/ProductCard";
 
 export default function FeaturedProducts() {
   const [filter, setFilterValue] = useFilters<IProductListFilters>({

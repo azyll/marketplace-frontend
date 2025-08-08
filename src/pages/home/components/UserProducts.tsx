@@ -1,12 +1,10 @@
-import { Card, Group, Image, Stack, Text, Title } from "@mantine/core";
-import { KEY } from "../../../constants/key";
-import { getProductList } from "../../../services/products.service";
+import { Title } from "@mantine/core";
+import { KEY } from "@/constants/key";
+import { getProductList } from "@/services/products.service";
 import { useQuery } from "@tanstack/react-query";
 import { Carousel } from "@mantine/carousel";
-import { getImage } from "../../../services/media.service";
-import { Link } from "react-router";
-import ProductCard from "../../products/components/ProductCard";
-import ProductCardSkeleton from "../../../components/ProductCardSkeleton";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
+import ProductCard from "@/components/ProductCard";
 
 export default function UserProducts() {
   const { data: products, isLoading } = useQuery({

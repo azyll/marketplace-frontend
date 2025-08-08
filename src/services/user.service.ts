@@ -1,5 +1,5 @@
-import { IUser } from "../types/user.type";
-import axios from "../utils/axios";
+import { IUser } from "@/types/user.type";
+import axios from "@/utils/axios";
 
 export const getLoggedInUser = async () => {
   return axios.get<IUser>("/me");

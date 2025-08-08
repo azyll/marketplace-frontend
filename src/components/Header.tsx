@@ -8,7 +8,7 @@ import {
 import HeaderSearchBar from "./HeaderSearchBar";
 import { useNavigate } from "react-router";
 import { useContext } from "react";
-import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext } from "@/contexts/AuthContext";
 
 export default function Header() {
   const navigate = useNavigate();

@@ -5,17 +5,18 @@ import {
   Divider,
   Group,
   Image,
+  NumberFormatter,
   NumberInput,
   Stack,
   Text,
   Title,
 } from "@mantine/core";
 import { useNavigate, useParams } from "react-router";
-import { KEY } from "../../constants/key";
+import { KEY } from "@/constants/key";
 import { useQuery } from "@tanstack/react-query";
-import { getProductBySlug } from "../../services/products.service";
-import { getImage } from "../../services/media.service";
-import { IconAdjustments, IconChevronLeft } from "@tabler/icons-react";
+import { getProductBySlug } from "@/services/products.service";
+import { getImage } from "@/services/media.service";
+import { IconChevronLeft } from "@tabler/icons-react";
 
 export default function ProductPage() {
   const { slug } = useParams();
@@ -28,19 +29,6 @@ export default function ProductPage() {
 
   const navigate = useNavigate();
 
-  /*
-name
-description
-type - category
-
-productVariant[
-stockQuantity
-price
-
-gender
-size
-]
-*/
   return (
     <main>
       <ActionIcon
@@ -52,7 +40,7 @@ size
       </ActionIcon>
       <Stack>
         <Image
-          src={getImage(product?.data?.image)}
+          src={getImage(product?.data?.image ?? "")}
           alt={product?.data.name}
         />
 
@@ -64,7 +52,11 @@ size
               size="xl"
               fw={700}
             >
-              {product?.data.productVariant[0].price}
+              <NumberFormatter
+                prefix="₱"
+                value={product?.data.productVariant[0].price}
+                decimalSeparator=""
+              />
             </Text>
           </Group>
 
@@ -72,8 +64,15 @@ size
           <Text>{product?.data.description}</Text>
 
           <Divider />
-
-          {product?.data.productVariant[0].size}
+          {product?.data.productVariant[0].size == "N/A" ? (
+            <>
+              {" "}
+              <Title order={4}>Select Size</Title>
+              <Text>{product?.data.productVariant[0].size}</Text>
+            </>
+          ) : (
+            ""
+          )}
         </Card>
 
         <Group

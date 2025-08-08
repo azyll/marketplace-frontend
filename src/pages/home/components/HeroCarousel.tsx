@@ -1,6 +1,6 @@
 import { Carousel } from "@mantine/carousel";
 import { Image } from "@mantine/core";
-import { getImage } from "../../../services/media.service";
+import { getImage } from "@/services/media.service";
 
 const images = [
   getImage("carousel-1.png"),
