@@ -5,7 +5,7 @@ import UserProducts from "./components/UserProducts";
 
 export default function Home() {
   return (
-    <main className="pt-4">
+    <main className="md:pt-4">
       <Hero />
       <FeaturedProducts />
       <UserProducts />

@@ -22,7 +22,11 @@ const App: React.FC = () => {
 
   const location = useLocation();
 
-  const showHeader = ["/", "/products"];
+  const headerRoutes = ["/", "/products"];
+  const hasHeader = headerRoutes.some(
+    (route) =>
+      location.pathname === route || location.pathname.startsWith(`${route}/`)
+  );
 
   const queryClient = new QueryClient();
 
@@ -30,18 +34,17 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <MantineProvider theme={theme}>
         <Notifications position="top-right" />
+
         <AuthProvider>
-          <AppShell>
-            {showHeader.includes(location.pathname) && (
+          <AppShell header={{ height: hasHeader ? 56 : 0 }}>
+            {hasHeader && (
               <AppShell.Header>
                 <Header />
               </AppShell.Header>
             )}
 
             <AppShell.Main>
-              <div className="mt-[56px]">
-                <Outlet />
-              </div>
+              <Outlet />
             </AppShell.Main>
           </AppShell>
         </AuthProvider>
