@@ -1,5 +1,5 @@
 import { Button, Group } from "@mantine/core";
-import { PRODUCT_CATEGORY } from "@/constants/product-category";
+import { PRODUCT_CATEGORY } from "@/constants/product";
 import { useEffect, useState } from "react";
 
 interface CategoryOption {
@@ -21,7 +21,7 @@ export default function FilterBar({ onSelect, value }: Props) {
     { label: "All", value: PRODUCT_CATEGORY.ALL },
     { label: "Uniform", value: PRODUCT_CATEGORY.UNIFORM },
     { label: "Proware", value: PRODUCT_CATEGORY.PROWARE },
-    { label: "Accessories", value: PRODUCT_CATEGORY.ACCESSORIES },
+    { label: "Accessory", value: PRODUCT_CATEGORY.ACCESSORY },
     { label: "Stationery", value: PRODUCT_CATEGORY.STATIONERY },
   ];
 
