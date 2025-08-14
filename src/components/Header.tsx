@@ -46,7 +46,10 @@ export default function Header() {
         >
           <HeaderSearchBar />
 
-          <ActionIcon variant="subtle">
+          <ActionIcon
+            variant="subtle"
+            onClick={() => navigate("/cart")}
+          >
             <IconShoppingBag />
           </ActionIcon>
 

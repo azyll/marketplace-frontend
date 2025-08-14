@@ -22,7 +22,7 @@ const App: React.FC = () => {
 
   const location = useLocation();
 
-  const headerRoutes = ["/", "/products"];
+  const headerRoutes = ["/", "/products", "/cart"];
   const hasHeader = headerRoutes.some(
     (route) =>
       location.pathname === route || location.pathname.startsWith(`${route}/`)
