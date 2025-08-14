@@ -1,6 +1,7 @@
 import { Carousel } from "@mantine/carousel";
 import { Image } from "@mantine/core";
 import { getImage } from "@/services/media.service";
+import "@/styles/carousel.css";
 
 const images = [
   getImage("carousel-1.png"),
@@ -15,6 +16,7 @@ export default function HeroCarousel() {
     <Carousel
       controlsOffset={"md"}
       withIndicators
+      classNames={{ indicator: "indicator" }}
       slideSize={{ base: "100%", md: "80%" }}
       slideGap="lg"
       emblaOptions={{

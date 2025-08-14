@@ -7,11 +7,12 @@ import { getProductList } from "@/services/products.service";
 import FilterBar from "@/components/FilterBar";
 import { useFilters } from "@/hooks/useFilters";
 import { IProductListFilters } from "@/types/product.type";
-import { PRODUCT_CATEGORY } from "@/constants/product-category";
+import { PRODUCT_CATEGORY } from "@/constants/product";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { useMemo } from "react";
 import { IconMoodSad } from "@tabler/icons-react";
 import ProductCard from "@/components/ProductCard";
+import "@/styles/carousel.css";
 
 export default function FeaturedProducts() {
   const [filter, setFilterValue] = useFilters<IProductListFilters>({
@@ -75,7 +76,9 @@ export default function FeaturedProducts() {
           slideSize={{ base: "80%", sm: "50%", md: "33.33%", lg: "25%" }}
           slideGap="md"
           withIndicators={false}
+          controlSize={30}
           className="!overflow-visible"
+          classNames={{ control: "control" }}
         >
           {isLoading
             ? [...Array(4)].map((_, index) => (
