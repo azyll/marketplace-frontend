@@ -3,6 +3,7 @@ import {
   ActionIcon,
   Button,
   Card,
+  Checkbox,
   Divider,
   Grid,
   Group,
@@ -12,7 +13,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { IconTrash } from "@tabler/icons-react";
+import { IconX } from "@tabler/icons-react";
 
 export default function Cart() {
   const cartItems = [
@@ -75,7 +76,10 @@ export default function Cart() {
                     variant="subtle"
                     color="red"
                   >
-                    <IconTrash size={18} />
+                    <IconX
+                      size={18}
+                      stroke={3}
+                    />
                   </ActionIcon>
                 </Group>
               </Card>

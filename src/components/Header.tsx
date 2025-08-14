@@ -18,16 +18,17 @@ export default function Header() {
   return (
     <nav className="h-14">
       <Group
-        className="max-w-[1200px] mx-auto"
+        className="max-w-[1200px] mx-auto h-full"
         px={{ base: 16, xl: 0 }}
         justify="space-between"
         wrap="nowrap"
+        align="center"
       >
         <img
-          className="z-0 cursor-pointer  grayscale-50"
+          className="z-0 cursor-pointer invert"
           src="logo.png"
           alt=""
-          width={56}
+          width={50}
           onClick={() => navigate("/")}
         />
 

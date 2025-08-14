@@ -28,7 +28,7 @@ export default function HeroCarousel() {
       {images.map((src, index) => (
         <Carousel.Slide key={index}>
           <Image
-            h={{ md: "550px" }}
+            h={{ base: "250px", md: "550px" }}
             src={src}
             alt={`Slide ${index + 1}`}
             className="md:!rounded-xl"
