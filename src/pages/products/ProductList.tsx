@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router";
 import { KEY } from "@/constants/key";
 import { getProductList } from "@/services/products.service";
 import { Card, Grid, Pagination, Space, Text } from "@mantine/core";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useFilters } from "@/hooks/useFilters";
 import FilterBar from "@/components/FilterBar";
 import { PRODUCT_CATEGORY } from "@/constants/product";
@@ -49,6 +49,10 @@ export default function Products() {
     return isLoading || (products?.data && products.data.length > 0);
   }, [isLoading, products]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <main className="max-w-[1200px] mx-auto">
       <Space h="sm" />
@@ -68,7 +72,7 @@ export default function Products() {
             mt=""
           >
             {isLoading
-              ? [...Array(4)].map((_, index) => (
+              ? [...Array(8)].map((_, index) => (
                   <Grid.Col
                     key={index}
                     span={{ base: 12, sm: 6, md: 3 }}
