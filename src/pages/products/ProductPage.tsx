@@ -52,6 +52,12 @@ export default function ProductPage() {
       )
     : [];
 
+  const sortedSizeOptions = sizeOptions.sort(
+    (a, b) =>
+      Object.keys(PRODUCT_SIZE).indexOf(a) -
+      Object.keys(PRODUCT_SIZE).indexOf(b)
+  );
+
   useEffect(() => {
     if (gender && size) {
       const variant = product?.data?.productVariant.find(
@@ -135,7 +141,7 @@ export default function ProductPage() {
 
             <Title order={4}>Size</Title>
             <Group gap={5}>
-              {sizeOptions.map((option) => (
+              {sortedSizeOptions.map((option) => (
                 <Button
                   key={option}
                   variant={size === option ? "filled" : "light"}
