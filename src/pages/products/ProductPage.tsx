@@ -14,7 +14,8 @@ import { KEY } from "@/constants/key";
 import { useQuery } from "@tanstack/react-query";
 import { getProductBySlug } from "@/services/products.service";
 import { getImage } from "@/services/media.service";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { PRODUCT_SIZE } from "@/constants/product";
 
 export default function ProductPage() {
   const { slug } = useParams();
@@ -33,31 +34,41 @@ export default function ProductPage() {
 
   const [price, setPrice] = useState<number | undefined>();
 
-  const genderOptions = [
-    { label: "Female", value: "female" },
-    { label: "Male", value: "male" },
-  ];
+  const genderOptions = Array.from(
+    new Set(product?.data?.productVariant.map((v) => v.name))
+  ).map((gender) => ({
+    label: gender,
+    value: gender.toLowerCase(),
+  }));
 
-  const sizeOptions = [
-    { label: "XS", value: "extra-small" },
-    { label: "S", value: "small" },
-    { label: "M", value: "medium" },
-    { label: "L", value: "large" },
-    { label: "XL", value: "extra-large" },
-    { label: "2XL", value: "double-extra-large" },
-    { label: "3XL", value: "triple-extra-large" },
-  ];
+  // Get sizes based on selected gender
+  const sizeOptions = gender
+    ? Array.from(
+        new Set(
+          product?.data?.productVariant
+            .filter((v) => v.name.toLowerCase() === gender.toLowerCase())
+            .map((v) => v.size)
+        )
+      )
+    : [];
 
-  const sizeLabel = {
-    "Extra Small": "XS",
-    Small: "S",
-    "Extra Large": "XL",
-  };
-
-  const sizeOptionsV2 = ["Extra Small", "Small", "Extra Large"];
+  useEffect(() => {
+    if (gender && size) {
+      const variant = product?.data?.productVariant.find(
+        (v) =>
+          v.name.toLowerCase() === gender.toLowerCase() &&
+          v.size.toLowerCase() === size.toLowerCase()
+      );
+      setPrice(variant?.price);
+    }
+  }, [gender, size, product]);
 
   const FALLBACK_IMAGE =
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbrHWzlFK_PWuIk1Jglo7Avt97howljIWwAA&s";
+
+  const handleAddToCart = {};
+
+  const handleBuyNow = {};
 
   return (
     <main className="max-w-[1200px] mx-auto">
@@ -67,7 +78,6 @@ export default function ProductPage() {
         px={{ sm: "xl", xl: 0 }}
       >
         <Grid.Col span={{ base: 12, sm: 6 }}>
-          {/* PC */}
           <Image
             src={getImage(product?.data?.image ?? FALLBACK_IMAGE)}
             alt={product?.data.name}
@@ -77,17 +87,6 @@ export default function ProductPage() {
             fallbackSrc={FALLBACK_IMAGE}
           />
         </Grid.Col>
-
-        {/* Mobile */}
-        {/* <Image
-          src={getImage(product?.data?.image ?? FALLBACK_IMAGE)}
-          alt={product?.data.name}
-          w={{ base: "100%", md: "50%" }}
-          radius={0}
-          hiddenFrom="md"
-          loading="lazy"
-          fallbackSrc={FALLBACK_IMAGE}
-        /> */}
 
         {/* Right side / product details */}
         <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -105,7 +104,7 @@ export default function ProductPage() {
             >
               <NumberFormatter
                 prefix="₱"
-                value={product?.data.productVariant[0].price}
+                value={price ?? product?.data?.productVariant[0]?.price}
                 decimalSeparator=""
               />
             </Text>
@@ -124,7 +123,10 @@ export default function ProductPage() {
                 <Button
                   key={value}
                   variant={gender === value ? "filled" : "light"}
-                  onClick={() => setGender(value)}
+                  onClick={() => {
+                    setGender(value);
+                    setSize(undefined); // reset size when gender changes
+                  }}
                 >
                   {label}
                 </Button>
@@ -132,20 +134,21 @@ export default function ProductPage() {
             </Group>
 
             <Title order={4}>Size</Title>
-
             <Group gap={5}>
-              {sizeOptionsV2.map((option) => (
+              {sizeOptions.map((option) => (
                 <Button
                   key={option}
                   variant={size === option ? "filled" : "light"}
                   onClick={() => setSize(option)}
                   miw={{ base: "60" }}
+                  disabled={!gender}
                 >
-                  {sizeLabel[option]}
+                  {PRODUCT_SIZE[option] || option}
                 </Button>
               ))}
             </Group>
 
+            {/* Cart Button*/}
             <Group
               className="
             sticky bottom-0 left-0 w-full py-2
@@ -159,12 +162,14 @@ export default function ProductPage() {
                 radius="xl"
                 color="yellow"
                 size="lg"
+                onClick={() => handleAddToCart}
               >
                 Add to cart
               </Button>
               <Button
                 radius="xl"
                 size="lg"
+                onClick={() => {}}
               >
                 Buy now
               </Button>

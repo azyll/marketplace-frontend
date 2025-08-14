@@ -6,7 +6,7 @@ import { Card, Grid, Pagination, Space, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { useFilters } from "@/hooks/useFilters";
 import FilterBar from "@/components/FilterBar";
-import { PRODUCT_CATEGORY } from "@/constants/product-category";
+import { PRODUCT_CATEGORY } from "@/constants/product";
 import { IProductListFilters } from "@/types/product.type";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { IconMoodSad } from "@tabler/icons-react";
@@ -18,6 +18,7 @@ export default function Products() {
   const [filter, setFilterValue] = useFilters<IProductListFilters>({
     category: searchParams.get("category") ?? PRODUCT_CATEGORY.ALL,
     latest: true,
+    limit: 8,
   });
 
   const handleOnCategorySelect = (category: string) => {
