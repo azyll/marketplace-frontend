@@ -1,3 +1,3 @@
 # Installation Guide
-npm install
+npm install     
 npm run dev
