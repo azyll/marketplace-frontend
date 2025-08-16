@@ -47,6 +47,7 @@ export default function Header() {
         >
           <HeaderSearchBar />
 
+          {/* Cart Button */}
           <ActionIcon
             variant="subtle"
             onClick={() => navigate("/cart")}
@@ -54,27 +55,40 @@ export default function Header() {
             <IconShoppingBag />
           </ActionIcon>
 
+          {/* Notifications Button */}
           <ActionIcon variant="subtle">
             <IconBell />
           </ActionIcon>
 
-          {/* visible on pc */}
+          {/* Login Button */}
           {!user ? (
-            <Button
-              variant="light"
-              visibleFrom="md"
-              radius={"xl"}
-              onClick={() => navigate("/auth/login")}
-            >
-              Sign in
-            </Button>
+            <>
+              {/* Desktop login button */}
+              <Button
+                variant="light"
+                radius="xl"
+                visibleFrom="md"
+                onClick={() => navigate("/auth/login")}
+              >
+                Sign in
+              </Button>
+
+              {/* Mobile login icon */}
+              <ActionIcon
+                variant="subtle"
+                hiddenFrom="md"
+                onClick={() => navigate("/auth/login")}
+              >
+                <IconUser />
+              </ActionIcon>
+            </>
           ) : (
             <Menu width={200}>
               <Menu.Target>
                 <Avatar
                   className="cursor-pointer"
                   key={user.id}
-                  name={user.firstName + " " + user.lastName}
+                  name={`${user.firstName} ${user.lastName}`}
                   color="initials"
                 />
               </Menu.Target>
@@ -87,22 +101,13 @@ export default function Header() {
                 <Menu.Item
                   color="red"
                   leftSection={<IconLogout size={14} />}
-                  onClick={() => logout()}
+                  onClick={logout}
                 >
                   Logout
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
           )}
-
-          {/* only visible on mobile */}
-          <ActionIcon
-            variant="subtle"
-            hiddenFrom="md"
-            onClick={() => navigate("/auth/login")}
-          >
-            <IconUser />
-          </ActionIcon>
         </Group>
       </Group>
     </nav>
