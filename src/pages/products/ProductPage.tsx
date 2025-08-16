@@ -35,19 +35,23 @@ export default function ProductPage() {
   const [price, setPrice] = useState<number | undefined>();
 
   const genderOptions = Array.from(
-    new Set(product?.data?.productVariant.map((v) => v.name))
+    new Set(
+      product?.data?.productVariant
+        .map((v) => v.name)
+        .filter((g) => g && g !== "N/A")
+    )
   ).map((gender) => ({
     label: gender,
     value: gender.toLowerCase(),
   }));
 
-  // Get sizes based on selected gender
   const sizeOptions = gender
     ? Array.from(
         new Set(
           product?.data?.productVariant
             .filter((v) => v.name.toLowerCase() === gender.toLowerCase())
             .map((v) => v.size)
+            .filter((s) => s && s !== "N/A")
         )
       )
     : [];
@@ -83,6 +87,7 @@ export default function ProductPage() {
         mt={{ base: 0, sm: "xl" }}
         px={{ sm: "xl", xl: 0 }}
       >
+        {/* Left side (Product image) */}
         <Grid.Col span={{ base: 12, sm: 6 }}>
           <Image
             src={getImage(product?.data?.image ?? FALLBACK_IMAGE)}
@@ -94,7 +99,7 @@ export default function ProductPage() {
           />
         </Grid.Col>
 
-        {/* Right side / product details */}
+        {/* Right side (product details) */}
         <Grid.Col span={{ base: 12, sm: 6 }}>
           <Stack
             w="100%"
@@ -117,42 +122,44 @@ export default function ProductPage() {
 
             <Divider />
 
-            {/* {
-          Size options
-          - disabled when size == N/A
-          - 
-          } */}
+            {genderOptions.length > 0 && (
+              <>
+                <Title order={4}>Gender</Title>
+                <Group gap={5}>
+                  {genderOptions.map(({ label, value }) => (
+                    <Button
+                      key={value}
+                      variant={gender === value ? "filled" : "light"}
+                      onClick={() => {
+                        setGender(value);
+                        setSize(undefined); // reset size when gender changes
+                      }}
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                </Group>
+              </>
+            )}
 
-            <Title order={4}>Gender</Title>
-            <Group gap={5}>
-              {genderOptions.map(({ label, value }) => (
-                <Button
-                  key={value}
-                  variant={gender === value ? "filled" : "light"}
-                  onClick={() => {
-                    setGender(value);
-                    setSize(undefined); // reset size when gender changes
-                  }}
-                >
-                  {label}
-                </Button>
-              ))}
-            </Group>
-
-            <Title order={4}>Size</Title>
-            <Group gap={5}>
-              {sortedSizeOptions.map((option) => (
-                <Button
-                  key={option}
-                  variant={size === option ? "filled" : "light"}
-                  onClick={() => setSize(option)}
-                  miw={{ base: "60" }}
-                  disabled={!gender}
-                >
-                  {PRODUCT_SIZE[option] || option}
-                </Button>
-              ))}
-            </Group>
+            {sortedSizeOptions.length > 0 && (
+              <>
+                <Title order={4}>Size</Title>
+                <Group gap={5}>
+                  {sortedSizeOptions.map((option) => (
+                    <Button
+                      key={option}
+                      variant={size === option ? "filled" : "light"}
+                      onClick={() => setSize(option)}
+                      miw={{ base: "60" }}
+                      disabled={!gender}
+                    >
+                      {PRODUCT_SIZE[option] || option}
+                    </Button>
+                  ))}
+                </Group>
+              </>
+            )}
 
             {/* Cart Button*/}
             <Group

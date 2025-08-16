@@ -14,22 +14,19 @@ import {
   Title,
 } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
+import { useState } from "react";
 
 export default function Cart() {
-  const cartItems = [
+  const [cartItems, setCartItems] = useState([
     {
-      id: 1,
-      name: "a",
-      price: 20,
-      image: getImage("bm.jpg"),
+      id: "1",
+      name: "Nike Air Zoom",
+      price: 1999,
+      image: "https://via.placeholder.com/80",
+      quantity: 1,
     },
-    {
-      id: 2,
-      name: "a",
-      price: 20,
-      image: getImage("bm.jpg"),
-    },
-  ];
+  ]);
+
   return (
     <main className="max-w-[1200px] mx-auto">
       <Grid
@@ -41,49 +38,50 @@ export default function Cart() {
           <Stack gap="md">
             <Title order={4}>My Cart</Title>
 
-            {cartItems.map((item) => (
-              <Card
-                key={item.id}
-                withBorder
-                radius="md"
-                padding="md"
-              >
-                <Group
-                  justify="space-between"
-                  align="flex-start"
+            {cartItems &&
+              cartItems.map((item) => (
+                <Card
+                  key={item.id}
+                  withBorder
+                  radius="md"
+                  padding="md"
                 >
-                  <Group>
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      radius="md"
-                      w={80}
-                      h={80}
-                    />
-                    <Stack gap={4}>
-                      <Text fw={500}>{item.name}</Text>
-
-                      <Text
-                        size="sm"
-                        c="dimmed"
-                      >
-                        ${item.price.toFixed(2)}
-                      </Text>
-                    </Stack>
-                  </Group>
-
-                  <ActionIcon
-                    variant="subtle"
-                    color="red"
+                  <Group
+                    justify="space-between"
+                    align="flex-start"
                   >
-                    <IconX
-                      size={18}
-                      stroke={3}
-                    />
-                  </ActionIcon>
-                </Group>
-              </Card>
-            ))}
+                    <Group>
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        radius="md"
+                        w={80}
+                        h={80}
+                      />
+                      <Stack gap={4}>
+                        <Text fw={500}>{item.name}</Text>
+
+                        <Text
+                          size="sm"
+                          c="dimmed"
+                        >
+                          ₱{item.price.toFixed(2)}
+                        </Text>
+                      </Stack>
+                    </Group>
+
+                    <ActionIcon
+                      variant="subtle"
+                      color="red"
+                    >
+                      <IconX
+                        size={18}
+                        stroke={3}
+                      />
+                    </ActionIcon>
+                  </Group>
+                </Card>
+              ))}
           </Stack>
         </Grid.Col>
 
