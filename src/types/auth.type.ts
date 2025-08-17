@@ -1,6 +1,6 @@
 import { IUser } from "./user.type";
 
-export interface AuthContextType {
+export interface IAuthContext {
   user: IUser | null;
   setUser: (user: IUser | null) => void;
   logout: () => void;

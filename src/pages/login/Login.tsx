@@ -119,6 +119,7 @@ export default function Login() {
     </main>
   );
 }
+
 function async(event: Event | undefined) {
   throw new Error("Function not implemented.");
 }

@@ -1,9 +1,9 @@
 import React, { createContext, useEffect, useState } from "react";
-import { AuthContextType } from "@/types/auth.type";
+import { IAuthContext } from "@/types/auth.type";
 import { IUser } from "@/types/user.type";
 import { getLoggedInUser } from "@/services/user.service";
 
-export const AuthContext = createContext<AuthContextType>({
+export const AuthContext = createContext<IAuthContext>({
   user: null,
   setUser: (user: IUser | null) => {},
   logout: () => {},
