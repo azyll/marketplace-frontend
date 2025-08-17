@@ -26,7 +26,7 @@ export default function Header() {
       >
         <img
           className="z-0 cursor-pointer invert"
-          src="logo.png"
+          src="/logo.png"
           alt=""
           width={50}
           onClick={() => navigate("/")}
