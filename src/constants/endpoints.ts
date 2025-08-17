@@ -3,4 +3,7 @@ export const ENDPOINT = {
     BASE: "/product",
     ID: "/product/:id",
   },
+  CART: {
+    BASE: "/cart",
+  },
 };

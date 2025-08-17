@@ -8,6 +8,7 @@ import "@mantine/core/styles.css";
 import "@mantine/carousel/styles.css";
 import "@mantine/notifications/styles.css";
 import "./styles/index.css";
+import { CartProvider } from "./contexts/CartContext";
 
 const App: React.FC = () => {
   const theme = createTheme({
@@ -36,17 +37,19 @@ const App: React.FC = () => {
         <Notifications position="top-right" />
 
         <AuthProvider>
-          <AppShell header={{ height: hasHeader ? 56 : 0 }}>
-            {hasHeader && (
-              <AppShell.Header>
-                <Header />
-              </AppShell.Header>
-            )}
+          <CartProvider>
+            <AppShell header={{ height: hasHeader ? 56 : 0 }}>
+              {hasHeader && (
+                <AppShell.Header>
+                  <Header />
+                </AppShell.Header>
+              )}
 
-            <AppShell.Main>
-              <Outlet />
-            </AppShell.Main>
-          </AppShell>
+              <AppShell.Main>
+                <Outlet />
+              </AppShell.Main>
+            </AppShell>
+          </CartProvider>
         </AuthProvider>
       </MantineProvider>
     </QueryClientProvider>
