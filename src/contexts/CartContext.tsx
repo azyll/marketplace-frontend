@@ -7,24 +7,47 @@ import {
 } from "react";
 import { ICartContext, ICart } from "@/types/cart.type";
 import {
-  getCart,
-  addToCart,
-  removeFromCart,
-  clearCart,
+  addItem,
+  clearItems,
+  getItems,
+  removeItem,
 } from "@/services/cart.service";
+import { AuthContext } from "./AuthContext";
 
-const CartContext = createContext<ICartContext | undefined>(undefined);
+export const CartContext = createContext<ICartContext>({
+  cart: [],
+  getCart: async () => {},
+  addToCart: async (_productVariantId: string) => {},
+  removeFromCart: async (_productVariantId: string) => {},
+  clearCart: async () => {},
+});
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
+  const { user } = useContext(AuthContext);
   const [cart, setCart] = useState<ICart[]>([]);
 
-  const getCart = async () => {};
+  const getCart = async () => {
+    if (!user) return; // not logged in
 
-  const addItem = async (productId: string) => {};
+    try {
+      const data = await getItems(user.id); // or user._id depending on your backend
 
-  const removeItem = async (productId: string) => {};
+      setCart(data || []);
+    } catch (err) {}
+  };
 
-  const clear = async () => {};
+  const addToCart = async (productVariantId: string) => {
+    if (!user) return;
+
+    try {
+      await addItem(user.id, productVariantId);
+      await getCart(); // refresh
+    } catch (err) {}
+  };
+
+  const removeFromCart = async (productVariantId: string) => {};
+
+  const clearCart = async () => {};
 
   useEffect(() => {
     getCart();
@@ -35,8 +58,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       value={{
         cart,
         getCart,
-        addToCart: addItem,
-        removeFromCart: removeItem,
+        addToCart,
+        removeFromCart,
         clearCart,
       }}
     >

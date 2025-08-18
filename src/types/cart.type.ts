@@ -10,8 +10,8 @@ export interface ICart {
 
 export interface ICartContext {
   cart: ICart[] | null;
-  getCart: () => {};
-  addToCart: (productId: string) => Promise<void>;
-  removeFromCart: (productId: string) => Promise<void>;
+  getCart: () => Promise<void>;
+  addToCart: (productVariantId: string) => Promise<void>;
+  removeFromCart: (productVariantId: string) => Promise<void>;
   clearCart: () => Promise<void>;
 }
