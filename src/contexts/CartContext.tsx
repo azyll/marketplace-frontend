@@ -27,10 +27,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<ICart[]>([]);
 
   const getCart = async () => {
-    if (!user) return; // not logged in
+    if (!user?.id) return; // not logged in
 
     try {
-      const data = await getItems(user.id); // or user._id depending on your backend
+      const data = await getItems(user?.id); // or user._id depending on your backend
 
       setCart(data || []);
     } catch (err) {}
@@ -45,7 +45,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     } catch (err) {}
   };
 
-  const removeFromCart = async (productVariantId: string) => {};
+  const removeFromCart = async (productVariantId: string) => {
+    if (!user) return;
+
+    try {
+      await removeItem(user.id, productVariantId);
+      await getCart(); // refresh
+    } catch (err) {}
+  };
 
   const clearCart = async () => {};
 

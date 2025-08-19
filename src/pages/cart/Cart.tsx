@@ -1,9 +1,10 @@
+import { AuthContext } from "@/contexts/AuthContext";
+import { CartContext } from "@/contexts/CartContext";
 import { getImage } from "@/services/media.service";
 import {
   ActionIcon,
   Button,
   Card,
-  Checkbox,
   Divider,
   Grid,
   Group,
@@ -14,18 +15,17 @@ import {
   Title,
 } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export default function Cart() {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: "1",
-      name: "Nike Air Zoom",
-      price: 1999,
-      image: "https://via.placeholder.com/80",
-      quantity: 1,
-    },
-  ]);
+  const { cart, getCart, removeFromCart } = useContext(CartContext);
+  const { user } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (user?.id) {
+      getCart();
+    }
+  }, [user]);
 
   return (
     <main className="max-w-[1200px] mx-auto">
@@ -38,10 +38,10 @@ export default function Cart() {
           <Stack gap="md">
             <Title order={4}>My Cart</Title>
 
-            {cartItems &&
-              cartItems.map((item) => (
+            {cart &&
+              cart.map((data) => (
                 <Card
-                  key={item.id}
+                  key={data.id}
                   withBorder
                   radius="md"
                   padding="md"
@@ -52,27 +52,35 @@ export default function Cart() {
                   >
                     <Group>
                       <Image
-                        src={item.image}
-                        alt={item.name}
+                        src={getImage(data.productVariant.product.image)}
+                        alt={data.productVariant.name}
                         radius="md"
                         w={80}
                         h={80}
                       />
                       <Stack gap={4}>
-                        <Text fw={500}>{item.name}</Text>
-
+                        <Text fw={500}>{data.productVariant.product.name}</Text>{" "}
                         <Text
                           size="sm"
                           c="dimmed"
                         >
-                          ₱{item.price.toFixed(2)}
+                          ₱{data.productVariant.price.toFixed(2)}
+                        </Text>
+                        <Text
+                          size="xs"
+                          c="dimmed"
+                        >
+                          {data.productVariant.productAttribute.name +
+                            ": " +
+                            data.productVariant.name}
+                          Size: {data.productVariant.size}
                         </Text>
                       </Stack>
                     </Group>
-
                     <ActionIcon
                       variant="subtle"
                       color="red"
+                      onClick={() => removeFromCart(data.productVariantId)}
                     >
                       <IconX
                         size={18}
@@ -98,14 +106,36 @@ export default function Cart() {
               Order Summary
             </Title>
             <Stack gap="sm">
-              <Group justify="space-between">
-                <Text>Subtotal</Text>
-              </Group>
+              {cart?.map((item) => (
+                <Group
+                  key={item.id}
+                  justify="space-between"
+                >
+                  <Text>
+                    {item.productVariant.product.name} x{item.quantity}
+                  </Text>
+                  <Text>
+                    ₱{(item.productVariant.price * item.quantity).toFixed(2)}
+                  </Text>
+                </Group>
+              ))}
 
               <Divider />
 
-              <Group justify="apart">
+              {/* Total */}
+              <Group justify="space-between">
                 <Text fw={700}>Total</Text>
+                <Text fw={700}>
+                  ₱
+                  {cart
+                    ? cart
+                        .reduce(
+                          (sum, item) => sum + item.productVariant.price,
+                          0
+                        )
+                        .toFixed(2)
+                    : "0.00"}
+                </Text>
               </Group>
 
               <Button

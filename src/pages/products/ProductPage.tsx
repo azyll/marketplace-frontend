@@ -14,8 +14,10 @@ import { KEY } from "@/constants/key";
 import { useQuery } from "@tanstack/react-query";
 import { getProductBySlug } from "@/services/products.service";
 import { getImage } from "@/services/media.service";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { PRODUCT_SIZE } from "@/constants/product";
+import { CartContext } from "@/contexts/CartContext";
+import { AuthContext } from "@/contexts/AuthContext";
 
 export default function ProductPage() {
   const { slug } = useParams();
@@ -25,6 +27,9 @@ export default function ProductPage() {
     queryFn: () => getProductBySlug(slug as string),
     enabled: !!slug,
   });
+
+  const { cart, addToCart } = useContext(CartContext);
+  const { user } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
@@ -75,10 +80,6 @@ export default function ProductPage() {
 
   const FALLBACK_IMAGE =
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbrHWzlFK_PWuIk1Jglo7Avt97howljIWwAA&s";
-
-  const handleAddToCart = {};
-
-  const handleBuyNow = {};
 
   return (
     <main className="max-w-[1200px] mx-auto">
@@ -154,7 +155,8 @@ export default function ProductPage() {
                       miw={{ base: "60" }}
                       disabled={!gender}
                     >
-                      {PRODUCT_SIZE[option] || option}
+                      {PRODUCT_SIZE[option as keyof typeof PRODUCT_SIZE] ||
+                        option}
                     </Button>
                   ))}
                 </Group>
@@ -175,13 +177,24 @@ export default function ProductPage() {
                 radius="xl"
                 color="yellow"
                 size="lg"
-                onClick={() => handleAddToCart}
+                disabled={!user || !gender || !size}
+                onClick={() => {
+                  const variant = product?.data?.productVariant.find(
+                    (v) =>
+                      v.name.toLowerCase() === gender?.toLowerCase() &&
+                      v.size.toLowerCase() === size?.toLowerCase()
+                  );
+                  if (!variant) return; // no valid selection
+
+                  addToCart(variant.id); // call context
+                }}
               >
                 Add to cart
               </Button>
               <Button
                 radius="xl"
                 size="lg"
+                disabled={!user || !gender || !size}
                 onClick={() => {}}
               >
                 Buy now

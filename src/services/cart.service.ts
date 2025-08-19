@@ -4,40 +4,45 @@ import axios from "@/utils/axios";
 
 // Get all items in the cart
 export const getItems = async (userId: string) => {
-  const response = await axios.get<ICart[]>(`${ENDPOINT.CART.BASE}/${userId}`);
-
-  return response.data;
+  const response = await axios.get<{ message: string; data: ICart[] }>(
+    `${ENDPOINT.CART.BASE}/${userId}`
+  );
+  return response.data.data;
 };
 
-// Add a product to the cart (always 1 quantity by default)
-export const addItem = async (userId: string, productVariantId: string) => {
+// Add a product to the cart
+export const addItem = async (
+  userId: string,
+  productId: string, // or bigint depending on your schema
+  quantity: number = 1
+) => {
   const response = await axios.post(`${ENDPOINT.CART.BASE}/${userId}`, {
-    product: { productVariantId },
+    product: productId, // <-- backend expects "product"
+    quantity, // only include this if backend accepts it
   });
-
   return response.data;
 };
 
 // Remove a product from the cart
 export const removeItem = async (userId: string, productVariantId: string) => {
   const response = await axios.delete(`${ENDPOINT.CART.BASE}/${userId}`, {
-    data: { productVariantIds: [productVariantId] }, // backend expects array
+    data: { productVariantIds: [productVariantId] },
   });
-
   return response.data;
 };
 
 // Clear all items in the cart
 export const clearItems = async (userId: string) => {
-  const response = await axios.delete(`${ENDPOINT.CART.BASE}/${userId}`);
-
+  const response = await axios.delete(`${ENDPOINT.CART.BASE}/${userId}`, {
+    data: { productVariantIds: [] },
+  });
   return response.data;
 };
 
+// Update cart item (increase/decrease quantity, etc.)
 export const updateItem = async (userId: string, cartId: string) => {
   const response = await axios.put(`${ENDPOINT.CART.BASE}/${userId}`, {
     cartId,
   });
-
   return response.data;
 };
