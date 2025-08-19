@@ -25,6 +25,7 @@ export interface IProductVariant {
   productAttribute: IProductAttribute;
   productAttributeId: string;
   productId: string;
+  product: IProduct;
   size: string;
   stockCondition: string;
   stockQuantity: number;
