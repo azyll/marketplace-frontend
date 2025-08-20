@@ -13,13 +13,14 @@ export const getItems = async (userId: string) => {
 // Add a product to the cart
 export const addItem = async (
   userId: string,
-  productId: string, // or bigint depending on your schema
+  productId: string,
   quantity: number = 1
 ) => {
   const response = await axios.post(`${ENDPOINT.CART.BASE}/${userId}`, {
-    product: productId, // <-- backend expects "product"
-    quantity, // only include this if backend accepts it
+    product: productId,
+    quantity,
   });
+
   return response.data;
 };
 

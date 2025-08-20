@@ -31,9 +31,10 @@ export default function Cart() {
     <main className="max-w-[1200px] mx-auto">
       <Grid
         gutter="xl"
-        mt={{ base: 0, sm: "xl" }}
+        mt={{ base: 0, sm: "md" }}
         px={{ sm: "xl", xl: 0 }}
       >
+        {/* TODO: add loading for fetching and removing items from cart */}
         <Grid.Col span={{ base: 12, sm: 6 }}>
           <Stack gap="md">
             <Title order={4}>My Cart</Title>
@@ -73,6 +74,7 @@ export default function Cart() {
                           {data.productVariant.productAttribute.name +
                             ": " +
                             data.productVariant.name}
+                          <br />
                           Size: {data.productVariant.size}
                         </Text>
                       </Stack>
@@ -95,6 +97,7 @@ export default function Cart() {
 
         <Grid.Col span={{ base: 12, sm: 6 }}>
           <Card
+            mt="42"
             withBorder
             radius="md"
             padding="lg"
