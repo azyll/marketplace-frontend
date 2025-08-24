@@ -1,6 +1,6 @@
 import { AuthContext } from "@/contexts/AuthContext";
-import { CartContext } from "@/contexts/CartContext";
 import { getImage } from "@/services/media.service";
+import { getItems, removeItem } from "@/services/cart.service";
 import {
   ActionIcon,
   Button,
@@ -9,23 +9,35 @@ import {
   Grid,
   Group,
   Image,
-  NumberInput,
   Stack,
   Text,
   Title,
 } from "@mantine/core";
-import { IconX } from "@tabler/icons-react";
-import { useContext, useEffect, useState } from "react";
+import { IconMoodSad, IconX } from "@tabler/icons-react";
+import { useContext } from "react";
+import CartItemSkeleton from "./components/CartItemSkeleton";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function Cart() {
-  const { cart, getCart, removeFromCart } = useContext(CartContext);
   const { user } = useContext(AuthContext);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (user?.id) {
-      getCart();
-    }
-  }, [user]);
+  // Fetch cart items
+  const { data: cart, isLoading } = useQuery({
+    queryKey: ["cart", user?.id],
+    queryFn: () => getItems(user!.id),
+    enabled: !!user?.id, // only run if user is logged in
+  });
+
+  // Remove item mutation
+  const removeMutation = useMutation({
+    mutationFn: (variantId: string) => removeItem(user!.id, variantId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart", user?.id] });
+    },
+  });
+
+  const isRemoving = removeMutation.isPending;
 
   return (
     <main className="max-w-[1200px] mx-auto">
@@ -34,18 +46,26 @@ export default function Cart() {
         mt={{ base: 0, sm: "md" }}
         px={{ sm: "xl", xl: 0 }}
       >
-        {/* TODO: add loading for fetching and removing items from cart */}
+        {/* Cart items */}
         <Grid.Col span={{ base: 12, sm: 6 }}>
           <Stack gap="md">
             <Title order={4}>My Cart</Title>
 
-            {cart &&
-              cart.map((data) => (
+            {isLoading && !user ? (
+              // Skeletons while loading
+              Array.from({ length: 2 }).map((_, i) => (
+                <CartItemSkeleton key={i} />
+              ))
+            ) : cart && cart.length > 0 ? (
+              cart.map((data: any) => (
                 <Card
                   key={data.id}
                   withBorder
                   radius="md"
                   padding="md"
+                  className={`relative transition-opacity ${
+                    isRemoving ? "opacity-50 pointer-events-none" : ""
+                  }`}
                 >
                   <Group
                     justify="space-between"
@@ -60,7 +80,7 @@ export default function Cart() {
                         h={80}
                       />
                       <Stack gap={4}>
-                        <Text fw={500}>{data.productVariant.product.name}</Text>{" "}
+                        <Text fw={500}>{data.productVariant.product.name}</Text>
                         <Text
                           size="sm"
                           c="dimmed"
@@ -82,7 +102,10 @@ export default function Cart() {
                     <ActionIcon
                       variant="subtle"
                       color="red"
-                      onClick={() => removeFromCart(data.productVariantId)}
+                      onClick={() =>
+                        removeMutation.mutate(data.productVariantId)
+                      }
+                      loading={isRemoving}
                     >
                       <IconX
                         size={18}
@@ -91,10 +114,26 @@ export default function Cart() {
                     </ActionIcon>
                   </Group>
                 </Card>
-              ))}
+              ))
+            ) : cart && cart.length === 0 ? (
+              <div className="flex justify-center items-center flex-col h-full">
+                <IconMoodSad
+                  color="gray"
+                  size={32}
+                  stroke={1.5}
+                />
+                <Text
+                  ta="center"
+                  c="dimmed"
+                >
+                  No items in cart.
+                </Text>
+              </div>
+            ) : null}
           </Stack>
         </Grid.Col>
 
+        {/* Order summary */}
         <Grid.Col span={{ base: 12, sm: 6 }}>
           <Card
             mt="42"
@@ -109,7 +148,7 @@ export default function Cart() {
               Order Summary
             </Title>
             <Stack gap="sm">
-              {cart?.map((item) => (
+              {cart?.map((item: any) => (
                 <Group
                   key={item.id}
                   justify="space-between"
@@ -125,7 +164,6 @@ export default function Cart() {
 
               <Divider />
 
-              {/* Total */}
               <Group justify="space-between">
                 <Text fw={700}>Total</Text>
                 <Text fw={700}>
@@ -133,7 +171,8 @@ export default function Cart() {
                   {cart
                     ? cart
                         .reduce(
-                          (sum, item) => sum + item.productVariant.price,
+                          (sum: number, item: any) =>
+                            sum + item.productVariant.price * item.quantity,
                           0
                         )
                         .toFixed(2)
@@ -147,7 +186,7 @@ export default function Cart() {
                 size="md"
                 radius="xl"
               >
-                Checkout
+                Go to Checkout
               </Button>
             </Stack>
           </Card>
