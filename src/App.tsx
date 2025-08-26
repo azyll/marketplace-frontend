@@ -19,14 +19,15 @@ const App: React.FC = () => {
       lg: "64rem",
       xl: "80rem",
     },
+    fontFamily: "Inter, sans-serif",
   });
 
   const location = useLocation();
 
-  const headerRoutes = ["/", "/products", "/cart"];
-  const hasHeader = headerRoutes.some(
+  const excludedHeaderRoutes = ["/auth/login"];
+  const hasHeader = excludedHeaderRoutes.some(
     (route) =>
-      location.pathname === route || location.pathname.startsWith(`${route}/`)
+      location.pathname !== route || location.pathname.startsWith(`${route}/`)
   );
 
   const queryClient = new QueryClient();
@@ -46,7 +47,9 @@ const App: React.FC = () => {
               )}
 
               <AppShell.Main>
-                <Outlet />
+                <div className="font-inter">
+                  <Outlet />
+                </div>
               </AppShell.Main>
             </AppShell>
           </CartProvider>
