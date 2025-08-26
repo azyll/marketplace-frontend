@@ -5,6 +5,10 @@ import Login from "@/pages/login/Login";
 import Cart from "@/pages/cart/Cart";
 import ProductList from "@/pages/products/ProductList";
 import ProductPage from "@/pages/products/ProductPage";
+import Checkout from "@/pages/checkout/Checkout";
+import Profile from "@/pages/user/profile/Profile";
+import User from "@/pages/user/User";
+import Order from "@/pages/user/orders/Order";
 
 export const router = createBrowserRouter([
   {
@@ -28,6 +32,22 @@ export const router = createBrowserRouter([
         path: "/cart",
         Component: Cart,
       },
+
+      {
+        path: "/user",
+        Component: User,
+        children: [
+          { index: true, Component: Profile },
+          {
+            path: "orders",
+            Component: Order,
+          },
+        ],
+      },
+      // {
+      //   path: "/order/checkout",
+      //   Component: Checkout,
+      // },
     ],
   },
 ]);
