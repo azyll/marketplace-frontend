@@ -15,6 +15,8 @@ export default function Header() {
 
   const { user, logout } = useContext(AuthContext);
 
+  //TODO: handle refresh / loading
+
   return (
     <nav className="h-14">
       <Group
@@ -50,6 +52,7 @@ export default function Header() {
           {/* Cart Button */}
           <ActionIcon
             variant="subtle"
+            disabled={!user}
             onClick={() => navigate("/cart")}
           >
             <IconShoppingBag />
@@ -85,16 +88,26 @@ export default function Header() {
           ) : (
             <Menu width={200}>
               <Menu.Target>
-                <Avatar
-                  className="cursor-pointer"
-                  key={user.id}
-                  name={`${user.firstName} ${user.lastName}`}
-                  color="initials"
-                />
+                {!user ? (
+                  <Avatar
+                    src={null}
+                    alt="no image here"
+                  />
+                ) : (
+                  <Avatar
+                    className="cursor-pointer"
+                    key={user.id}
+                    name={`${user.firstName} ${user.lastName}`}
+                    color="initials"
+                  />
+                )}
               </Menu.Target>
 
               <Menu.Dropdown>
-                <Menu.Item leftSection={<IconUser size={14} />}>
+                <Menu.Item
+                  leftSection={<IconUser size={14} />}
+                  onClick={() => navigate("/user")}
+                >
                   Profile
                 </Menu.Item>
                 <Menu.Divider />
