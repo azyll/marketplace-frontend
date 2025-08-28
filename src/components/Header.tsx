@@ -1,14 +1,25 @@
-import { Group, Button, ActionIcon, Title, Avatar, Menu } from "@mantine/core";
+import {
+  Group,
+  Button,
+  ActionIcon,
+  Title,
+  Avatar,
+  Menu,
+  Notification,
+} from "@mantine/core";
 import {
   IconShoppingBag,
   IconBell,
   IconUser,
   IconLogout,
+  IconInfoCircle,
+  IconLock,
 } from "@tabler/icons-react";
 import HeaderSearchBar from "./HeaderSearchBar";
 import { useNavigate } from "react-router";
 import { useContext } from "react";
 import { AuthContext } from "@/contexts/AuthContext";
+import { notifications } from "@mantine/notifications";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -52,8 +63,19 @@ export default function Header() {
           {/* Cart Button */}
           <ActionIcon
             variant="subtle"
-            disabled={!user}
-            onClick={() => navigate("/cart")}
+            onClick={() => {
+              if (!user) {
+                notifications.show({
+                  title: "Login required",
+                  message: "Please log in to view your cart",
+                  icon: <IconLock size={18} />,
+                });
+
+                navigate("/auth/login");
+              } else {
+                navigate("/cart");
+              }
+            }}
           >
             <IconShoppingBag />
           </ActionIcon>
