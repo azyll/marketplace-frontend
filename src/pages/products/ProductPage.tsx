@@ -20,7 +20,6 @@ import { PRODUCT_SIZE } from "@/constants/product";
 import { CartContext } from "@/contexts/CartContext";
 import { AuthContext } from "@/contexts/AuthContext";
 import { IconCheck, IconX } from "@tabler/icons-react";
-
 const FALLBACK_IMAGE =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbrHWzlFK_PWuIk1Jglo7Avt97howljIWwAA&s";
 
@@ -42,47 +41,9 @@ export default function ProductPage() {
   const [price, setPrice] = useState<number>();
   const [loading, setLoading] = useState(false);
 
-  const variants = product?.data?.productVariant ?? [];
-
-  const genderOptions = useMemo(
-    () =>
-      Array.from(
-        new Set(variants.map((v) => v.name).filter((g) => g && g !== "N/A"))
-      ).map((g) => ({ label: g, value: g.toLowerCase() })),
-    [variants]
-  );
-
-  const sortedSizeOptions = useMemo(() => {
-    if (!gender) return [];
-    const sizes = variants
-      .filter((v) => v.name.toLowerCase() === gender.toLowerCase())
-      .map((v) => v.size)
-      .filter((s) => s && s !== "N/A");
-
-    return sizes.sort(
-      (a, b) =>
-        Object.keys(PRODUCT_SIZE).indexOf(a) -
-        Object.keys(PRODUCT_SIZE).indexOf(b)
-    );
-  }, [gender, variants]);
-
-  useEffect(() => {
-    if (gender && size) {
-      const variant = variants.find(
-        (v) =>
-          v.name.toLowerCase() === gender.toLowerCase() &&
-          v.size.toLowerCase() === size.toLowerCase()
-      );
-      setPrice(variant?.price);
-    }
-  }, [gender, size, variants]);
-
+  //TODO: replace cart context with tanstack query
   const handleAddToCart = () => {
-    const variant = variants.find(
-      (v) =>
-        v.name.toLowerCase() === gender?.toLowerCase() &&
-        v.size.toLowerCase() === size?.toLowerCase()
-    );
+    const variant = variants.find((v) => v.name === gender && v.size === size);
     if (!variant) return;
 
     setLoading(true);
@@ -103,6 +64,45 @@ export default function ProductPage() {
       })
       .finally(() => setLoading(false));
   };
+
+  const handleBuyNow = () => {
+    navigate("/order/checkout");
+
+    //TODO: if buy now from product page vs if from cart
+  };
+
+  const variants = product?.data?.productVariant ?? [];
+
+  const genderOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(variants.map((v) => v.name).filter((g) => g && g !== "N/A"))
+      ).map((g) => ({ label: g, value: g })),
+    [variants]
+  );
+
+  const sortedSizeOptions = useMemo(() => {
+    if (!gender) return [];
+    const sizes = variants
+      .filter((v) => v.name === gender)
+      .map((v) => v.size)
+      .filter((s) => s && s !== "N/A");
+
+    return sizes.sort(
+      (a, b) =>
+        Object.keys(PRODUCT_SIZE).indexOf(a) -
+        Object.keys(PRODUCT_SIZE).indexOf(b)
+    );
+  }, [gender, variants]);
+
+  useEffect(() => {
+    if (gender && size) {
+      const variant = variants.find(
+        (v) => v.name === gender && v.size === size
+      );
+      setPrice(variant?.price);
+    }
+  }, [gender, size, variants]);
 
   return (
     <main className="max-w-[1200px] mx-auto relative">
