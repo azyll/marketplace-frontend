@@ -1,16 +1,37 @@
 import { ActionIcon, Button, Drawer, Group, Input } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 import { useFilters } from "@/hooks/useFilters";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 
 interface HeaderSearch {
-  search?: string;
+  name?: string;
 }
+
 export default function HeaderSearchBar() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const navigate = useNavigate();
   const [filter, setFilterValue] = useFilters<HeaderSearch>({
-    search: undefined,
+    name: undefined,
   });
+
+  // Handle search action (for mobile)
+  const handleSearch = () => {
+    if (filter.name && filter.name.trim()) {
+      navigate(`/products?name=${encodeURIComponent(filter.name.trim())}`);
+      setSearchOpen(false);
+    }
+  };
+
+  // Auto-search for desktop
+  useEffect(() => {
+    if (filter.name) {
+      const timeoutId = setTimeout(() => {
+        navigate(`/products?name=${encodeURIComponent(filter.name!)}`);
+      }, 300);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [filter.name, navigate]);
 
   return (
     <>
@@ -37,23 +58,25 @@ export default function HeaderSearchBar() {
           justify="space-between"
           mb="md"
           wrap="nowrap"
+          gap="xs"
         >
           <Input
             placeholder="Search Products"
-            value={filter.search}
-            onChange={(value) => setFilterValue("search", value.target.value)}
+            value={filter.name || ""}
+            onChange={(value) => setFilterValue("name", value.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             radius="xl"
             flex={1}
-            rightSection={
-              <ActionIcon
-                variant="light"
-                radius={"xl"}
-                onClick={() => console.log("Search for:", filter)}
-              >
-                <IconSearch size={14} />
-              </ActionIcon>
-            }
           />
+
+          <ActionIcon
+            variant="light"
+            radius="xl"
+            size="lg"
+            onClick={handleSearch}
+          >
+            <IconSearch size={16} />
+          </ActionIcon>
 
           <Button
             variant="subtle"
@@ -64,7 +87,6 @@ export default function HeaderSearchBar() {
             Cancel
           </Button>
         </Group>
-        <b>{filter.search}</b>
       </Drawer>
 
       {/* Search Bar for desktop */}
@@ -72,12 +94,19 @@ export default function HeaderSearchBar() {
         w={{ base: 160, xs: 100, sm: 200 }}
         flex={1}
         visibleFrom="sm"
-        rightSection={<IconSearch size={14} />}
-        // mr="sm"
+        rightSection={
+          <ActionIcon
+            variant="subtle"
+            onClick={handleSearch}
+          >
+            <IconSearch size={14} />
+          </ActionIcon>
+        }
         radius="xl"
         placeholder="Search Products"
-        value={filter.search}
-        onChange={(value) => setFilterValue("search", value.target.value)}
+        value={filter.name || ""}
+        onChange={(value) => setFilterValue("name", value.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && handleSearch()}
       />
     </>
   );

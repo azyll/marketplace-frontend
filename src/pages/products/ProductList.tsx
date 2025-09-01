@@ -19,10 +19,14 @@ export default function Products() {
     category: searchParams.get("category") ?? PRODUCT_CATEGORY.ALL,
     latest: true,
     limit: 8,
+    name: searchParams.get("name") ?? undefined, // Add this line
   });
 
   const handleOnCategorySelect = (category: string) => {
-    setSearchParams({ category });
+    // Keep existing search when changing category
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("category", category);
+    setSearchParams(newParams);
     setFilterValue("category", category);
   };
 
@@ -53,6 +57,14 @@ export default function Products() {
     window.scrollTo(0, 0);
   }, []);
 
+  // Update filters when URL changes
+  useEffect(() => {
+    const nameParam = searchParams.get("name");
+    if (nameParam !== filter.name) {
+      setFilterValue("name", nameParam || undefined);
+    }
+  }, [searchParams]);
+
   return (
     <main className="max-w-[1200px] mx-auto">
       <Space h="sm" />
@@ -64,6 +76,19 @@ export default function Products() {
       </section>
 
       <Space h="sm" />
+
+      {/* Show current search term */}
+      {filter.name && (
+        <section className="px-4 xl:px-0">
+          <Text
+            size="sm"
+            c="dimmed"
+          >
+            Search results for: "{filter.name}"
+          </Text>
+          <Space h="xs" />
+        </section>
+      )}
 
       <section>
         {showCarousel ? (
@@ -107,7 +132,9 @@ export default function Products() {
                 ta="center"
                 c="dimmed"
               >
-                No products found.
+                {filter.name
+                  ? `No products found for "${filter.name}"`
+                  : "No products found."}
               </Text>
             </div>
           </Card>
