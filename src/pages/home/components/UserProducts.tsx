@@ -39,6 +39,7 @@ export default function UserProducts() {
         slideSize={{ base: "80%", sm: "50%", md: "33.33%", lg: "25%" }}
         slideGap="md"
         withIndicators={false}
+        classNames={{ control: "control" }}
       >
         {isLoading
           ? [...Array(4)].map((_, index) => (
