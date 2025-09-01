@@ -3,11 +3,14 @@ import { getImage } from "@/services/media.service";
 import { Avatar, Button, Group, Stack, Tabs, Text, Title } from "@mantine/core";
 import { IconMail, IconShoppingBag, IconUser } from "@tabler/icons-react";
 import { useContext } from "react";
-import { Outlet, useNavigate } from "react-router";
+import { Outlet, useLocation, useNavigate } from "react-router";
 import "./User.css";
 
 export default function User() {
-  const router = useNavigate();
+  const navigate = useNavigate();
+
+  const location = useLocation();
+
   const user = useContext(AuthContext);
 
   return (
@@ -50,8 +53,9 @@ export default function User() {
               <Tabs
                 className="absolute bottom-0"
                 mt="lg"
-                defaultValue="details"
-                // variant="pills"
+                defaultValue={
+                  location.pathname.includes("/orders") ? "orders" : "details"
+                }
                 c="white"
                 color="white"
                 styles={(theme) => ({
@@ -64,7 +68,7 @@ export default function User() {
                   <Tabs.Tab
                     value="details"
                     leftSection={<IconUser size={12} />}
-                    onClick={() => router("/user")}
+                    onClick={() => navigate("/user")}
                     size={4}
                   >
                     Details
@@ -72,7 +76,7 @@ export default function User() {
                   <Tabs.Tab
                     value="orders"
                     leftSection={<IconShoppingBag size={12} />}
-                    onClick={() => router("/user/orders")}
+                    onClick={() => navigate("/user/orders")}
                     size={4}
                   >
                     Orders
@@ -85,9 +89,9 @@ export default function User() {
           {/* Right side: Button */}
           <Button
             variant="white"
-            onClick={() => router("/")}
+            onClick={() => navigate("/")}
           >
-            Back to store
+            To store
           </Button>
         </Group>
       </div>
