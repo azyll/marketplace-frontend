@@ -186,7 +186,7 @@ export default function Cart() {
                 size="md"
                 radius="xl"
               >
-                Go to Checkout
+                Place Order
               </Button>
             </Stack>
           </Card>
