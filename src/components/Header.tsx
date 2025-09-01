@@ -1,19 +1,11 @@
-import {
-  Group,
-  Button,
-  ActionIcon,
-  Title,
-  Avatar,
-  Menu,
-  Notification,
-} from "@mantine/core";
+import { Group, Button, ActionIcon, Title, Avatar, Menu } from "@mantine/core";
 import {
   IconShoppingBag,
   IconBell,
   IconUser,
   IconLogout,
-  IconInfoCircle,
   IconLock,
+  IconFileTime,
 } from "@tabler/icons-react";
 import HeaderSearchBar from "./HeaderSearchBar";
 import { useNavigate } from "react-router";
@@ -25,8 +17,6 @@ export default function Header() {
   const navigate = useNavigate();
 
   const { user, logout } = useContext(AuthContext);
-
-  //TODO: handle refresh / loading
 
   return (
     <nav className="h-14">
@@ -63,6 +53,7 @@ export default function Header() {
           {/* Cart Button */}
           <ActionIcon
             variant="subtle"
+            radius="xl"
             onClick={() => {
               if (!user) {
                 notifications.show({
@@ -81,7 +72,10 @@ export default function Header() {
           </ActionIcon>
 
           {/* Notifications Button */}
-          <ActionIcon variant="subtle">
+          <ActionIcon
+            variant="subtle"
+            radius="xl"
+          >
             <IconBell />
           </ActionIcon>
 
@@ -132,7 +126,16 @@ export default function Header() {
                 >
                   Profile
                 </Menu.Item>
+
+                <Menu.Item
+                  leftSection={<IconFileTime size={14} />}
+                  onClick={() => navigate("/user/orders")}
+                >
+                  Order History
+                </Menu.Item>
+
                 <Menu.Divider />
+
                 <Menu.Item
                   color="red"
                   leftSection={<IconLogout size={14} />}
