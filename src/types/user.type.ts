@@ -1,3 +1,4 @@
+import { IProgram } from "./program.type";
 import { IRoleSystemTag } from "./role.type";
 
 export interface IUser {
@@ -17,6 +18,7 @@ export interface IStudent {
   id: number;
   userId: string;
   programId: string;
+  program: IProgram;
   level: string;
   createdAt: Date;
   deletedAt: Date | null;
