@@ -5,12 +5,23 @@ import { useQuery } from "@tanstack/react-query";
 import { Carousel } from "@mantine/carousel";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import ProductCard from "@/components/ProductCard";
+import { useContext } from "react";
+import { AuthContext } from "@/contexts/AuthContext";
 
 export default function UserProducts() {
+  const user = useContext(AuthContext);
+
   const { data: products, isLoading } = useQuery({
     queryKey: [KEY.PRODUCTS],
-    queryFn: () => getProductList({ department: "Proware", latest: true }),
+    queryFn: () =>
+      getProductList({
+        department: "Information and Communication Technology",
+        latest: true,
+      }),
+    enabled: !!user,
   });
+
+  if (!user.user?.student.program.name) return null;
 
   return (
     <section className="max-w-[1200px] mx-auto">
@@ -20,7 +31,7 @@ export default function UserProducts() {
         pb={10}
         order={2}
       >
-        Program
+        {user.user?.student.program.name}
       </Title>
 
       <Carousel
