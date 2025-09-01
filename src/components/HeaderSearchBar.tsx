@@ -78,16 +78,21 @@ export default function HeaderSearchBar() {
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             radius="xl"
             flex={1}
+            rightSection={
+              <div className="flex items-center justify-center h-full pointer-events-auto">
+                <ActionIcon
+                  variant="light"
+                  radius="xl"
+                  onClick={handleSearch}
+                >
+                  <IconSearch
+                    size={20}
+                    strokeWidth={2.5}
+                  />
+                </ActionIcon>
+              </div>
+            }
           />
-
-          <ActionIcon
-            variant="light"
-            radius="xl"
-            size="lg"
-            onClick={handleSearch}
-          >
-            <IconSearch size={16} />
-          </ActionIcon>
 
           <Button
             variant="subtle"
@@ -129,7 +134,6 @@ export default function HeaderSearchBar() {
             )}
           </div>
         }
-        rightSectionWidth={36}
         radius="xl"
         placeholder="Search products"
         value={filter.name || ""}
