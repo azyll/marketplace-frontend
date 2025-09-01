@@ -8,6 +8,7 @@ export const getLoggedInUser = async () => {
 export const getUsers = async () => {
   try {
     const response = await axios.get("/api/user");
+
     return response.data;
   } catch (error) {
     console.log(error);
@@ -19,5 +20,15 @@ export const postUsers = async () => {
     const response = await axios.post("/api/user");
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const updateUser = async (data: Partial<IUser>) => {
+  try {
+    const response = await axios.put<IUser>("/api/user", data);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
   }
 };
