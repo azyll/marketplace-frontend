@@ -3,7 +3,7 @@ import { ICart } from "@/types/cart.type";
 import axios from "@/utils/axios";
 
 // Get all items in the cart
-export const getItems = async (userId: string) => {
+export const getItems = async (userId: string | undefined) => {
   const response = await axios.get<{ message: string; data: ICart[] }>(
     `${ENDPOINT.CART.BASE}/${userId}`
   );
