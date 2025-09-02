@@ -5,10 +5,10 @@ import Login from "@/pages/login/Login";
 import Cart from "@/pages/cart/Cart";
 import ProductList from "@/pages/products/ProductList";
 import ProductPage from "@/pages/products/ProductPage";
-import Checkout from "@/pages/checkout/Checkout";
 import Profile from "@/pages/user/profile/Profile";
 import User from "@/pages/user/User";
-import Order from "@/pages/user/orders/Order";
+import Order from "@/pages/order/Order";
+import OrderHistory from "@/pages/user/orders/OrderHistory";
 
 export const router = createBrowserRouter([
   {
@@ -32,6 +32,10 @@ export const router = createBrowserRouter([
         path: "/cart",
         Component: Cart,
       },
+      {
+        path: "/order",
+        Component: Order,
+      },
 
       {
         path: "/user",
@@ -40,14 +44,10 @@ export const router = createBrowserRouter([
           { index: true, Component: Profile },
           {
             path: "orders",
-            Component: Order,
+            Component: OrderHistory,
           },
         ],
       },
-      // {
-      //   path: "/order/checkout",
-      //   Component: Checkout,
-      // },
     ],
   },
 ]);
