@@ -6,12 +6,15 @@ import {
   IconLogout,
   IconLock,
   IconFileTime,
+  IconClipboard,
+  IconClipboardList,
 } from "@tabler/icons-react";
 import HeaderSearchBar from "./HeaderSearchBar";
 import { useNavigate } from "react-router";
 import { useContext } from "react";
 import { AuthContext } from "@/contexts/AuthContext";
 import { notifications } from "@mantine/notifications";
+import { ENDPOINT } from "@/constants/endpoints";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -62,9 +65,9 @@ export default function Header() {
                   icon: <IconLock size={18} />,
                 });
 
-                navigate("/auth/login");
+                navigate(ENDPOINT.LOGIN);
               } else {
-                navigate("/cart");
+                navigate(ENDPOINT.CART.BASE);
               }
             }}
           >
@@ -87,7 +90,7 @@ export default function Header() {
                 variant="light"
                 radius="xl"
                 visibleFrom="md"
-                onClick={() => navigate("/auth/login")}
+                onClick={() => navigate(ENDPOINT.LOGIN)}
               >
                 Sign in
               </Button>
@@ -96,7 +99,7 @@ export default function Header() {
               <ActionIcon
                 variant="subtle"
                 hiddenFrom="md"
-                onClick={() => navigate("/auth/login")}
+                onClick={() => navigate(ENDPOINT.LOGIN)}
               >
                 <IconUser />
               </ActionIcon>
@@ -122,14 +125,14 @@ export default function Header() {
               <Menu.Dropdown>
                 <Menu.Item
                   leftSection={<IconUser size={14} />}
-                  onClick={() => navigate("/user")}
+                  onClick={() => navigate(ENDPOINT.USER.BASE)}
                 >
                   Profile
                 </Menu.Item>
 
                 <Menu.Item
-                  leftSection={<IconFileTime size={14} />}
-                  onClick={() => navigate("/user/orders")}
+                  leftSection={<IconClipboardList size={14} />}
+                  onClick={() => navigate(ENDPOINT.USER.ORDER)}
                 >
                   Order History
                 </Menu.Item>

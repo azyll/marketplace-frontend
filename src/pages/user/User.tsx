@@ -5,6 +5,7 @@ import { IconMail, IconShoppingBag, IconUser } from "@tabler/icons-react";
 import { useContext } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import "./User.css";
+import { ENDPOINT } from "@/constants/endpoints";
 
 export default function User() {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ export default function User() {
                   <Tabs.Tab
                     value="details"
                     leftSection={<IconUser size={12} />}
-                    onClick={() => navigate("/user")}
+                    onClick={() => navigate(ENDPOINT.USER.BASE)}
                     size={4}
                   >
                     Details
@@ -76,7 +77,7 @@ export default function User() {
                   <Tabs.Tab
                     value="orders"
                     leftSection={<IconShoppingBag size={12} />}
-                    onClick={() => navigate("/user/orders")}
+                    onClick={() => navigate(ENDPOINT.USER.ORDER)}
                     size={4}
                   >
                     Orders

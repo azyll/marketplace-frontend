@@ -20,6 +20,7 @@ import { PRODUCT_SIZE } from "@/constants/product";
 import { CartContext } from "@/contexts/CartContext";
 import { AuthContext } from "@/contexts/AuthContext";
 import { IconCheck, IconX } from "@tabler/icons-react";
+import { ENDPOINT } from "@/constants/endpoints";
 const FALLBACK_IMAGE =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbrHWzlFK_PWuIk1Jglo7Avt97howljIWwAA&s";
 
@@ -66,7 +67,7 @@ export default function ProductPage() {
   };
 
   const handleBuyNow = () => {
-    navigate("/order/checkout");
+    navigate(ENDPOINT.ORDER.BASE);
 
     //TODO: if buy now from product page vs if from cart
   };

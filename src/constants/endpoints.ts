@@ -6,4 +6,13 @@ export const ENDPOINT = {
   CART: {
     BASE: "/cart",
   },
+  ORDER: {
+    BASE: "/order",
+  },
+  LOGIN: "/auth/login",
+
+  USER: {
+    BASE: "/user",
+    ORDER: "/user/orders",
+  },
 };
