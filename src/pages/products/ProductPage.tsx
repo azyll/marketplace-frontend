@@ -213,7 +213,7 @@ export default function ProductPage() {
                   /* TODO: implement Buy Now */
                 }}
               >
-                Buy now
+                Place Order
               </Button>
             </Group>
           </Stack>
