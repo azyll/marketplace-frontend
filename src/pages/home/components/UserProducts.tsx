@@ -18,7 +18,7 @@ export default function UserProducts() {
         department: user.user?.student.program.department.name,
         latest: true,
       }),
-    enabled: !!user,
+    enabled: !!user.user?.student,
   });
 
   if (!user.user?.student?.program.department.name) return null;
