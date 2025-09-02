@@ -45,10 +45,6 @@ export default function Cart() {
 
   return (
     <main className="max-w-[1200px] mx-auto">
-      <ConfirmationModal
-        opened={opened}
-        onClose={close}
-      />
       <Grid
         gutter="xl"
         mt={{ base: 0, sm: "md" }}
@@ -197,6 +193,12 @@ export default function Cart() {
               >
                 Place Order
               </Button>
+
+              <ConfirmationModal
+                opened={opened}
+                onClose={close}
+                cart={cart ?? []}
+              />
             </Stack>
           </Card>
         </Grid.Col>
