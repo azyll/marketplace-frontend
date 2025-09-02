@@ -17,6 +17,8 @@ import { IconMoodSad, IconX } from "@tabler/icons-react";
 import { useContext } from "react";
 import CartItemSkeleton from "./components/CartItemSkeleton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useDisclosure } from "@mantine/hooks";
+import ConfirmationModal from "./components/ConfirmationModal";
 
 export default function Cart() {
   const { user } = useContext(AuthContext);
@@ -39,8 +41,14 @@ export default function Cart() {
 
   const isRemoving = removeMutation.isPending;
 
+  const [opened, { open, close }] = useDisclosure(false);
+
   return (
     <main className="max-w-[1200px] mx-auto">
+      <ConfirmationModal
+        opened={opened}
+        onClose={close}
+      />
       <Grid
         gutter="xl"
         mt={{ base: 0, sm: "md" }}
@@ -102,9 +110,9 @@ export default function Cart() {
                     <ActionIcon
                       variant="subtle"
                       color="red"
-                      onClick={() =>
-                        removeMutation.mutate(data.productVariantId)
-                      }
+                      onClick={() => {
+                        removeMutation.mutate(data.productVariantId);
+                      }}
                       loading={isRemoving}
                     >
                       <IconX
@@ -185,6 +193,7 @@ export default function Cart() {
                 mt="md"
                 size="md"
                 radius="xl"
+                onClick={open}
               >
                 Place Order
               </Button>
