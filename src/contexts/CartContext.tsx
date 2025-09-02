@@ -6,12 +6,7 @@ import {
   ReactNode,
 } from "react";
 import { ICartContext, ICart } from "@/types/cart.type";
-import {
-  addItem,
-  clearItems,
-  getItems,
-  removeItem,
-} from "@/services/cart.service";
+import { addItem, getItems, removeItem } from "@/services/cart.service";
 import { AuthContext } from "./AuthContext";
 
 export const CartContext = createContext<ICartContext>({
