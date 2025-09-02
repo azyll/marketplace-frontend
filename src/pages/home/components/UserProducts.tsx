@@ -15,13 +15,13 @@ export default function UserProducts() {
     queryKey: [KEY.PRODUCTS],
     queryFn: () =>
       getProductList({
-        department: "Information and Communication Technology",
+        department: user.user?.student.program.department.name,
         latest: true,
       }),
     enabled: !!user,
   });
 
-  if (!user.user?.student.program.name) return null;
+  if (!user.user?.student?.program.department.name) return null;
 
   return (
     <section className="max-w-[1200px] mx-auto">
@@ -31,7 +31,7 @@ export default function UserProducts() {
         pb={10}
         order={2}
       >
-        {user.user?.student.program.name}
+        {user.user?.student?.program?.department?.name}
       </Title>
 
       <Carousel
