@@ -20,6 +20,7 @@ export interface IStudent {
   programId: string;
   program: IProgram;
   level: string;
+  sex: "male | female";
   createdAt: Date;
   deletedAt: Date | null;
   updatedAt: Date | null;

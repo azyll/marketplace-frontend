@@ -96,12 +96,20 @@ export default function ProductPage() {
     );
   }, [gender, variants]);
 
+  const [stock, setStock] = useState<number | null>(null);
+  const [stockCondition, setStockCondition] = useState<string | null>(null);
+
   useEffect(() => {
     if (gender && size) {
       const variant = variants.find(
         (v) => v.name === gender && v.size === size
       );
       setPrice(variant?.price);
+      setStock(variant?.stockQuantity ?? null);
+      setStockCondition(variant?.stockCondition ?? null);
+    } else {
+      setStock(null);
+      setStockCondition(null);
     }
   }, [gender, size, variants]);
 
@@ -184,6 +192,14 @@ export default function ProductPage() {
                     </Button>
                   ))}
                 </Group>
+                {stock !== null && (
+                  <Text
+                    mt="sm"
+                    c="dimmed"
+                  >
+                    {stock === 0 ? "Out of stock" : `${stock}pc(s) available`}
+                  </Text>
+                )}
               </>
             )}
 

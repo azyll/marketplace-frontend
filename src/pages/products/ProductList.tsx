@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router";
 import { KEY } from "@/constants/key";
 import { getProductList } from "@/services/products.service";
 import { Card, Grid, Pagination, Space, Text } from "@mantine/core";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useContext } from "react";
 import { useFilters } from "@/hooks/useFilters";
 import FilterBar from "@/components/FilterBar";
 import { PRODUCT_CATEGORY } from "@/constants/product";
@@ -11,8 +11,10 @@ import { IProductListFilters } from "@/types/product.type";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { IconMoodSad } from "@tabler/icons-react";
 import ProductCard from "@/components/ProductCard";
+import { AuthContext } from "@/contexts/AuthContext";
 
 export default function Products() {
+  const user = useContext(AuthContext);
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [filter, setFilterValue] = useFilters<IProductListFilters>({
@@ -31,15 +33,30 @@ export default function Products() {
   };
 
   const { data: products, isLoading } = useQuery({
-    queryKey: [KEY.PRODUCTS, filter],
-    queryFn: () =>
-      getProductList({
+    queryKey: [
+      KEY.PRODUCTS,
+      filter,
+      user.user?.student?.program?.department?.name,
+    ],
+    queryFn: () => {
+      const queryParams: any = {
         ...filter,
         category:
           filter.category === PRODUCT_CATEGORY.ALL
             ? undefined
             : filter.category,
-      }),
+      };
+
+      // If user is logged in, add department filter
+      // Also check if department is already in URL params (from FeaturedProducts "View All" button)
+      const departmentFromUrl = searchParams.get("department");
+      if (user.user?.student?.program?.department?.name || departmentFromUrl) {
+        queryParams.department =
+          departmentFromUrl || user.user?.student.program.department.name;
+      }
+
+      return getProductList(queryParams);
+    },
   });
 
   const totalPages = useMemo(() => {
@@ -65,6 +82,12 @@ export default function Products() {
     }
   }, [searchParams]);
 
+  // Get the department name for display (from URL param or user context)
+  const currentDepartment = useMemo(() => {
+    const departmentFromUrl = searchParams.get("department");
+    return departmentFromUrl || user.user?.student?.program?.department?.name;
+  }, [searchParams, user.user?.student?.program?.department?.name]);
+
   return (
     <main className="max-w-[1200px] mx-auto">
       <Space h="sm" />
@@ -76,6 +99,19 @@ export default function Products() {
       </section>
 
       <Space h="sm" />
+
+      {/* Show current department filter if applied */}
+      {currentDepartment && (
+        <section className="px-4 xl:px-0">
+          <Text
+            size="sm"
+            c="dimmed"
+          >
+            Showing products for: {currentDepartment}
+          </Text>
+          <Space h="xs" />
+        </section>
+      )}
 
       {/* Show current search term */}
       {filter.name && (
