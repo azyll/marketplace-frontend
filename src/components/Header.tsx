@@ -1,12 +1,20 @@
-import { Group, Button, ActionIcon, Title, Avatar, Menu } from "@mantine/core";
+import {
+  Group,
+  Button,
+  ActionIcon,
+  Title,
+  Avatar,
+  Menu,
+  Stack,
+  Text,
+  Badge,
+} from "@mantine/core";
 import {
   IconShoppingBag,
   IconBell,
   IconUser,
   IconLogout,
   IconLock,
-  IconFileTime,
-  IconClipboard,
   IconClipboardList,
 } from "@tabler/icons-react";
 import HeaderSearchBar from "./HeaderSearchBar";
@@ -15,6 +23,7 @@ import { useContext } from "react";
 import { AuthContext } from "@/contexts/AuthContext";
 import { notifications } from "@mantine/notifications";
 import { ENDPOINT } from "@/constants/endpoints";
+import { getAcronym } from "@/helper/textFormatter";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -107,19 +116,43 @@ export default function Header() {
           ) : (
             <Menu width={200}>
               <Menu.Target>
-                {!user ? (
+                <Group
+                  gap="sm"
+                  className="cursor-pointer transition-colors hover:text-blue-600"
+                >
+                  <Stack
+                    gap={0}
+                    className="leading-tight"
+                  >
+                    <Text
+                      fw={600}
+                      size="sm"
+                    >
+                      {user.fullName}
+                    </Text>
+                    <Text
+                      size="xs"
+                      c="dimmed"
+                      className="tracking-wide"
+                    >
+                      <Badge
+                        variant="light"
+                        size="xs"
+                        radius="sm"
+                        color="blue"
+                      >
+                        {getAcronym(user.student?.program?.name)}
+                      </Badge>
+                    </Text>
+                  </Stack>
+
                   <Avatar
-                    src={null}
-                    alt="no image here"
-                  />
-                ) : (
-                  <Avatar
-                    className="cursor-pointer"
                     key={user.id}
-                    name={`${user.firstName} ${user.lastName}`}
+                    name={user.fullName}
                     color="initials"
+                    radius="xl"
                   />
-                )}
+                </Group>
               </Menu.Target>
 
               <Menu.Dropdown>
