@@ -158,7 +158,11 @@ export default function Cart() {
                   justify="space-between"
                 >
                   <Text>
-                    {item.productVariant.product.name} x{item.quantity}
+                    {item.productVariant.product.name}
+                    <span className="text-gray-400">
+                      {" "}
+                      ({item.productVariant.size}) × {item.quantity}pc
+                    </span>
                   </Text>
                   <Text>
                     ₱{(item.productVariant.price * item.quantity).toFixed(2)}
