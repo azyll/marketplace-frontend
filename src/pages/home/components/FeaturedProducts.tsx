@@ -9,27 +9,42 @@ import { useFilters } from "@/hooks/useFilters";
 import { IProductListFilters } from "@/types/product.type";
 import { PRODUCT_CATEGORY } from "@/constants/product";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
-import { useMemo } from "react";
+import { useMemo, useContext } from "react";
 import { IconMoodSad } from "@tabler/icons-react";
 import ProductCard from "@/components/ProductCard";
+import { AuthContext } from "@/contexts/AuthContext";
 import "@/styles/carousel.css";
 
 export default function FeaturedProducts() {
+  const user = useContext(AuthContext);
+
   const [filter, setFilterValue] = useFilters<IProductListFilters>({
     category: PRODUCT_CATEGORY.ALL,
     latest: true,
   });
 
   const { data: products, isLoading } = useQuery({
-    queryKey: [KEY.PRODUCTS, filter],
-    queryFn: () =>
-      getProductList({
+    queryKey: [
+      KEY.PRODUCTS,
+      filter,
+      user.user?.student?.program?.department?.name,
+    ],
+    queryFn: () => {
+      const queryParams: any = {
         ...filter,
         category:
           filter.category === PRODUCT_CATEGORY.ALL
             ? undefined
             : filter.category,
-      }),
+      };
+
+      // If user is logged in, add department filter
+      if (user.user?.student?.program?.department?.name) {
+        queryParams.department = user.user.student.program.department.name;
+      }
+
+      return getProductList(queryParams);
+    },
   });
 
   const showCarousel = useMemo(() => {
@@ -62,7 +77,13 @@ export default function FeaturedProducts() {
         <Button
           className="shrink-0"
           component={Link}
-          to={`/products?category=${filter.category}`}
+          to={`/products?category=${filter.category}${
+            user.user?.student?.program?.department?.name
+              ? `&department=${encodeURIComponent(
+                  user.user.student.program.department.name
+                )}`
+              : ""
+          }`}
           variant="default"
           radius="xl"
         >
