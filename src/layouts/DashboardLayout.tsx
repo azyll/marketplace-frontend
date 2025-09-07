@@ -19,7 +19,7 @@ export const DashboardLayout = () => {
 
   const handleOnLogout = () => {
     logout()
-    redirect(ROUTES.AUTH.BASE)
+    navigate(ROUTES.AUTH.BASE)
   }
 
   const items = [
@@ -43,8 +43,12 @@ export const DashboardLayout = () => {
   ]
 
   if (!user) {
-    redirect(ROUTES.AUTH.BASE)
+    navigate(ROUTES.AUTH.BASE)
     return null
+  }
+
+  if (user.role.systemTag !== "admin" && user.role.systemTag !== "employee") {
+    navigate("/")
   }
 
   return (
