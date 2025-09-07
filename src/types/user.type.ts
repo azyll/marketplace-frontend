@@ -1,5 +1,6 @@
 import { IProgram } from "./program.type"
 import { IRole, IRoleSystemTag } from "./role.type"
+import { IPagination } from "@/types/common.type"
 
 export interface IUser {
   fullName: string
@@ -24,4 +25,8 @@ export interface IStudent {
   createdAt: Date
   deletedAt: Date | null
   updatedAt: Date | null
+}
+
+export interface IGetUserFilter extends IPagination {
+  // Add other user filters here
 }

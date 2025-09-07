@@ -1,6 +1,5 @@
-import { AppShell, Avatar, Badge, Burger, Group, Menu, Stack, Text } from "@mantine/core"
-import { Link, Outlet, redirect, useNavigate } from "react-router"
-import { useDisclosure } from "@mantine/hooks"
+import { AppShell, Avatar, Badge, Burger, Group, Menu, NavLink, Stack, Text } from "@mantine/core"
+import { Link, Outlet, redirect, useLocation, useNavigate } from "react-router"
 import { useContext } from "react"
 import { AuthContext } from "@/contexts/AuthContext"
 import {
@@ -13,8 +12,8 @@ import {
 import { ROUTES } from "@/constants/routes"
 
 export const DashboardLayout = () => {
-  // const [opened, { toggle }] = useDisclosure()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const { user, logout } = useContext(AuthContext)
 
@@ -23,9 +22,29 @@ export const DashboardLayout = () => {
     redirect(ROUTES.AUTH.BASE)
   }
 
+  const items = [
+    {
+      label: "Users",
+      path: ROUTES.DASHBOARD.USER.BASE,
+      icon: <IconUser size={14} />,
+    },
+    {
+      label: "Products",
+      path: ROUTES.DASHBOARD.PRODUCTS.BASE,
+      icon: <IconBuildingStore size={14} />,
+      disabled: true,
+    },
+    {
+      label: "Orders",
+      path: ROUTES.DASHBOARD.ORDERS.BASE,
+      icon: <IconShoppingBagCheck size={14} />,
+      disabled: true,
+    },
+  ]
+
   if (!user) {
     redirect(ROUTES.AUTH.BASE)
-    return
+    return null
   }
 
   return (
@@ -79,12 +98,17 @@ export const DashboardLayout = () => {
       </AppShell.Header>
 
       <AppShell.Navbar p="md">
-        <Menu>
-          <Menu.Label>Menu</Menu.Label>
-          <Menu.Item leftSection={<IconUser size={14} />}>Users</Menu.Item>
-          <Menu.Item leftSection={<IconBuildingStore size={14} />}>Products</Menu.Item>
-          <Menu.Item leftSection={<IconShoppingBagCheck size={14} />}>Orders</Menu.Item>
-        </Menu>
+        {items.map((item, index) => (
+          <NavLink
+            leftSection={item.icon}
+            label={item.label}
+            key={index}
+            active={location.pathname === item.path}
+            disabled={item.disabled}
+            component={Link}
+            to={item.path}
+          />
+        ))}
       </AppShell.Navbar>
 
       <AppShell.Main>
