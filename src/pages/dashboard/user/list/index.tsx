@@ -1,14 +1,18 @@
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { getUsers } from "@/services/user.service"
+import { deleteUser, getUsers } from "@/services/user.service"
 import { useFilters } from "@/hooks/useFilters"
 import { IGetUserFilter, IUser } from "@/types/user.type"
-import { ActionIcon, Box, Button, Card, Space } from "@mantine/core"
+import { ActionIcon, Box, Button, Card, List, Modal, Space, Text, Title } from "@mantine/core"
 import dayjs from "dayjs"
 import { IconEdit, IconMoodSad, IconPlus, IconTrashX } from "@tabler/icons-react"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import { useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
+import { useDisclosure } from "@mantine/hooks"
+import { useState } from "react"
+import { notifications } from "@mantine/notifications"
+import Axios from "axios"
 
 export const UserList = () => {
   const DEFAULT_PAGE = 1
@@ -33,8 +37,6 @@ export const UserList = () => {
   const handleOnEditUser = (userId: string) => {
     navigate(ROUTES.DASHBOARD.USER.ID.replace(":userId", userId))
   }
-
-  const handleOnDeleteUser = (userId: string) => {}
 
   const columns: DataTableColumn<IUser>[] = [
     {
@@ -80,8 +82,96 @@ export const UserList = () => {
     },
   ]
 
+  const queryClient = useQueryClient()
+
+  const [opened, { open, close }] = useDisclosure(false)
+
+  const [userForDeletion, setUserForDeletion] = useState<IUser>()
+
+  const handleOnDeleteUser = (userId: string) => {
+    const user = users?.data?.find(({ id }) => id === userId)
+
+    if (user) {
+      setUserForDeletion(user)
+      open()
+    }
+  }
+
+  const deleteMutation = useMutation({
+    mutationFn: (userId: string) => deleteUser(userId),
+    onSuccess: async () => {
+      notifications.show({
+        title: "Delete Success",
+        message: "Successfully Deleted User",
+        color: "green",
+      })
+
+      close()
+
+      await queryClient.invalidateQueries({ queryKey: [KEY.USERS] })
+      setUserForDeletion(undefined)
+    },
+    onError: (error) => {
+      let errorMessage = "Unable to Delete User, Please contact your Admin"
+
+      if (Axios.isAxiosError(error)) {
+        errorMessage = error.response?.data.error?.[0]?.message ?? errorMessage
+      }
+
+      notifications.show({
+        title: "Delete Failed",
+        message: errorMessage,
+        color: "red",
+      })
+    },
+  })
+
+  const handleOnCancelDeleteUser = () => {
+    if (deleteMutation.isPending) return
+
+    close()
+    setTimeout(() => {
+      setUserForDeletion(undefined)
+    }, 200)
+  }
+
   return (
     <Card>
+      <Modal
+        opened={opened}
+        onClose={() => handleOnCancelDeleteUser()}
+        withCloseButton={false}
+        centered
+        closeOnClickOutside={!deleteMutation.isPending}
+      >
+        <Title order={5} mb={4}>
+          Delete User
+        </Title>
+
+        <Text fz={14}>
+          Are you sure you want to delete <b>{userForDeletion?.fullName}</b>?
+        </Text>
+
+        <div className="mt-8 flex justify-end gap-2">
+          <Button
+            variant="light"
+            color="black"
+            onClick={() => handleOnCancelDeleteUser()}
+            disabled={deleteMutation.isPending}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            color="red"
+            loading={deleteMutation.isPending}
+            onClick={() => deleteMutation.mutate(userForDeletion?.id ?? "")}
+          >
+            Delete
+          </Button>
+        </div>
+      </Modal>
+
       <Card.Section px={16} pt={16}>
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Users</h1>
