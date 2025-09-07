@@ -103,7 +103,7 @@ export const DashboardLayout = () => {
             leftSection={item.icon}
             label={item.label}
             key={index}
-            active={location.pathname === item.path}
+            active={location.pathname === item.path || location.pathname.includes(item.path)}
             disabled={item.disabled}
             component={Link}
             to={item.path}
@@ -112,7 +112,9 @@ export const DashboardLayout = () => {
       </AppShell.Navbar>
 
       <AppShell.Main>
-        <Outlet />
+        <div className="mx-auto max-w-[1200px]">
+          <Outlet />
+        </div>
       </AppShell.Main>
     </AppShell>
   )

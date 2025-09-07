@@ -1,3 +1,5 @@
+import { IPagination } from "@/types/common.type"
+
 export type IRoleSystemTag = "student" | "admin" | "employee"
 
 export interface IRole {
@@ -8,3 +10,5 @@ export interface IRole {
   updatedAt: Date
   deletedAt: Date
 }
+
+export interface IGetRolesFilters extends IPagination {}

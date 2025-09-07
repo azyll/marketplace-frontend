@@ -9,13 +9,12 @@ import Profile from "@/pages/user/profile/Profile"
 import User from "@/pages/user/User"
 import Order from "@/pages/order/Order"
 import OrderHistory from "@/pages/user/orders/OrderHistory"
-import { UserList } from "@/pages/dashboard/user/UserList"
-import { UserLayout } from "@/pages/dashboard/user"
-import { UserPage } from "@/pages/dashboard/user/UserPage"
 import { ROUTES } from "@/constants/routes"
 import { BaseLayout } from "@/layouts/BaseLayout"
 import { DashboardLayout } from "@/layouts/DashboardLayout"
 import { MarketplaceLayout } from "@/layouts/MarketplaceLayout"
+import { UserPage } from "@/pages/dashboard/user/page"
+import { UserList } from "@/pages/dashboard/user/list"
 
 export const router = createBrowserRouter([
   {
@@ -84,17 +83,11 @@ export const router = createBrowserRouter([
           },
           {
             path: ROUTES.DASHBOARD.USER.BASE,
-            Component: UserLayout,
-            children: [
-              {
-                index: true,
-                Component: UserList,
-              },
-              {
-                path: ROUTES.DASHBOARD.USER.ID,
-                Component: UserPage,
-              },
-            ],
+            Component: UserList,
+          },
+          {
+            path: ROUTES.DASHBOARD.USER.ID,
+            Component: UserPage,
           },
         ],
       },

@@ -30,3 +30,13 @@ export interface IStudent {
 export interface IGetUserFilter extends IPagination {
   // Add other user filters here
 }
+
+export interface ICreateUserInput {
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  roleId: string
+}
+
+export type IUpdateUserInput = Partial<Omit<ICreateUserInput, "password">>

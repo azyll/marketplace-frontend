@@ -3,10 +3,9 @@ import { KEY } from "@/constants/key"
 import { getUsers } from "@/services/user.service"
 import { useFilters } from "@/hooks/useFilters"
 import { IGetUserFilter, IUser } from "@/types/user.type"
-import { ActionIcon, Box, Button, Card, LoadingOverlay, Pagination, Table } from "@mantine/core"
+import { ActionIcon, Box, Button, Card, Space } from "@mantine/core"
 import dayjs from "dayjs"
 import { IconEdit, IconMoodSad, IconPlus, IconTrashX } from "@tabler/icons-react"
-import { useMemo } from "react"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import { useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
@@ -31,7 +30,9 @@ export const UserList = () => {
     navigate(ROUTES.DASHBOARD.USER.ID.replace(":userId", "create"))
   }
 
-  const handleOnEditUser = (userId: string) => {}
+  const handleOnEditUser = (userId: string) => {
+    navigate(ROUTES.DASHBOARD.USER.ID.replace(":userId", userId))
+  }
 
   const handleOnDeleteUser = (userId: string) => {}
 
@@ -86,7 +87,7 @@ export const UserList = () => {
           <h1 className="text-xl font-bold">Manage Users</h1>
 
           <Button onClick={() => handleOnCreateUser()}>
-            <IconPlus size={14} /> Create User
+            <IconPlus size={14} /> <Space w={6} /> Create User
           </Button>
         </div>
       </Card.Section>
@@ -95,19 +96,22 @@ export const UserList = () => {
         <DataTable
           columns={columns}
           records={users?.data ?? []}
-          verticalSpacing="md"
-          highlightOnHover
-          withTableBorder
-          striped
-          borderRadius={6}
-          minHeight={220}
+          // State
+          fetching={isLoading}
           noRecordsIcon={
             <Box p={4} mb={4}>
               <IconMoodSad size={36} strokeWidth={1.5} />
             </Box>
           }
           noRecordsText="No users found"
-          fetching={isLoading}
+          // Styling
+          verticalSpacing="md"
+          highlightOnHover
+          withTableBorder
+          striped
+          borderRadius={6}
+          minHeight={220}
+          // Pagination
           totalRecords={users?.meta.totalItems ?? 0}
           recordsPerPage={filters.limit ?? DEFAULT_LIMIT}
           page={filters.page ?? DEFAULT_PAGE}
