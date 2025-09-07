@@ -27,7 +27,6 @@ export default function Header() {
     [user],
   )
 
-  console.log(user)
   return (
     <nav className="h-14">
       <Group
