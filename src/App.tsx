@@ -1,14 +1,15 @@
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { Outlet, useLocation } from "react-router";
-import Header from "./components/Header";
-import { AuthProvider } from "./contexts/AuthContext";
-import { Notifications } from "@mantine/notifications";
-import { AppShell, createTheme, MantineProvider } from "@mantine/core";
-import "@mantine/core/styles.css";
-import "@mantine/carousel/styles.css";
-import "@mantine/notifications/styles.css";
-import "./styles/index.css";
-import { CartProvider } from "./contexts/CartContext";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
+import { Outlet, useLocation } from "react-router"
+import Header from "./components/Header"
+import { AuthProvider } from "./contexts/AuthContext"
+import { Notifications } from "@mantine/notifications"
+import { AppShell, createTheme, MantineProvider } from "@mantine/core"
+import "@mantine/core/styles.css"
+import "@mantine/carousel/styles.css"
+import "@mantine/notifications/styles.css"
+import "./styles/index.css"
+import { CartProvider } from "./contexts/CartContext"
+import { ROUTES } from "@/constants/routes"
 
 const App: React.FC = () => {
   const theme = createTheme({
@@ -20,17 +21,17 @@ const App: React.FC = () => {
       xl: "80rem",
     },
     fontFamily: "Inter, sans-serif",
-  });
+  })
 
-  const location = useLocation();
+  const location = useLocation()
 
-  const excludedHeaderRoutes = ["/auth/login"];
-  const hasHeader = excludedHeaderRoutes.some(
-    (route) =>
-      location.pathname !== route || location.pathname.startsWith(`${route}/`)
-  );
+  const excludedHeaderRoutes = ["/auth/login", ROUTES.DASHBOARD.BASE]
 
-  const queryClient = new QueryClient();
+  const hasHeader = excludedHeaderRoutes.every(
+    (route) => location.pathname !== route && !location.pathname.startsWith(`${route}/`),
+  )
+
+  const queryClient = new QueryClient()
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -56,7 +57,7 @@ const App: React.FC = () => {
         </AuthProvider>
       </MantineProvider>
     </QueryClientProvider>
-  );
-};
+  )
+}
 
-export default App;
+export default App
