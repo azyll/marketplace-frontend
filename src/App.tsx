@@ -6,16 +6,15 @@ import "mantine-datatable/styles.css"
 
 import "./styles/index.css"
 
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 import { Outlet, useLocation } from "react-router"
-import Header from "./components/Header"
 import { AuthProvider } from "./contexts/AuthContext"
 import { Notifications } from "@mantine/notifications"
-import { AppShell, createTheme, MantineProvider } from "@mantine/core"
+import { createTheme, MantineProvider } from "@mantine/core"
 import { CartProvider } from "./contexts/CartContext"
 import { ROUTES } from "@/constants/routes"
+import { FC } from "react"
 
-const App: React.FC = () => {
+const App: FC = () => {
   const theme = createTheme({
     breakpoints: {
       xs: "36rem",
@@ -35,20 +34,16 @@ const App: React.FC = () => {
     (route) => location.pathname !== route && !location.pathname.startsWith(`${route}/`),
   )
 
-  const queryClient = new QueryClient()
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <MantineProvider theme={theme}>
-        <Notifications position="top-right" />
+    <MantineProvider theme={theme}>
+      <Notifications position="top-right" />
 
-        <AuthProvider>
-          <CartProvider>
-            <Outlet />
-          </CartProvider>
-        </AuthProvider>
-      </MantineProvider>
-    </QueryClientProvider>
+      <AuthProvider>
+        <CartProvider>
+          <Outlet />
+        </CartProvider>
+      </AuthProvider>
+    </MantineProvider>
   )
 }
 
