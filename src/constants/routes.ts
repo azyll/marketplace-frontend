@@ -6,4 +6,10 @@ export const ROUTES = {
       ID: "/dashboard/users/:userId",
     },
   },
+  AUTH: {
+    BASE: "/auth",
+    LOGIN: {
+      BASE: "/auth/login",
+    },
+  },
 }

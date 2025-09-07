@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router"
+import { createBrowserRouter, redirect } from "react-router"
 import Home from "@/pages/home/Home"
 import App from "@/App"
 import Login from "@/pages/login/Login"
@@ -9,47 +9,66 @@ import Profile from "@/pages/user/profile/Profile"
 import User from "@/pages/user/User"
 import Order from "@/pages/order/Order"
 import OrderHistory from "@/pages/user/orders/OrderHistory"
-import { DashboardLayout } from "@/pages/dashboard"
-import { UserList } from "@/pages/dashboard/pages/user/UserList"
-import { UserLayout } from "@/pages/dashboard/pages/user"
-import { UserPage } from "@/pages/dashboard/pages/user/UserPage"
+import { UserList } from "@/pages/dashboard/user/UserList"
+import { UserLayout } from "@/pages/dashboard/user"
+import { UserPage } from "@/pages/dashboard/user/UserPage"
 import { ROUTES } from "@/constants/routes"
+import { BaseLayout } from "@/layouts/BaseLayout"
+import { DashboardLayout } from "@/layouts/DashboardLayout"
+import { MarketplaceLayout } from "@/layouts/MarketplaceLayout"
 
 export const router = createBrowserRouter([
   {
     path: "/",
     Component: App,
     children: [
-      { index: true, Component: Home },
       {
-        path: "/products",
-        Component: ProductList,
-      },
-      {
-        path: "/products/:slug",
-        Component: ProductPage,
-      },
-      {
-        path: "/auth/login",
-        Component: Login,
-      },
-      {
-        path: "/cart",
-        Component: Cart,
-      },
-      {
-        path: "/order",
-        Component: Order,
+        Component: MarketplaceLayout,
+        children: [
+          { index: true, Component: Home },
+          {
+            path: "/products",
+            Component: ProductList,
+          },
+          {
+            path: "/products/:slug",
+            Component: ProductPage,
+          },
+          {
+            path: "/cart",
+            Component: Cart,
+          },
+          {
+            path: "/order",
+            Component: Order,
+          },
+
+          {
+            path: "/user",
+            Component: User,
+            children: [
+              { index: true, Component: Profile },
+              {
+                path: "orders",
+                Component: OrderHistory,
+              },
+            ],
+          },
+        ],
       },
 
+      // Auth Routes
       {
-        path: "/user",
-        Component: User,
+        path: ROUTES.AUTH.BASE,
+        Component: BaseLayout,
         children: [
-          { index: true, Component: Profile },
           {
-            path: "orders",
-            Component: OrderHistory,
+            index: true,
+            loader: () => redirect(ROUTES.AUTH.LOGIN.BASE),
+          },
+          {
+            path: ROUTES.AUTH.LOGIN.BASE,
+            Component: Login,
           },
         ],
       },
@@ -59,6 +78,10 @@ export const router = createBrowserRouter([
         path: ROUTES.DASHBOARD.BASE,
         Component: DashboardLayout,
         children: [
+          {
+            index: true,
+            loader: () => redirect(ROUTES.DASHBOARD.USER.BASE),
+          },
           {
             path: ROUTES.DASHBOARD.USER.BASE,
             Component: UserLayout,

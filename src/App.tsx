@@ -40,19 +40,7 @@ const App: React.FC = () => {
 
         <AuthProvider>
           <CartProvider>
-            <AppShell header={{ height: hasHeader ? 56 : 0 }}>
-              {hasHeader && (
-                <AppShell.Header>
-                  <Header />
-                </AppShell.Header>
-              )}
-
-              <AppShell.Main>
-                <div className="font-inter">
-                  <Outlet />
-                </div>
-              </AppShell.Main>
-            </AppShell>
+            <Outlet />
           </CartProvider>
         </AuthProvider>
       </MantineProvider>
