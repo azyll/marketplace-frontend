@@ -5,6 +5,7 @@ export interface IProductListFilters extends IPagination {
   latest?: boolean;
   name?: string;
   category?: string;
+  sex?: "male | female";
 }
 
 export interface IProductAttribute {

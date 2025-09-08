@@ -17,11 +17,14 @@ export default function Products() {
   const user = useContext(AuthContext);
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const department = user.user?.student?.program?.department?.name;
+  const sex = user.user?.student?.sex;
+
   const [filter, setFilterValue] = useFilters<IProductListFilters>({
     category: searchParams.get("category") ?? PRODUCT_CATEGORY.ALL,
     latest: true,
     limit: 8,
-    name: searchParams.get("name") ?? undefined, // Add this line
+    name: searchParams.get("name") ?? undefined,
   });
 
   const handleOnCategorySelect = (category: string) => {
@@ -33,11 +36,7 @@ export default function Products() {
   };
 
   const { data: products, isLoading } = useQuery({
-    queryKey: [
-      KEY.PRODUCTS,
-      filter,
-      user.user?.student?.program?.department?.name,
-    ],
+    queryKey: [KEY.PRODUCTS, filter, department, sex],
     queryFn: () => {
       const queryParams: any = {
         ...filter,
@@ -50,9 +49,14 @@ export default function Products() {
       // If user is logged in, add department filter
       // Also check if department is already in URL params (from FeaturedProducts "View All" button)
       const departmentFromUrl = searchParams.get("department");
-      if (user.user?.student?.program?.department?.name || departmentFromUrl) {
+      if (department || departmentFromUrl) {
         queryParams.department =
           departmentFromUrl || user.user?.student.program.department.name;
+      }
+
+      // Add sex-based filtering if user is logged in and has a sex value
+      if (sex) {
+        queryParams.sex = sex;
       }
 
       return getProductList(queryParams);
@@ -85,8 +89,8 @@ export default function Products() {
   // Get the department name for display (from URL param or user context)
   const currentDepartment = useMemo(() => {
     const departmentFromUrl = searchParams.get("department");
-    return departmentFromUrl || user.user?.student?.program?.department?.name;
-  }, [searchParams, user.user?.student?.program?.department?.name]);
+    return departmentFromUrl || department;
+  }, [searchParams, department]);
 
   return (
     <main className="max-w-[1200px] mx-auto">
@@ -121,6 +125,19 @@ export default function Products() {
             c="dimmed"
           >
             Search results for: "{filter.name}"
+          </Text>
+          <Space h="xs" />
+        </section>
+      )}
+
+      {/* Show sex filter indicator */}
+      {sex && (
+        <section className="px-4 xl:px-0">
+          <Text
+            size="sm"
+            c="dimmed"
+          >
+            Showing {sex} products
           </Text>
           <Space h="xs" />
         </section>

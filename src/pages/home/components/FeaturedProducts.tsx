@@ -28,6 +28,7 @@ export default function FeaturedProducts() {
       KEY.PRODUCTS,
       filter,
       user.user?.student?.program?.department?.name,
+      user.user?.student?.sex,
     ],
     queryFn: () => {
       const queryParams: any = {
@@ -41,6 +42,10 @@ export default function FeaturedProducts() {
       // If user is logged in, add department filter
       if (user.user?.student?.program?.department?.name) {
         queryParams.department = user.user.student.program.department.name;
+      }
+
+      if (user.user?.student?.sex) {
+        queryParams.sex = user.user.student.sex;
       }
 
       return getProductList(queryParams);
