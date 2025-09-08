@@ -6,6 +6,7 @@ export interface IUser {
   firstName: string;
   lastName: string;
   email: string;
+  roleId: string;
   roleSystemTag: IRoleSystemTag;
   id: string;
   student: IStudent;
