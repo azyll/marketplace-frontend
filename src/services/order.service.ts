@@ -1,5 +1,5 @@
 import { ENDPOINT } from "@/constants/endpoints";
-import { IOrder } from "@/types/order.type";
+import { IOrder, IOrderStatusType } from "@/types/order.type";
 import axios from "@/utils/axios";
 
 export const createOrder = async (
@@ -23,20 +23,20 @@ export const getOrder = async (orderId: string) => {
 };
 
 export const getOrders = async () => {
-  const response = await axios.get<IOrder>(ENDPOINT.ORDER.BASE);
+  const response = await axios.get<IOrder>(ENDPOINT.ORDER.STUDENT);
 
   return response.data;
 };
 
 export const getStudentOrders = async (
-  studentId: string,
+  userId: string,
   params?: {
     page?: number;
     limit?: number;
-    status?: "ongoing" | "completed" | "cancelled";
+    status?: IOrderStatusType;
   }
 ) => {
-  const response = await axios.get(`${ENDPOINT.ORDER.BASE}/${studentId}`, {
+  const response = await axios.get(`${ENDPOINT.ORDER.STUDENT}/${userId}`, {
     params,
   });
 
