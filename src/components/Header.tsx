@@ -107,7 +107,7 @@ export default function Header() {
                     </Text>
 
                     <Badge variant="light" size="xs" radius="sm" color="blue">
-                      {user.student ? getAcronym(user.student?.program?.name) : user.roleSystemTag}
+                      {user.student ? getAcronym(user.student?.program?.name) : user.role.systemTag}
                     </Badge>
                   </Stack>
                 </Group>
