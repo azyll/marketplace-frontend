@@ -1,16 +1,20 @@
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { Outlet, useLocation } from "react-router";
-import Header from "./components/Header";
-import { AuthProvider } from "./contexts/AuthContext";
-import { Notifications } from "@mantine/notifications";
-import { AppShell, createTheme, MantineProvider } from "@mantine/core";
-import "@mantine/core/styles.css";
-import "@mantine/carousel/styles.css";
-import "@mantine/notifications/styles.css";
-import "./styles/index.css";
-import { CartProvider } from "./contexts/CartContext";
+import "@mantine/core/styles.css"
+import "@mantine/carousel/styles.css"
+import "@mantine/notifications/styles.css"
 
-const App: React.FC = () => {
+import "mantine-datatable/styles.css"
+
+import "./styles/index.css"
+
+import { Outlet, useLocation } from "react-router"
+import { AuthProvider } from "./contexts/AuthContext"
+import { Notifications } from "@mantine/notifications"
+import { createTheme, MantineProvider } from "@mantine/core"
+import { CartProvider } from "./contexts/CartContext"
+import { ROUTES } from "@/constants/routes"
+import { FC } from "react"
+
+const App: FC = () => {
   const theme = createTheme({
     breakpoints: {
       xs: "36rem",
@@ -20,43 +24,27 @@ const App: React.FC = () => {
       xl: "80rem",
     },
     fontFamily: "Inter, sans-serif",
-  });
+  })
 
-  const location = useLocation();
+  const location = useLocation()
 
-  const excludedHeaderRoutes = ["/auth/login"];
-  const hasHeader = excludedHeaderRoutes.some(
-    (route) =>
-      location.pathname !== route || location.pathname.startsWith(`${route}/`)
-  );
+  const excludedHeaderRoutes = ["/auth/login", ROUTES.DASHBOARD.BASE]
 
-  const queryClient = new QueryClient();
+  const hasHeader = excludedHeaderRoutes.every(
+    (route) => location.pathname !== route && !location.pathname.startsWith(`${route}/`),
+  )
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <MantineProvider theme={theme}>
-        <Notifications position="top-right" />
+    <MantineProvider theme={theme}>
+      <Notifications position="top-right" />
 
-        <AuthProvider>
-          <CartProvider>
-            <AppShell header={{ height: hasHeader ? 56 : 0 }}>
-              {hasHeader && (
-                <AppShell.Header>
-                  <Header />
-                </AppShell.Header>
-              )}
+      <AuthProvider>
+        <CartProvider>
+          <Outlet />
+        </CartProvider>
+      </AuthProvider>
+    </MantineProvider>
+  )
+}
 
-              <AppShell.Main>
-                <div className="font-inter">
-                  <Outlet />
-                </div>
-              </AppShell.Main>
-            </AppShell>
-          </CartProvider>
-        </AuthProvider>
-      </MantineProvider>
-    </QueryClientProvider>
-  );
-};
-
-export default App;
+export default App
