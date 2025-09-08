@@ -120,6 +120,13 @@ export default function Header() {
                   gap="sm"
                   className="cursor-pointer transition-colors hover:text-blue-600"
                 >
+                  <Avatar
+                    key={user.id}
+                    name={user.fullName}
+                    color="initials"
+                    radius="xl"
+                  />
+
                   <Stack
                     gap={0}
                     className="leading-tight"
@@ -130,28 +137,18 @@ export default function Header() {
                     >
                       {user.fullName}
                     </Text>
-                    <Text
-                      size="xs"
-                      c="dimmed"
-                      className="tracking-wide"
-                    >
-                      <Badge
-                        variant="light"
-                        size="xs"
-                        radius="sm"
-                        color="blue"
-                      >
-                        {getAcronym(user.student?.program?.name)}
-                      </Badge>
-                    </Text>
-                  </Stack>
 
-                  <Avatar
-                    key={user.id}
-                    name={user.fullName}
-                    color="initials"
-                    radius="xl"
-                  />
+                    <Badge
+                      variant="light"
+                      size="xs"
+                      radius="sm"
+                      color="blue"
+                    >
+                      {user.student
+                        ? getAcronym(user.student?.program?.name)
+                        : user.roleSystemTag}
+                    </Badge>
+                  </Stack>
                 </Group>
               </Menu.Target>
 
