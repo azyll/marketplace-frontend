@@ -5,7 +5,7 @@ import { IStudent } from "@/types/user.type"
 
 export const createStudent = async (userId: string, payload: ICreateStudentInput) => {
   const response = await axios.post<IStudent>(
-    ENDPOINT.STUDENT.USER_ID.replace(":userId", userId),
+    ENDPOINT.STUDENT.ID.replace(":userId", userId),
     payload,
   )
 
