@@ -38,7 +38,7 @@ export const router = createBrowserRouter([
             Component: Cart,
           },
           {
-            path: "/order",
+            path: "/order/:orderId",
             Component: Order,
           },
 
