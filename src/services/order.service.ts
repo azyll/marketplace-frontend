@@ -7,11 +7,19 @@ export const createOrder = async (
   orderItems: { productVariantId: string; quantity: number }[],
   orderType: "cart" | "buy-now",
 ) => {
-  const response = await axios.post<IOrder>(`${ENDPOINT.ORDER.BASE}/${studentId}`, {
-    studentId,
-    orderItems,
-    orderType,
-  })
+  const response = await axios.post<IOrder>(
+    `${ENDPOINT.ORDER.BASE}/${studentId}`,
+    {
+      studentId,
+      orderItems,
+      orderType,
+    },
+    {
+      params: {
+        orderType,
+      },
+    },
+  )
 
   return response.data.data
 }
