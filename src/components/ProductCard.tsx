@@ -52,6 +52,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             size="xs"
             c="gray.6"
             mt={-2}
+            tt="capitalize"
           >
             {product.category}
           </Text>
