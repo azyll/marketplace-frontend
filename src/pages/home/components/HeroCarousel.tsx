@@ -1,24 +1,21 @@
-import { Carousel } from "@mantine/carousel";
-import { Image, Title } from "@mantine/core";
-import { getImage } from "@/services/media.service";
-import "@/styles/carousel.css";
+import { Carousel } from "@mantine/carousel"
+import { Image, Title } from "@mantine/core"
+import { getImage } from "@/services/media.service"
+import "@/styles/carousel.css"
 
 const images = [
   getImage("carousel-1.png"),
   getImage("carousel-2.png"),
-  getImage("carousel-3.png"),
+  // getImage("carousel-3.png"),
   getImage("carousel-4.png"),
-  getImage("carousel-5.png"),
-];
+  // getImage("carousel-5.png"),
+]
 
 export default function HeroCarousel() {
   return (
     <>
-      <section className="max-w-[1200px] mx-auto">
-        <Title
-          px={{ base: 16, xl: 0 }}
-          order={2}
-        >
+      <section className="mx-auto max-w-[1200px]">
+        <Title px={{ base: 16, xl: 0 }} order={2}>
           Announcements
         </Title>
       </section>
@@ -47,5 +44,5 @@ export default function HeroCarousel() {
         ))}
       </Carousel>
     </>
-  );
+  )
 }
