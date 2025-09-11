@@ -10,6 +10,7 @@ import {
   Grid,
   Group,
   Image,
+  NumberFormatter,
   Stack,
   Text,
   Title,
@@ -125,7 +126,14 @@ export default function Cart() {
                       <Stack gap={4}>
                         <Text fw={500}>{data.productVariant.product.name}</Text>
                         <Text size="sm" c="dimmed">
-                          ₱{data.productVariant.price.toFixed(2)}
+                          <NumberFormatter
+                            prefix="₱"
+                            decimalScale={2}
+                            thousandSeparator
+                            decimalSeparator="."
+                            fixedDecimalScale
+                            value={data.productVariant.price}
+                          />
                         </Text>
                         <Text size="xs" c="dimmed">
                           {data.productVariant.productAttribute.name +
