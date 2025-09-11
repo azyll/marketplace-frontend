@@ -1,114 +1,52 @@
-//Form
-// Student ID
-// First Name
-// Last Name
-// Program
-
-import { EditableWrapper } from "@/components/EditableWrapper";
-import { AuthContext } from "@/contexts/AuthContext";
-import { Button, Select, Space, TextInput, Title } from "@mantine/core";
-import { useForm } from "@mantine/form";
-import { useContext, useEffect, useState } from "react";
-
-// User Details
-// User fullName
-
-// Student Details
-// Student ID
-// Program
-// Level
+import { AuthContext } from "@/contexts/AuthContext"
+import { Space, Text, Title } from "@mantine/core"
+import { useContext } from "react"
 
 export default function Profile() {
-  const user = useContext(AuthContext);
-
-  const [isEdit, setIsEdit] = useState(false);
-
-  const form = useForm({
-    mode: "uncontrolled",
-    initialValues: {
-      firstname: user.user?.firstName,
-      lastname: user.user?.lastName,
-      program: user.user?.student.program?.name,
-      studentid: user.user?.student.id,
-    },
-  });
-
-  useEffect(() => {
-    form.setInitialValues({
-      firstname: user.user?.firstName,
-      lastname: user.user?.lastName,
-      program: user.user?.student?.program?.name,
-      studentid: user.user?.student.id,
-    });
-    form.reset();
-  }, [user]);
+  const user = useContext(AuthContext)
 
   return (
-    <div className="mx-auto max-w-page-width page-x-padding mt-4">
-      <Button onClick={() => setIsEdit((prev) => !prev)}>Edit</Button>
-
+    <div className="max-w-page-width page-x-padding mx-auto mt-4">
       <div>
         <Title size="h3">User Details</Title>
-
-        <EditableWrapper
-          label="First Name"
-          value={form.values.firstname}
-          state={isEdit ? "edit" : "view"}
-        >
-          <TextInput
-            label="First Name"
-            {...form.getInputProps("firstname")}
-          />
-        </EditableWrapper>
-
-        <EditableWrapper
-          label="Last Name"
-          value={form.values.lastname}
-          state={isEdit ? "edit" : "view"}
-        >
-          <TextInput
-            label="Last Name"
-            {...form.getInputProps("lastname")}
-          />
-        </EditableWrapper>
+        <Space h={12} />
+        <div className="space-y-3">
+          <Text size="sm" fw={500} c="dimmed">
+            Full Name
+          </Text>
+          <Text>{user.user?.fullName || "Not provided"}</Text>
+        </div>
       </div>
 
-      <Space h={16} />
+      <Space h={24} />
 
-      <div>
-        <Title size="h3">Student Details</Title>
+      {user.user?.student ? (
+        <div>
+          <Title size="h3">Student Details</Title>
 
-        <EditableWrapper
-          label="Student ID"
-          value={form.values.studentid}
-          state={isEdit ? "edit" : "view"}
-        >
-          <TextInput
-            label="Student ID"
-            {...form.getInputProps("studentid")}
-          />
-        </EditableWrapper>
+          <Space h={12} />
 
-        <EditableWrapper
-          label="Program"
-          value={form.values.program}
-          state={isEdit ? "edit" : "view"}
-        >
-          <Select
-            label="Program"
-            {...form.getInputProps("program")}
-            data={[
-              "Bachelor of Arts in Communication",
-              "Bachelor of Science in Business Administration",
-              "Bachelor of Science in Computer Engineering",
-              "Bachelor of Science in Computer Science",
-              "Bachelor of Science in Hospitality Management",
-              "Bachelor of Science in Information Technology",
-              "Bachelor of Science in Tourism Management",
-            ]}
-          />
-        </EditableWrapper>
-      </div>
+          <div className="space-y-3">
+            <div>
+              <Text size="sm" fw={500} c="dimmed">
+                Student ID
+              </Text>
+
+              <Text>{user.user.student.id || "Not provided"}</Text>
+            </div>
+
+            <div>
+              <Text size="sm" fw={500} c="dimmed">
+                Program
+              </Text>
+
+              <Text>{user.user.student.program?.name || "Not assigned"}</Text>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
     </div>
-  );
+  )
 }

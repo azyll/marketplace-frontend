@@ -12,12 +12,14 @@ import {
   Divider,
   Flex,
   Center,
+  Skeleton,
 } from "@mantine/core"
 import { IconAlertCircle, IconMoodSad, IconRefresh } from "@tabler/icons-react"
 import { IOrder, IOrderStatusType } from "@/types/order.type"
 import { AuthContext } from "@/contexts/AuthContext"
 import { getStudentOrders } from "@/services/order.service"
 import { useFilters } from "@/hooks/useFilters"
+import { OrderHistorySkeleton } from "./components/OrderHistorySkeleton"
 
 // Define the filter state type
 interface FilterState {
@@ -125,15 +127,29 @@ export default function OrderHistory() {
     })
   }
 
+  // Show skeleton loading when loading and no orders yet
   if (loading && orders.length === 0) {
     return (
       <div className="max-w-page-width page-x-padding mx-auto mt-4">
-        <Center className="py-8">
-          <Stack align="center">
-            <Loader size="md" />
-            <Text>Loading orders...</Text>
+        <Stack gap="lg">
+          <div>
+            <Skeleton height={28} width={150} className="mb-4" />
+
+            {/* Filter Buttons Skeleton */}
+            <Group gap="xs" className="mb-4">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} height={32} width={80} radius="xl" />
+              ))}
+            </Group>
+          </div>
+
+          <Stack gap="md">
+            {/* Render 3 skeleton cards */}
+            {[1, 2, 3].map((i) => (
+              <OrderHistorySkeleton key={i} />
+            ))}
           </Stack>
-        </Center>
+        </Stack>
       </div>
     )
   }
@@ -280,6 +296,18 @@ export default function OrderHistory() {
                 </Stack>
               </Card>
             ))}
+
+            {/* Show loading indicator when loading more pages */}
+            {loading && orders.length > 0 && (
+              <Center className="py-4">
+                <Stack align="center">
+                  <Loader size="sm" />
+                  <Text size="sm" c="dimmed">
+                    Loading more orders...
+                  </Text>
+                </Stack>
+              </Center>
+            )}
           </Stack>
         )}
       </Stack>
