@@ -1,4 +1,15 @@
-import { Group, Button, ActionIcon, Title, Avatar, Menu, Stack, Text, Badge } from "@mantine/core"
+import {
+  Group,
+  Button,
+  ActionIcon,
+  Title,
+  Avatar,
+  Menu,
+  Stack,
+  Text,
+  Badge,
+  Skeleton,
+} from "@mantine/core"
 import {
   IconShoppingBag,
   IconBell,
@@ -14,13 +25,13 @@ import { useContext, useMemo } from "react"
 import { AuthContext } from "@/contexts/AuthContext"
 import { notifications } from "@mantine/notifications"
 import { ENDPOINT } from "@/constants/endpoints"
-import { getAcronym } from "@/helper/textFormatter"
 import { ROUTES } from "@/constants/routes"
+import { getAcronym } from "@/helper/textFormatter"
 
 export default function Header() {
   const navigate = useNavigate()
 
-  const { user, logout } = useContext(AuthContext)
+  const { user, logout, isLoading } = useContext(AuthContext)
 
   const isAdmin = useMemo(
     () => user?.role.systemTag === "admin" || user?.role.systemTag === "employee",
@@ -77,8 +88,16 @@ export default function Header() {
             <IconBell />
           </ActionIcon>
 
-          {/* Login Button */}
-          {!user ? (
+          {/* Loading State */}
+          {isLoading ? (
+            <Group gap="sm" wrap="nowrap">
+              <Skeleton circle height={34} width={34} />
+              <Stack gap={2}>
+                <Skeleton height={14} width={80} radius="sm" />
+                <Skeleton height={12} width={30} radius="sm" />
+              </Stack>
+            </Group>
+          ) : !user ? (
             <>
               {/* Desktop login button */}
               <Button
@@ -100,12 +119,10 @@ export default function Header() {
               <Menu.Target>
                 <Group gap="sm" className="cursor-pointer transition-colors hover:text-blue-600">
                   <Avatar key={user.id} name={user.fullName} color="initials" radius="xl" />
-
                   <Stack gap={0} className="leading-tight">
                     <Text fw={600} size="sm">
                       {user.fullName}
                     </Text>
-
                     <Badge variant="light" size="xs" radius="sm" color="blue">
                       {user.student ? getAcronym(user.student?.program?.name) : user.role.systemTag}
                     </Badge>
@@ -121,16 +138,17 @@ export default function Header() {
                   Profile
                 </Menu.Item>
 
-                <Menu.Item
-                  leftSection={<IconClipboardList size={14} />}
-                  onClick={() => navigate(ENDPOINT.USER.ORDER)}
-                >
-                  Order History
-                </Menu.Item>
+                {user.student ? (
+                  <Menu.Item
+                    leftSection={<IconClipboardList size={14} />}
+                    onClick={() => navigate(ENDPOINT.USER.ORDER)}
+                  >
+                    Order History
+                  </Menu.Item>
+                ) : null}
 
                 <Menu.Divider />
 
-                {/*  Hide dashboard link if currently logged-in user is not an admin */}
                 {isAdmin && (
                   <>
                     <Menu.Item
@@ -139,7 +157,6 @@ export default function Header() {
                     >
                       Dashboard
                     </Menu.Item>
-
                     <Menu.Divider />
                   </>
                 )}
