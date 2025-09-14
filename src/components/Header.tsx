@@ -48,11 +48,14 @@ export default function Header() {
         align="center"
       >
         <img
-          className="z-0 cursor-pointer invert"
+          className="z-0 cursor-pointer"
           src="/logo.png"
           alt=""
-          width={50}
-          onClick={() => navigate("/")}
+          width={45}
+          onClick={() => {
+            navigate("/")
+            window.location.reload()
+          }}
         />
 
         <Title order={4} className="z-0 cursor-pointer" onClick={() => navigate("/")}>
