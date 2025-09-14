@@ -94,7 +94,7 @@ export default function Header() {
           {isLoading ? (
             <Group gap="sm" wrap="nowrap">
               <Skeleton circle height={34} width={34} />
-              <Stack gap={2}>
+              <Stack gap={2} visibleFrom="md">
                 <Skeleton height={14} width={80} radius="sm" />
                 <Skeleton height={12} width={30} radius="sm" />
               </Stack>
@@ -121,10 +121,12 @@ export default function Header() {
               <Menu.Target>
                 <Group gap="sm" className="cursor-pointer transition-colors hover:text-blue-600">
                   <Avatar key={user.id} name={user.fullName} color="initials" radius="xl" />
-                  <Stack gap={0} className="leading-tight">
+
+                  <Stack gap={0} className="leading-tight" visibleFrom="md">
                     <Text fw={600} size="sm">
                       {user.fullName}
                     </Text>
+
                     <Badge variant="light" size="xs" radius="sm" color="blue">
                       {user.student ? user.student?.program?.acronym : user.role.systemTag}
                     </Badge>
@@ -133,6 +135,22 @@ export default function Header() {
               </Menu.Target>
 
               <Menu.Dropdown>
+                {/* User info visible on mobile only */}
+                <div className="md:hidden">
+                  <Menu.Label>
+                    <Group justify="space-between" gap={4}>
+                      <Text fw={600} size="sm">
+                        {user.fullName}
+                      </Text>
+
+                      <Badge variant="light" size="xs" radius="sm" color="blue">
+                        {user.student ? user.student?.program?.acronym : user.role.systemTag}
+                      </Badge>
+                    </Group>
+                  </Menu.Label>
+                  <Menu.Divider />
+                </div>
+
                 <Menu.Item
                   leftSection={<IconUser size={14} />}
                   onClick={() => navigate(ENDPOINT.USER.BASE)}
