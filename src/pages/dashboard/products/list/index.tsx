@@ -77,6 +77,7 @@ export const ProductList = () => {
             color="red"
             variant="light"
             onClick={() => handleOnDeleteProduct(id)}
+            disabled
           >
             <IconTrashX size={14} />
           </ActionIcon>
