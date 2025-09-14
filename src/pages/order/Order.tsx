@@ -19,7 +19,6 @@ import { useQuery } from "@tanstack/react-query"
 import { getOrder } from "@/services/order.service"
 import { KEY } from "@/constants/key"
 import { useLocation, useParams } from "react-router"
-import { getAcronym } from "@/helper/textFormatter"
 
 export default function Order() {
   const user = useContext(AuthContext)
@@ -188,7 +187,7 @@ export default function Order() {
                       Program
                     </Text>
                     <Text size="sm" fw={500}>
-                      {getAcronym(user.user?.student.program.name)}
+                      {user.user?.student.program.acronym}
                     </Text>
                   </Group>
                 </Stack>

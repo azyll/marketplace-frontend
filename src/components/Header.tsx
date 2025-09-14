@@ -26,7 +26,6 @@ import { AuthContext } from "@/contexts/AuthContext"
 import { notifications } from "@mantine/notifications"
 import { ENDPOINT } from "@/constants/endpoints"
 import { ROUTES } from "@/constants/routes"
-import { getAcronym } from "@/helper/textFormatter"
 
 export default function Header() {
   const navigate = useNavigate()
@@ -127,7 +126,7 @@ export default function Header() {
                       {user.fullName}
                     </Text>
                     <Badge variant="light" size="xs" radius="sm" color="blue">
-                      {user.student ? getAcronym(user.student?.program?.name) : user.role.systemTag}
+                      {user.student ? user.student?.program?.acronym : user.role.systemTag}
                     </Badge>
                   </Stack>
                 </Group>
