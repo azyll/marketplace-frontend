@@ -32,7 +32,6 @@ export const DashboardLayout = () => {
       label: "Products",
       path: ROUTES.DASHBOARD.PRODUCTS.BASE,
       icon: <IconBuildingStore size={14} />,
-      disabled: true,
     },
     {
       label: "Orders",
