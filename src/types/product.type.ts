@@ -28,7 +28,7 @@ export interface IProductVariant {
   productId: string
   product: IProduct
   size: string
-  stockCondition: string
+  stockCondition: "in-stock" | "out-of-stock" | "low-stock"
   stockQuantity: number
 }
 

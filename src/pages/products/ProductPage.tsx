@@ -8,6 +8,7 @@ import {
   Stack,
   Text,
   Title,
+  Badge,
 } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { useNavigate, useParams } from "react-router"
@@ -20,7 +21,7 @@ import { useContext, useEffect, useMemo, useState } from "react"
 import { PRODUCT_SIZE } from "@/constants/product"
 import { CartContext } from "@/contexts/CartContext"
 import { AuthContext } from "@/contexts/AuthContext"
-import { IconCheck, IconX } from "@tabler/icons-react"
+import { IconCheck, IconX, IconAlertTriangle } from "@tabler/icons-react"
 
 const FALLBACK_IMAGE =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbrHWzlFK_PWuIk1Jglo7Avt97howljIWwAA&s"
@@ -142,7 +143,42 @@ export default function ProductPage() {
     setSize(undefined) // Reset size when attribute changes
   }
 
-  const isOutOfStock = stock === 0
+  // Enhanced stock condition helpers
+  const isOutOfStock = stockCondition === "out-of-stock"
+  const isLowStock = stockCondition === "low-stock"
+  const isInStock = stockCondition === "in-stock"
+
+  const getStockDisplay = () => {
+    if (!stockCondition) return null
+
+    switch (stockCondition) {
+      case "out-of-stock":
+        return {
+          text: "Out of stock",
+          color: "red" as const,
+          icon: <IconX size={16} />,
+          badge: { color: "red", text: "Out of Stock" },
+        }
+      case "low-stock":
+        return {
+          text: `Low stock - Only ${stock}pc(s) remaining`,
+          color: "orange" as const,
+          icon: <IconAlertTriangle size={16} />,
+          badge: { color: "orange", text: "Low Stock" },
+        }
+      case "in-stock":
+        return {
+          text: `${stock}pc(s) available`,
+          color: "green" as const,
+          icon: <IconCheck size={16} />,
+          badge: { color: "green", text: "In Stock" },
+        }
+      default:
+        return null
+    }
+  }
+
+  const stockDisplay = getStockDisplay()
   const hasSizeRequirement = variants.some((v) => v.size !== "N/A")
 
   const canOrder = useMemo(() => {
@@ -170,8 +206,19 @@ export default function ProductPage() {
     return isSexAttribute && userHasSex && sexIsAutoSelected
   }
 
-  // Add to cart
+  // Add to cart with stock condition awareness
   const handleAddToCart = () => {
+    if (isOutOfStock) {
+      notifications.show({
+        title: "Cannot Add to Cart",
+        message: "This item is currently out of stock.",
+        color: "red",
+        icon: <IconX size={16} />,
+        autoClose: 3000,
+      })
+      return
+    }
+
     const variant = variants.find((v) => {
       const attributeMatch = Object.entries(selectedAttributes).every(
         ([attrName, attrValue]) => v.name === attrValue && v.productAttribute.name === attrName,
@@ -184,21 +231,32 @@ export default function ProductPage() {
     setLoading(true)
     addToCart(variant.id)
       .then((res) => {
+        let message = res.message
+
+        // Add low stock warning to success message
+        if (res.type === "success" && isLowStock) {
+          message = `${res.message} Note: This item is low in stock.`
+        }
+
         notifications.show({
           title: res.type === "success" ? "Success" : "Error",
-          message: res.message,
-          color: res.type === "success" ? "green" : "red",
+          message,
+          color: res.type === "success" ? (isLowStock ? "orange" : "green") : "red",
           icon: res.type === "success" ? <IconCheck size={16} /> : <IconX size={16} />,
-          autoClose: 3000,
+          autoClose: isLowStock ? 5000 : 3000, // Show longer for low stock warning
         })
       })
       .finally(() => setLoading(false))
   }
 
-  // Buy now
+  // Buy now with stock condition awareness
   const buyNowMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Missing required information")
+
+      if (isOutOfStock) {
+        throw new Error("This item is currently out of stock")
+      }
 
       const variant = variants.find((v) => {
         const attributeMatch = Object.entries(selectedAttributes).every(
@@ -214,16 +272,27 @@ export default function ProductPage() {
       const orderItems = [{ productVariantId: variant.id, quantity: 1 }]
 
       const result = await createOrder(user.id, orderItems, "buy-now")
-      console.log("Order result:", result) // Add this to see what's returned
+      console.log("Order result:", result)
       return result
     },
     onSuccess: (order) => {
-      console.log("Order in onSuccess:", order) // Add this too
+      console.log("Order in onSuccess:", order)
+
+      let message = "Your order has been created successfully."
+      let color: "green" | "orange" = "green"
+
+      // Add low stock notice to success message
+      if (isLowStock) {
+        message += " Note: This item is low in stock, so please complete payment promptly."
+        color = "orange"
+      }
+
       notifications.show({
         title: "Success!",
-        message: "Your order has been created successfully.",
-        color: "green",
+        message,
+        color,
         icon: <IconCheck size={16} />,
+        autoClose: isLowStock ? 6000 : 4000,
       })
 
       navigate(`/order/${order?.id}?orderType=buy-now`, { state: { orderData: order } })
@@ -247,20 +316,37 @@ export default function ProductPage() {
       >
         {/* Product image */}
         <Grid.Col span={{ base: 12, sm: 6 }}>
-          <Image
-            src={getImage(product?.data?.image ?? FALLBACK_IMAGE)}
-            alt={product?.data?.name}
-            w="100%"
-            className="sm:!rounded-xl"
-            loading="lazy"
-            fallbackSrc={FALLBACK_IMAGE}
-          />
+          <div className="relative">
+            <Image
+              src={getImage(product?.data?.image ?? FALLBACK_IMAGE)}
+              alt={product?.data?.name}
+              w="100%"
+              className="sm:!rounded-xl"
+              loading="lazy"
+              fallbackSrc={FALLBACK_IMAGE}
+            />
+            {/* Stock badge overlay */}
+            {stockDisplay && (
+              <Badge
+                color={stockDisplay.badge.color}
+                variant="filled"
+                size="lg"
+                className="absolute top-4 right-4"
+                leftSection={stockDisplay.icon}
+              >
+                {stockDisplay.badge.text}
+              </Badge>
+            )}
+          </div>
         </Grid.Col>
 
         {/* Product details */}
         <Grid.Col span={{ base: 12, sm: 6 }}>
-          <Stack w="100%" bg="#f2f5f9" px={{ base: 16, md: 0 }}>
-            <Title order={3}>{product?.data?.name}</Title>
+          <Stack gap={10} w="100%" bg="#f2f5f9" px={{ base: 16, md: 0 }}>
+            <Title order={3}>
+              {product?.data?.name} ({product?.data.category})
+            </Title>
+
             <Text c="dimmed">{product?.data?.description}</Text>
 
             <Text size="xl" fw={700}>
@@ -271,16 +357,15 @@ export default function ProductPage() {
 
             {/* Attribute selection */}
             {Object.entries(attributeGroups).map(([attributeName, attributeData]) => (
-              <div key={attributeName}>
-                <Title order={4}>{attributeData.name}</Title>
+              <Stack key={attributeName}>
+                <Title key={attributeName} order={4}>
+                  {attributeData.name}
+                </Title>
 
                 {/* Show selected value for auto-selected sex */}
                 {shouldHideSexSelection(attributeName, attributeData) ? (
                   <>
-                    {" "}
-                    <Text c="dimmed" size="sm">
-                      Selected: {selectedAttributes[attributeName]}
-                    </Text>
+                    <Text size="sm">Selected: {selectedAttributes[attributeName]}</Text>
                     <Text c="dimmed" size="xs" fs="italic">
                       Note: This option is determined by your registered profile. If you wish to
                       order uniforms for a different sex, kindly visit the Proware.
@@ -293,13 +378,14 @@ export default function ProductPage() {
                         key={value}
                         variant={selectedAttributes[attributeName] === value ? "filled" : "light"}
                         onClick={() => handleAttributeChange(attributeName, value)}
+                        disabled={isOutOfStock}
                       >
                         {value}
                       </Button>
                     ))}
                   </Group>
                 )}
-              </div>
+              </Stack>
             ))}
 
             {/* Size selection */}
@@ -318,10 +404,15 @@ export default function ProductPage() {
                     </Button>
                   ))}
                 </Group>
-                {stock !== null && (
-                  <Text mt="sm" c={isOutOfStock ? "red" : "dimmed"}>
-                    {isOutOfStock ? "Out of stock" : `${stock}pc(s) available`}
-                  </Text>
+
+                {/* Enhanced stock display */}
+                {stockDisplay && (
+                  <Group mt="sm" gap="xs">
+                    {stockDisplay.icon}
+                    <Text c={stockDisplay.color} fw={isOutOfStock || isLowStock ? 600 : 400}>
+                      {stockDisplay.text}
+                    </Text>
+                  </Group>
                 )}
               </>
             )}
