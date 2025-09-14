@@ -19,6 +19,8 @@ import { useQuery } from "@tanstack/react-query"
 import { getOrder } from "@/services/order.service"
 import { KEY } from "@/constants/key"
 import { useLocation, useParams } from "react-router"
+import { formatDate } from "@/helper/formatDate"
+import { IOrderStatusType } from "@/types/order.type"
 
 export default function Order() {
   const user = useContext(AuthContext)
@@ -46,6 +48,19 @@ export default function Order() {
     return <div>Order not found</div>
   }
 
+  const getStatusColor = (status: IOrderStatusType) => {
+    switch (status) {
+      case "ongoing":
+        return "yellow"
+      case "completed":
+        return "green"
+      case "cancelled":
+        return "red"
+      default:
+        return "gray"
+    }
+  }
+
   return (
     <Container size="xl" px="md" py="xl">
       {/* Option 1: Full Width with Floating Summary Card */}
@@ -68,7 +83,7 @@ export default function Order() {
             {/* ORDER STEPS */}
             <div className="w-full max-w-4xl">
               <Stepper
-                active={1}
+                active={0}
                 allowNextStepsSelect={false}
                 size="lg"
                 color="blue"
@@ -124,18 +139,25 @@ export default function Order() {
                   <Text size="sm" fw={600} c="dimmed" tt="uppercase">
                     Order Details
                   </Text>
-                  <Badge variant="light" color="blue" size="sm">
-                    Pending Payment
-                  </Badge>
+                  <Badge color={getStatusColor(orderData.status)}>{orderData.status}</Badge>
                 </Group>
 
                 <Stack gap="xs">
                   <Group justify="space-between">
                     <Text size="sm" c="dimmed">
-                      Order #
+                      Order No.
                     </Text>
                     <Text size="sm" fw={500}>
                       {orderData.id}
+                    </Text>
+                  </Group>
+
+                  <Group justify="space-between">
+                    <Text size="sm" c="dimmed">
+                      Placed on
+                    </Text>
+                    <Text size="sm" fw={500}>
+                      {formatDate(orderData.createdAt)}
                     </Text>
                   </Group>
 
@@ -169,7 +191,7 @@ export default function Order() {
                       ID
                     </Text>
                     <Text size="sm" fw={500}>
-                      {user.user?.student.id}
+                      0{user.user?.student.id}
                     </Text>
                   </Group>
 
@@ -187,7 +209,7 @@ export default function Order() {
                       Program
                     </Text>
                     <Text size="sm" fw={500}>
-                      {user.user?.student.program.acronym}
+                      {user.user?.student.program.acronym.toUpperCase()}
                     </Text>
                   </Group>
                 </Stack>
