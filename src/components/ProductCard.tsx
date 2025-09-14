@@ -42,6 +42,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             thousandSeparator
             fixedDecimalScale
             value={product.productVariant?.[0].price}
+            className="font-semibold"
           />
 
           <Text size="xs" c="gray.6" mt={-2} tt="capitalize">
