@@ -27,33 +27,43 @@ export default function Products() {
     name: searchParams.get("name") ?? undefined,
   })
 
-  const handleOnCategorySelect = (category: string) => {
+  const handleOnCategorySelect = (category: string | null) => {
     // Keep existing search when changing category
     const newParams = new URLSearchParams(searchParams)
-    newParams.set("category", category)
+
+    if (category) {
+      newParams.set("category", category)
+    } else {
+      // Remove category param when deselected
+      newParams.delete("category")
+    }
+
     setSearchParams(newParams)
-    setFilterValue("category", category)
+    setFilterValue("category", category ?? undefined)
   }
 
   const { data: products, isLoading } = useQuery({
-    queryKey: [KEY.PRODUCTS, filter, department, sex],
+    queryKey: [KEY.PRODUCTS, filter, department, sex, searchParams.get("department")],
     queryFn: () => {
       const queryParams: any = {
         ...filter,
         category: filter.category === PRODUCT_CATEGORY.ALL ? undefined : filter.category,
       }
 
-      // If user is logged in, add department filter
-      // Also check if department is already in URL params (from FeaturedProducts "View All" button)
+      // Priority: URL department param > user's department context
       const departmentFromUrl = searchParams.get("department")
-      if (department || departmentFromUrl) {
-        queryParams.department = departmentFromUrl || user.user?.student.program.department.name
+      const activeDepartment = departmentFromUrl || department
+
+      if (activeDepartment) {
+        queryParams.department = activeDepartment
       }
 
       // Add sex-based filtering if user is logged in and has a sex value
       if (sex) {
         queryParams.sex = sex
       }
+
+      console.log("Query params being sent:", queryParams) // Debug log
 
       return getProductList(queryParams)
     },
@@ -82,19 +92,19 @@ export default function Products() {
     }
   }, [searchParams])
 
-  // Get the department name for display (from URL param or user context)
+  // Get the department name for display (from filter or user context)
   const currentDepartment = useMemo(() => {
-    const departmentFromUrl = searchParams.get("department")
-    return departmentFromUrl || department
-  }, [searchParams, department])
+    return filter.department || department
+  }, [filter.department, department])
 
   return (
     <main className="mx-auto max-w-[1200px]">
       <Space h="sm" />
       <section className="px-4 xl:px-0">
         <FilterBar
-          value={filter.category}
-          onSelect={(category) => handleOnCategorySelect(category)}
+          onProgramSelect={(department) => setFilterValue("department", department)}
+          categoryValue={filter.category}
+          onCategorySelect={(category) => handleOnCategorySelect(category)}
         />
       </section>
 
