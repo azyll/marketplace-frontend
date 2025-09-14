@@ -32,7 +32,7 @@ export default function Profile() {
                 Student ID
               </Text>
 
-              <Text>{user.user.student.id || "Not provided"}</Text>
+              <Text>0{user.user.student.id || "Not provided"}</Text>
             </div>
 
             <div>

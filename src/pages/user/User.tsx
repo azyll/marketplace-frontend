@@ -23,7 +23,7 @@ export default function User() {
           align="center"
           className="max-w-page-width page-x-padding relative mx-auto"
         >
-          <Group gap="md">
+          <Group gap="md" wrap="nowrap">
             <Avatar src={getImage("bm.jpg")} size="95" radius="md" />
             <Stack gap={2}>
               <Title c="white" order={3}>

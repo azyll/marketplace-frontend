@@ -20,6 +20,8 @@ import { AuthContext } from "@/contexts/AuthContext"
 import { getStudentOrders } from "@/services/order.service"
 import { useFilters } from "@/hooks/useFilters"
 import { OrderHistorySkeleton } from "./components/OrderHistorySkeleton"
+import { useNavigate } from "react-router"
+import { formatDate } from "@/helper/formatDate"
 
 // Define the filter state type
 interface FilterState {
@@ -86,6 +88,8 @@ export default function OrderHistory() {
   const user = useContext(AuthContext)
   const userId = user.user?.id
 
+  const navigate = useNavigate()
+
   // Use the useFilters hook for filter state
   const [filters, setFilter] = useFilters<FilterState>({
     page: 1,
@@ -115,16 +119,6 @@ export default function OrderHistory() {
       default:
         return "gray"
     }
-  }
-
-  const formatDate = (date: Date | string) => {
-    return new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
   }
 
   // Show skeleton loading when loading and no orders yet
@@ -166,6 +160,7 @@ export default function OrderHistory() {
         >
           <Stack gap="sm">
             <Text>{error}</Text>
+
             <Button
               leftSection={<IconRefresh size="1rem" />}
               onClick={refetch}
@@ -190,9 +185,10 @@ export default function OrderHistory() {
           </Title>
 
           {/* Filter Buttons */}
-          <Group gap="xs" className="mb-4">
+          <Group gap="xs" className="hide-scrollbar mb-4 overflow-x-auto" wrap="nowrap">
             {(["all", "ongoing", "completed", "cancelled"] as const).map((status) => (
               <Button
+                className="shrink-0"
                 key={status}
                 onClick={() => handleFilterChange(status)}
                 variant={filters.status === status ? "filled" : "outline"}
@@ -211,13 +207,18 @@ export default function OrderHistory() {
           <Card h={240} bg="#e9edf3" padding="sm" radius="lg" mx={{ base: 16, xl: 0 }}>
             <div className="flex h-full flex-col items-center justify-center">
               <IconMoodSad color="gray" size={32} stroke={1.5} />
+
               <Text ta="center" c="dimmed">
                 No orders found.
               </Text>
             </div>
           </Card>
         ) : (
-          <Stack gap="md">
+          <Stack
+            className="cursor-pointer"
+            gap="md"
+            onClick={() => navigate(`/order/${orders[0].id}`)}
+          >
             {orders.map((order) => (
               <Card key={order.id} shadow="sm" padding="lg" radius="md" withBorder>
                 <Stack gap="md">
@@ -227,10 +228,12 @@ export default function OrderHistory() {
                       <Title order={3} size="h4">
                         Order #{order.id.slice(-8)}
                       </Title>
+
                       <Text size="sm" c="dimmed">
                         Placed on {formatDate(order.createdAt)}
                       </Text>
                     </div>
+
                     <Badge color={getStatusColor(order.status)} variant="light" tt="capitalize">
                       {order.status}
                     </Badge>
@@ -243,6 +246,7 @@ export default function OrderHistory() {
                         <Text size="sm" c="dimmed">
                           Order Number:
                         </Text>
+
                         <Text size="sm" fw={500}>
                           {order.id}
                         </Text>
@@ -251,8 +255,9 @@ export default function OrderHistory() {
                         <Text size="sm" c="dimmed">
                           Student ID:
                         </Text>
+
                         <Text size="sm" fw={500}>
-                          {order.studentId}
+                          0{order.studentId}
                         </Text>
                       </div>
                     </Group>
@@ -263,6 +268,7 @@ export default function OrderHistory() {
                           <Text size="sm" c="dimmed">
                             Last Updated:
                           </Text>
+
                           <Text size="xs">{formatDate(order.updatedAt)}</Text>
                         </div>
                         {order.deletedAt && (
@@ -270,6 +276,7 @@ export default function OrderHistory() {
                             <Text size="sm" c="dimmed">
                               Deleted At:
                             </Text>
+
                             <Text size="xs" c="red">
                               {formatDate(order.deletedAt)}
                             </Text>
@@ -283,31 +290,18 @@ export default function OrderHistory() {
 
                   {/* Order Footer */}
                   <Group justify="space-between">
-                    <div></div>
                     <Group gap="xs">
                       <Text size="sm" c="dimmed">
                         Total:
                       </Text>
                       <Text size="lg" fw={700}>
-                        P{order.total.toFixed(2)}
+                        ₱{order.total.toFixed(2)}
                       </Text>
                     </Group>
                   </Group>
                 </Stack>
               </Card>
             ))}
-
-            {/* Show loading indicator when loading more pages */}
-            {loading && orders.length > 0 && (
-              <Center className="py-4">
-                <Stack align="center">
-                  <Loader size="sm" />
-                  <Text size="sm" c="dimmed">
-                    Loading more orders...
-                  </Text>
-                </Stack>
-              </Center>
-            )}
           </Stack>
         )}
       </Stack>
