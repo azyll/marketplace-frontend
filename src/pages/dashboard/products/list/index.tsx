@@ -66,9 +66,9 @@ export const ProductList = () => {
       title: "Actions",
       width: 120,
       textAlign: "center",
-      render: ({ id }) => (
+      render: ({ productSlug }) => (
         <div className="flex justify-center gap-4">
-          <ActionIcon size="lg" variant="light" onClick={() => handleOnEditProduct(id)}>
+          <ActionIcon size="lg" variant="light" onClick={() => handleOnEditProduct(productSlug)}>
             <IconEdit size={14} />
           </ActionIcon>
 
@@ -76,7 +76,7 @@ export const ProductList = () => {
             size="lg"
             color="red"
             variant="light"
-            onClick={() => handleOnDeleteProduct(id)}
+            onClick={() => handleOnDeleteProduct(productSlug)}
             disabled
           >
             <IconTrashX size={14} />
