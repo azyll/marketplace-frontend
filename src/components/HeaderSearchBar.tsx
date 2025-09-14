@@ -1,48 +1,41 @@
-import {
-  ActionIcon,
-  Button,
-  CloseButton,
-  Drawer,
-  Group,
-  Input,
-} from "@mantine/core";
-import { IconSearch } from "@tabler/icons-react";
-import { useFilters } from "@/hooks/useFilters";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { ActionIcon, Button, CloseButton, Drawer, Group, Input } from "@mantine/core"
+import { IconSearch } from "@tabler/icons-react"
+import { useFilters } from "@/hooks/useFilters"
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router"
 
 interface HeaderSearch {
-  name?: string;
+  search?: string
 }
 
 export default function HeaderSearchBar() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false)
 
   const [filter, setFilterValue] = useFilters<HeaderSearch>({
-    name: undefined,
-  });
+    search: undefined,
+  })
 
   const handleSearch = () => {
-    if (filter.name && filter.name.trim()) {
-      navigate(`/products?name=${encodeURIComponent(filter.name.trim())}`);
-      setSearchOpen(false);
+    if (filter.search && filter.search.trim()) {
+      navigate(`/products?search=${encodeURIComponent(filter.search.trim())}`)
+      setSearchOpen(false)
     }
-  };
+  }
 
   // Auto-search for desktop
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (filter.name && filter.name.trim()) {
-        navigate(`/products?name=${encodeURIComponent(filter.name.trim())}`);
-      } else if (filter.name === "") {
-        navigate("/products");
+      if (filter.search && filter.search.trim()) {
+        navigate(`/products?search=${encodeURIComponent(filter.search.trim())}`)
+      } else if (filter.search === "") {
+        navigate("/products")
       }
-    }, 300);
+    }, 300)
 
-    return () => clearTimeout(timeoutId);
-  }, [filter.name, navigate]);
+    return () => clearTimeout(timeoutId)
+  }, [filter.search, navigate])
 
   return (
     <>
@@ -51,7 +44,7 @@ export default function HeaderSearchBar() {
         variant="subtle"
         hiddenFrom="sm"
         onClick={() => {
-          setSearchOpen(true);
+          setSearchOpen(true)
         }}
       >
         <IconSearch />
@@ -65,41 +58,24 @@ export default function HeaderSearchBar() {
         padding="md"
         withCloseButton={false}
       >
-        <Group
-          justify="space-between"
-          mb="md"
-          wrap="nowrap"
-          gap="xs"
-        >
+        <Group justify="space-between" mb="md" wrap="nowrap" gap="xs">
           <Input
             placeholder="Search products"
-            value={filter.name || ""}
-            onChange={(value) => setFilterValue("name", value.target.value)}
+            value={filter.search || ""}
+            onChange={(value) => setFilterValue("search", value.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             radius="xl"
             flex={1}
             rightSection={
-              <div className="flex items-center justify-center h-full pointer-events-auto">
-                <ActionIcon
-                  variant="light"
-                  radius="xl"
-                  onClick={handleSearch}
-                >
-                  <IconSearch
-                    size={20}
-                    strokeWidth={2.5}
-                  />
+              <div className="pointer-events-auto flex h-full items-center justify-center">
+                <ActionIcon variant="light" radius="xl" onClick={handleSearch}>
+                  <IconSearch size={20} strokeWidth={2.5} />
                 </ActionIcon>
               </div>
             }
           />
 
-          <Button
-            variant="subtle"
-            color="gray"
-            size="sm"
-            onClick={() => setSearchOpen(false)}
-          >
+          <Button variant="subtle" color="gray" size="sm" onClick={() => setSearchOpen(false)}>
             Cancel
           </Button>
         </Group>
@@ -107,39 +83,33 @@ export default function HeaderSearchBar() {
 
       {/* Search Bar for desktop */}
       <Input
+        variant="filled"
         w={{ base: 160, xs: 100, sm: 200 }}
         flex={1}
         visibleFrom="sm"
         rightSection={
-          <div className="flex items-center justify-center h-full pointer-events-auto">
-            {filter.name ? (
+          <div className="pointer-events-auto flex h-full items-center justify-center">
+            {filter.search ? (
               <CloseButton
                 radius="xl"
                 onClick={() => {
-                  setFilterValue("name", "");
-                  handleSearch();
+                  setFilterValue("search", "")
+                  handleSearch()
                 }}
               />
             ) : (
-              <ActionIcon
-                variant="subtle"
-                onClick={() => handleSearch()}
-                radius="xl"
-              >
-                <IconSearch
-                  size={20}
-                  strokeWidth={2.5}
-                />
+              <ActionIcon variant="subtle" onClick={() => handleSearch()} radius="xl">
+                <IconSearch size={20} strokeWidth={2.5} />
               </ActionIcon>
             )}
           </div>
         }
         radius="xl"
         placeholder="Search products"
-        value={filter.name || ""}
-        onChange={(e) => setFilterValue("name", e.target.value)}
+        value={filter.search || ""}
+        onChange={(e) => setFilterValue("search", e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleSearch()}
       />
     </>
-  );
+  )
 }
