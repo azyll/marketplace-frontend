@@ -93,8 +93,8 @@ export default function Cart() {
   }
 
   return (
-    <main className="mx-auto max-w-[1200px]">
-      <Grid gutter="xl" mt={{ base: 0, sm: "md" }} px={{ sm: "xl", xl: 0 }}>
+    <main className="relative mx-auto max-w-[1200px]">
+      <Grid gutter="xl" mt="md" px={{ base: 16, sm: "xl", xl: 0 }}>
         {/* Cart items */}
         <Grid.Col span={{ base: 12, sm: 6 }}>
           <Stack gap="md">
@@ -112,7 +112,10 @@ export default function Cart() {
                   padding="md"
                   className={`relative transition-opacity ${
                     isRemoving ? "pointer-events-none opacity-50" : ""
-                  }`}
+                  } cursor-pointer`}
+                  onClick={() =>
+                    navigate(`/products/${cart[0].productVariant.product.productSlug}`)
+                  }
                 >
                   <Group justify="space-between" align="flex-start">
                     <Group>
@@ -171,10 +174,11 @@ export default function Cart() {
 
         {/* Order summary */}
         <Grid.Col span={{ base: 12, sm: 6 }}>
-          <Card mt="42" withBorder radius="md" padding="lg">
+          <Card className="sticky bottom-0" mt="42" withBorder radius="md" padding="lg">
             <Title order={4} mb="md">
               Order Summary
             </Title>
+
             <Stack gap="sm">
               {cart?.map((item: any) => (
                 <Group key={item.id} justify="space-between">
@@ -193,6 +197,7 @@ export default function Cart() {
 
               <Group justify="space-between">
                 <Text fw={700}>Total</Text>
+
                 <Text fw={700}>
                   ₱
                   {cart

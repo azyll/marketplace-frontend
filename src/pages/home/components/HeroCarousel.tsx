@@ -15,7 +15,7 @@ export default function HeroCarousel() {
   return (
     <>
       <section className="mx-auto max-w-[1200px]">
-        <Title px={{ base: 16, xl: 0 }} order={2}>
+        <Title pt="sm" px={{ base: 16, xl: 0 }} order={2}>
           Announcements
         </Title>
       </section>
