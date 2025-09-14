@@ -4,14 +4,7 @@ import { useNavigate, useParams } from "react-router"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { ROUTES } from "@/constants/routes"
 import { KEY } from "@/constants/key"
-import { getUserById } from "@/services/user.service"
 import { getProductBySlug } from "@/services/products.service"
-import Axios from "axios"
-import { notifications } from "@mantine/notifications"
-import { ICreateUserInput } from "@/types/user.type"
-import { ICreateStudentInput } from "@/types/student.type"
-import { UserDetailsForm } from "@/pages/dashboard/user/page/UserDetailsForm"
-import { StudentDetailsForm } from "@/pages/dashboard/user/page/StudentDetailsForm"
 
 export const ProductPage = () => {
   const { productId } = useParams<{ productId: string }>()
