@@ -24,7 +24,7 @@ export default function Products() {
     category: searchParams.get("category") ?? PRODUCT_CATEGORY.ALL,
     latest: true,
     limit: 8,
-    name: searchParams.get("name") ?? undefined,
+    search: searchParams.get("search") ?? undefined,
   })
 
   const handleOnCategorySelect = (category: string | null) => {
@@ -63,8 +63,6 @@ export default function Products() {
         queryParams.sex = sex
       }
 
-      console.log("Query params being sent:", queryParams) // Debug log
-
       return getProductList(queryParams)
     },
   })
@@ -86,9 +84,10 @@ export default function Products() {
 
   // Update filters when URL changes
   useEffect(() => {
-    const nameParam = searchParams.get("name")
-    if (nameParam !== filter.name) {
-      setFilterValue("name", nameParam || undefined)
+    const searchParam = searchParams.get("search")
+
+    if (searchParam !== filter.search) {
+      setFilterValue("search", searchParam || undefined)
     }
   }, [searchParams])
 
@@ -114,17 +113,17 @@ export default function Products() {
       {currentDepartment && (
         <section className="px-4 xl:px-0">
           <Text size="sm" c="dimmed">
-            Showing products for: {currentDepartment}
+            Showing products from: {currentDepartment}
           </Text>
           <Space h="xs" />
         </section>
       )}
 
       {/* Show current search term */}
-      {filter.name && (
+      {filter.search && (
         <section className="px-4 xl:px-0">
           <Text size="sm" c="dimmed">
-            Search results for: "{filter.name}"
+            Search results for: "{filter.search}"
           </Text>
           <Space h="xs" />
         </section>
@@ -150,7 +149,7 @@ export default function Products() {
             <div className="flex h-full flex-col items-center justify-center">
               <IconMoodSad color="gray" size={32} stroke={1.5} />
               <Text ta="center" c="dimmed">
-                {filter.name ? `No products found for "${filter.name}"` : "No products found."}
+                {filter.search ? `No products found for "${filter.search}"` : "No products found."}
               </Text>
             </div>
           </Card>

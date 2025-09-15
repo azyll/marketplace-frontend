@@ -6,6 +6,7 @@ export interface IProductListFilters extends IPagination {
   name?: string
   category?: string
   sex?: "male | female"
+  search?: string
 }
 
 export interface IProductAttribute {
