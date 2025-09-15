@@ -113,7 +113,7 @@ export default function FilterBar({
   ))
 
   return (
-    <Group gap="sm" wrap="nowrap" className="hide-scrollbar overflow-x-auto" p={{ base: 4 }}>
+    <Group gap="sm" wrap="nowrap" className="hide-scrollbar overflow-x-auto">
       {/* Program Filter Combobox*/}
       {!user.user?.student ? (
         <Combobox
