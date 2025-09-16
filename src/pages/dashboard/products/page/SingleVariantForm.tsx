@@ -7,6 +7,8 @@ import { ICreateProductVariantInput, IProductAttribute } from "@/types/product.t
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
 import { getProductAttributes } from "@/services/product-attribute.service"
+import { createProductSchema } from "@/schema/product.schema"
+import { zod4Resolver } from "mantine-form-zod-resolver"
 
 export interface SingleVariantFormRef {
   form: UseFormReturnType<{ variants: ICreateProductVariantInput[] }>
@@ -24,6 +26,8 @@ export const SingleVariantForm = ({ ref, disabled }: Props) => {
     select: (attributes: IProductAttribute[]) => attributes.find(({ name }) => name === "N/A"),
   })
 
+  const variantsSchema = createProductSchema.pick({ variants: true })
+
   const form = useForm<{ variants: ICreateProductVariantInput[] }>({
     initialValues: {
       variants: [
@@ -36,6 +40,7 @@ export const SingleVariantForm = ({ ref, disabled }: Props) => {
         },
       ],
     },
+    validate: zod4Resolver(variantsSchema),
   })
 
   useEffect(() => {

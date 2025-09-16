@@ -120,7 +120,7 @@ export const ProductList = () => {
           withTableBorder
           striped
           borderRadius={6}
-          minHeight={220}
+          minHeight={340}
           // Pagination
           totalRecords={products?.meta.totalItems ?? 0}
           recordsPerPage={filters.limit ?? DEFAULT_LIMIT}
