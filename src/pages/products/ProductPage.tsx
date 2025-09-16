@@ -19,9 +19,10 @@ import { createOrder } from "@/services/order.service"
 import { getImage } from "@/services/media.service"
 import { useContext, useEffect, useMemo, useState } from "react"
 import { PRODUCT_SIZE } from "@/constants/product"
-import { CartContext } from "@/contexts/CartContext"
 import { AuthContext } from "@/contexts/AuthContext"
-import { IconCheck, IconX, IconAlertTriangle } from "@tabler/icons-react"
+import { IconCheck, IconX } from "@tabler/icons-react"
+import QuantityInput from "./components/QuantityInput"
+import { addItem } from "@/services/cart.service"
 
 const FALLBACK_IMAGE =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbrHWzlFK_PWuIk1Jglo7Avt97howljIWwAA&s"
@@ -35,19 +36,28 @@ export default function ProductPage() {
     queryFn: () => getProductBySlug(slug as string),
     enabled: !!slug,
   })
-
-  const { addToCart } = useContext(CartContext)
   const { user } = useContext(AuthContext)
 
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({})
-  const [size, setSize] = useState<string>()
+  const [size, setSize] = useState<string>("Small")
   const [price, setPrice] = useState<number>()
+  const [quantity, setQuantity] = useState(1)
   const [loading, setLoading] = useState(false)
 
   const variants = product?.data?.productVariant ?? []
 
+  // Check if product has no variants at all
+  const hasNoVariants = variants.length === 0
+
+  // For products with no variants, use the base product data
+  const basePrice = product?.data?.productVariant[0].price
+  const baseStock = product?.data?.productVariant[0].stockQuantity
+  const baseStockCondition = product?.data?.productVariant[0].stockCondition
+
   // Group variants by attribute type (skip "N/A")
   const attributeGroups = useMemo(() => {
+    if (hasNoVariants) return {}
+
     const groups: Record<string, { name: string; values: string[] }> = {}
 
     variants.forEach((variant) => {
@@ -66,10 +76,12 @@ export default function ProductPage() {
     })
 
     return groups
-  }, [variants])
+  }, [variants, hasNoVariants])
 
   // Auto-set user's sex when variants are loaded
   useEffect(() => {
+    if (hasNoVariants) return // Skip for products without variants
+
     if (user?.student?.sex && variants.length > 0 && Object.keys(selectedAttributes).length === 0) {
       const userSex = user.student.sex.toLowerCase()
 
@@ -89,10 +101,12 @@ export default function ProductPage() {
         }
       }
     }
-  }, [user?.student?.sex, variants, attributeGroups, selectedAttributes])
+  }, [user?.student?.sex, variants, attributeGroups, selectedAttributes, hasNoVariants])
 
   // Filter size options
   const sortedSizeOptions = useMemo(() => {
+    if (hasNoVariants) return [] // No size options for products without variants
+
     if (Object.keys(selectedAttributes).length === 0 && Object.keys(attributeGroups).length > 0) {
       return []
     }
@@ -113,12 +127,20 @@ export default function ProductPage() {
     return [...new Set(sizes.filter((s) => s && s !== "N/A"))].sort(
       (a, b) => Object.keys(PRODUCT_SIZE).indexOf(a) - Object.keys(PRODUCT_SIZE).indexOf(b),
     )
-  }, [selectedAttributes, variants, attributeGroups])
+  }, [selectedAttributes, variants, attributeGroups, hasNoVariants])
 
   const [stock, setStock] = useState<number | null>(null)
   const [stockCondition, setStockCondition] = useState<string | null>(null)
 
   useEffect(() => {
+    if (hasNoVariants) {
+      // Use base product data when no variants exist
+      setPrice(basePrice)
+      setStock(baseStock ?? null)
+      setStockCondition(baseStockCondition ?? null)
+      return
+    }
+
     let variant: any
 
     if (Object.keys(selectedAttributes).length > 0 || Object.keys(attributeGroups).length === 0) {
@@ -133,7 +155,16 @@ export default function ProductPage() {
     setPrice(variant?.price)
     setStock(variant?.stockQuantity ?? null)
     setStockCondition(variant?.stockCondition ?? null)
-  }, [selectedAttributes, size, variants, attributeGroups])
+  }, [
+    selectedAttributes,
+    size,
+    variants,
+    attributeGroups,
+    hasNoVariants,
+    basePrice,
+    baseStock,
+    baseStockCondition,
+  ])
 
   const handleAttributeChange = (attributeName: string, value: string) => {
     setSelectedAttributes((prev) => ({
@@ -143,47 +174,19 @@ export default function ProductPage() {
     setSize(undefined) // Reset size when attribute changes
   }
 
-  // Enhanced stock condition helpers
+  // Stock condition helpers
   const isOutOfStock = stockCondition === "out-of-stock"
   const isLowStock = stockCondition === "low-stock"
   const isInStock = stockCondition === "in-stock"
 
-  const getStockDisplay = () => {
-    if (!stockCondition) return null
-
-    switch (stockCondition) {
-      case "out-of-stock":
-        return {
-          text: "Out of stock",
-          color: "red" as const,
-          icon: <IconX size={16} />,
-          badge: { color: "red", text: "Out of Stock" },
-        }
-      case "low-stock":
-        return {
-          text: `Low stock - Only ${stock}pc(s) remaining`,
-          color: "orange" as const,
-          icon: <IconAlertTriangle size={16} />,
-          badge: { color: "orange", text: "Low Stock" },
-        }
-      case "in-stock":
-        return {
-          text: `${stock}pc(s) available`,
-          color: "green" as const,
-          icon: <IconCheck size={16} />,
-          badge: { color: "green", text: "In Stock" },
-        }
-      default:
-        return null
-    }
-  }
-
-  const stockDisplay = getStockDisplay()
-  const hasSizeRequirement = variants.some((v) => v.size !== "N/A")
+  const hasSizeRequirement = hasNoVariants ? false : variants.some((v) => v.size !== "N/A")
 
   const canOrder = useMemo(() => {
     if (!user) return false
     if (isOutOfStock) return false
+
+    // For products with no variants, always allow ordering (if in stock)
+    if (hasNoVariants) return true
 
     // If there are no attribute groups (only "N/A"), skip attribute requirement
     const attributesOk =
@@ -194,20 +197,27 @@ export default function ProductPage() {
     const sizeOk = !hasSizeRequirement || size || hasSizeNA
 
     return attributesOk && sizeOk
-  }, [user, isOutOfStock, attributeGroups, selectedAttributes, hasSizeRequirement, size, variants])
+  }, [
+    user,
+    isOutOfStock,
+    attributeGroups,
+    selectedAttributes,
+    hasSizeRequirement,
+    size,
+    variants,
+    hasNoVariants,
+  ])
 
   // Check if sex selection should be hidden for logged-in users
   const shouldHideSexSelection = (attributeName: string, attributeData: any) => {
-    const isSexAttribute =
-      attributeData.name.toLowerCase() === "sex" || attributeData.name.toLowerCase() === "gender"
+    const isSexAttribute = attributeData.name.toLowerCase() === "gender" || "sex"
     const userHasSex = user?.student?.sex
     const sexIsAutoSelected = selectedAttributes[attributeName] && userHasSex
 
     return isSexAttribute && userHasSex && sexIsAutoSelected
   }
 
-  // Add to cart with stock condition awareness
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (isOutOfStock) {
       notifications.show({
         title: "Cannot Add to Cart",
@@ -219,34 +229,74 @@ export default function ProductPage() {
       return
     }
 
-    const variant = variants.find((v) => {
-      const attributeMatch = Object.entries(selectedAttributes).every(
-        ([attrName, attrValue]) => v.name === attrValue && v.productAttribute.name === attrName,
-      )
-      return attributeMatch && (v.size === size || v.size === "N/A")
-    })
-
-    if (!variant) return
+    if (!user?.id) {
+      notifications.show({
+        title: "Error",
+        message: "Please log in to add items to cart.",
+        color: "red",
+        icon: <IconX size={16} />,
+        autoClose: 3000,
+      })
+      return
+    }
 
     setLoading(true)
-    addToCart(variant.id)
-      .then((res) => {
-        let message = res.message
 
-        // Add low stock warning to success message
-        if (res.type === "success" && isLowStock) {
-          message = `${res.message} Note: This item is low in stock.`
+    try {
+      let productId: string | undefined
+
+      if (hasNoVariants) {
+        // For products without variants, use the product ID directly
+        productId = product?.data?.id
+      } else {
+        // For products with variants, find the selected variant
+        const variant = variants.find((v) => {
+          const attributeMatch = Object.entries(selectedAttributes).every(
+            ([attrName, attrValue]) => v.name === attrValue && v.productAttribute.name === attrName,
+          )
+          return attributeMatch && (v.size === size || v.size === "N/A")
+        })
+
+        if (!variant) {
+          notifications.show({
+            title: "Error",
+            message: "Please select all required options.",
+            color: "red",
+            icon: <IconX size={16} />,
+            autoClose: 3000,
+          })
+          return
         }
 
-        notifications.show({
-          title: res.type === "success" ? "Success" : "Error",
-          message,
-          color: res.type === "success" ? (isLowStock ? "orange" : "green") : "red",
-          icon: res.type === "success" ? <IconCheck size={16} /> : <IconX size={16} />,
-          autoClose: isLowStock ? 5000 : 3000, // Show longer for low stock warning
-        })
+        productId = variant.id
+      }
+
+      const response = await addItem(user.id, productId, quantity)
+
+      let message = response.message
+
+      if (isLowStock) {
+        message = `${message} Note: This item is low in stock.`
+      }
+
+      notifications.show({
+        title: "Success",
+        message,
+        color: isLowStock ? "orange" : "green",
+        icon: <IconCheck size={16} />,
+        autoClose: isLowStock ? 5000 : 3000,
       })
-      .finally(() => setLoading(false))
+    } catch (error: any) {
+      notifications.show({
+        title: "Error",
+        message: error.response?.data?.error,
+        color: "red",
+        icon: <IconX size={16} />,
+        autoClose: 3000,
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Buy now with stock condition awareness
@@ -258,19 +308,28 @@ export default function ProductPage() {
         throw new Error("This item is currently out of stock")
       }
 
-      const variant = variants.find((v) => {
-        const attributeMatch = Object.entries(selectedAttributes).every(
-          ([attrName, attrValue]) => v.name === attrValue && v.productAttribute.name === attrName,
-        )
-        return attributeMatch && (v.size === size || v.size === "N/A")
-      })
+      let orderItems: any[]
+      console.log(quantity)
 
-      if (!variant) {
-        throw new Error("Selected variant not found")
+      if (hasNoVariants) {
+        // For products without variants, create order with product ID
+        orderItems = [{ productId: product?.data?.id, quantity }]
+      } else {
+        // Original variant-based logic
+        const variant = variants.find((v) => {
+          const attributeMatch = Object.entries(selectedAttributes).every(
+            ([attrName, attrValue]) => v.name === attrValue && v.productAttribute.name === attrName,
+          )
+          return attributeMatch && (v.size === size || v.size === "N/A")
+        })
+
+        if (!variant) {
+          throw new Error("Selected variant not found")
+        }
+
+        orderItems = [{ productVariantId: variant.id, quantity }]
       }
-
-      const orderItems = [{ productVariantId: variant.id, quantity: 1 }]
-
+      console.log(quantity)
       const result = await createOrder(user.id, orderItems, "buy-now")
       console.log("Order result:", result)
       return result
@@ -300,7 +359,7 @@ export default function ProductPage() {
     onError: (error: any) => {
       notifications.show({
         title: "Error",
-        message: error.message || "Failed to create order. Please try again.",
+        message: error.response?.data?.error,
         color: "red",
         icon: <IconX size={16} />,
       })
@@ -326,15 +385,9 @@ export default function ProductPage() {
               fallbackSrc={FALLBACK_IMAGE}
             />
             {/* Stock badge overlay */}
-            {stockDisplay && (
-              <Badge
-                color={stockDisplay.badge.color}
-                variant="filled"
-                size="lg"
-                className="absolute top-4 right-4"
-                leftSection={stockDisplay.icon}
-              >
-                {stockDisplay.badge.text}
+            {stock !== null && (
+              <Badge variant="filled" size="lg" className="absolute top-4 right-4">
+                {stockCondition}
               </Badge>
             )}
           </div>
@@ -343,53 +396,65 @@ export default function ProductPage() {
         {/* Product details */}
         <Grid.Col span={{ base: 12, sm: 6 }}>
           <Stack gap={10} w="100%" bg="#f2f5f9" px={{ base: 16, md: 0 }}>
-            <Title order={3}>
-              {product?.data?.name} ({product?.data.category})
-            </Title>
-
-            <Text c="dimmed">{product?.data?.description}</Text>
+            <div className="gap-2">
+              <Title order={3}>
+                {product?.data?.name} ({product?.data.category})
+              </Title>
+              <Text c="dimmed">{product?.data?.description}</Text>
+              <Group>
+                <Text size="xs" c="dimmed">
+                  category: {product?.data?.category}, program: product.data.department
+                </Text>
+              </Group>
+            </div>
 
             <Text size="xl" fw={700}>
-              <NumberFormatter prefix="₱" value={price ?? variants[0]?.price} decimalSeparator="" />
+              <NumberFormatter
+                prefix="₱"
+                value={price ?? (hasNoVariants ? basePrice : variants[0]?.price)}
+                decimalSeparator=""
+              />
             </Text>
 
             <Divider />
 
-            {/* Attribute selection */}
-            {Object.entries(attributeGroups).map(([attributeName, attributeData]) => (
-              <Stack key={attributeName}>
-                <Title key={attributeName} order={4}>
-                  {attributeData.name}
-                </Title>
+            {/* Only show attribute selection if product has variants */}
+            {!hasNoVariants &&
+              Object.entries(attributeGroups).map(([attributeName, attributeData]) => (
+                <Stack gap={2} key={attributeName}>
+                  <Title key={attributeName} order={4}>
+                    {attributeData.name}
+                  </Title>
 
-                {/* Show selected value for auto-selected sex */}
-                {shouldHideSexSelection(attributeName, attributeData) ? (
-                  <>
-                    <Text size="sm">Selected: {selectedAttributes[attributeName]}</Text>
-                    <Text c="dimmed" size="xs" fs="italic">
-                      Note: This option is determined by your registered profile. If you wish to
-                      order uniforms for a different sex, kindly visit the Proware.
-                    </Text>
-                  </>
-                ) : (
-                  <Group gap={5}>
-                    {attributeData.values.map((value) => (
-                      <Button
-                        key={value}
-                        variant={selectedAttributes[attributeName] === value ? "filled" : "light"}
-                        onClick={() => handleAttributeChange(attributeName, value)}
-                        disabled={isOutOfStock}
-                      >
-                        {value}
-                      </Button>
-                    ))}
-                  </Group>
-                )}
-              </Stack>
-            ))}
+                  {/* Show selected value for auto-selected sex */}
+                  {shouldHideSexSelection(attributeName, attributeData) ? (
+                    <>
+                      <Text size="sm">Selected: {selectedAttributes[attributeName]}</Text>
+                      <Text c="dimmed" size="xs" fs="italic">
+                        Note: This option is determined by your registered profile. If you wish to
+                        order uniforms for a different sex, kindly visit the Proware.
+                      </Text>
+                    </>
+                  ) : (
+                    <Group gap={5}>
+                      {attributeData.values.map((value) => (
+                        <Button
+                          key={value}
+                          variant={selectedAttributes[attributeName] === value ? "filled" : "white"}
+                          radius="xl"
+                          onClick={() => handleAttributeChange(attributeName, value)}
+                          disabled={isOutOfStock}
+                        >
+                          {value}
+                        </Button>
+                      ))}
+                    </Group>
+                  )}
+                </Stack>
+              ))}
 
-            {/* Size selection */}
-            {sortedSizeOptions.length > 0 && (
+            {/* Size selection - only for products with variants */}
+            {!hasNoVariants && sortedSizeOptions.length > 0 && (
               <>
                 <Title order={4}>Size</Title>
                 <Group gap={5}>
@@ -397,6 +462,7 @@ export default function ProductPage() {
                     <Button
                       key={option}
                       variant={size === option ? "filled" : "light"}
+                      // radius="xl"
                       onClick={() => setSize(option)}
                       miw={{ base: 60 }}
                     >
@@ -404,20 +470,24 @@ export default function ProductPage() {
                     </Button>
                   ))}
                 </Group>
-
-                {/* Enhanced stock display */}
-                {stockDisplay && (
-                  <Group mt="sm" gap="xs">
-                    {stockDisplay.icon}
-                    <Text c={stockDisplay.color} fw={isOutOfStock || isLowStock ? 600 : 400}>
-                      {stockDisplay.text}
-                    </Text>
-                  </Group>
-                )}
               </>
             )}
 
-            {/* Actions */}
+            {/* Quantity Input */}
+            <Stack gap={3}>
+              <Title order={4}>Quantity</Title>
+              <QuantityInput quantity={quantity} setQuantity={setQuantity} />
+            </Stack>
+
+            {/* Stock display */}
+            {stock !== null && stockCondition && (
+              <Stack gap={2}>
+                <Title order={4}>Stock</Title>
+                <Text fw={isOutOfStock || isLowStock ? 600 : 400}>{stock}pc(s) available</Text>
+              </Stack>
+            )}
+
+            {/* Action Buttons */}
             <Group
               className="sticky bottom-0 left-0 w-full py-2 md:static md:bg-transparent md:p-0"
               mt="sm"

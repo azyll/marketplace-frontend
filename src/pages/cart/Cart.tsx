@@ -15,7 +15,7 @@ import {
   Text,
   Title,
 } from "@mantine/core"
-import { IconMoodSad, IconX } from "@tabler/icons-react"
+import { IconMoodSad, IconTemperature, IconTrash, IconX } from "@tabler/icons-react"
 import { useContext } from "react"
 import CartItemSkeleton from "./components/CartItemSkeleton"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -23,6 +23,7 @@ import { useDisclosure } from "@mantine/hooks"
 import ConfirmationModal from "./components/ConfirmationModal"
 import { notifications } from "@mantine/notifications"
 import { useNavigate } from "react-router"
+import QuantityInput from "../products/components/QuantityInput"
 
 export default function Cart() {
   const { user } = useContext(AuthContext)
@@ -89,7 +90,7 @@ export default function Cart() {
 
   const handlePlaceOrder = () => {
     createOrderMutation.mutate()
-    close() // Close the confirmation modal
+    close()
   }
 
   return (
@@ -98,7 +99,7 @@ export default function Cart() {
         {/* Cart items */}
         <Grid.Col span={{ base: 12, sm: 6 }}>
           <Stack gap="md">
-            <Title order={4}>My Cart</Title>
+            <Title order={4}>My Cart - {cart?.length} item(s)</Title>
 
             {isLoading && !user ? (
               // Skeletons while loading
@@ -112,10 +113,10 @@ export default function Cart() {
                   padding="md"
                   className={`relative transition-opacity ${
                     isRemoving ? "pointer-events-none opacity-50" : ""
-                  } cursor-pointer`}
-                  onClick={() =>
-                    navigate(`/products/${cart[0].productVariant.product.productSlug}`)
-                  }
+                  } `}
+                  //   onClick={() =>
+                  //     navigate(`/products/${cart[0].productVariant.product.productSlug}`)
+                  //   }
                 >
                   <Group justify="space-between" align="flex-start">
                     <Group>
@@ -128,34 +129,44 @@ export default function Cart() {
                       />
                       <Stack gap={4}>
                         <Text fw={500}>{data.productVariant.product.name}</Text>
-                        <Text size="sm" c="dimmed">
+
+                        <Text size="sm">
                           <NumberFormatter
                             prefix="₱"
                             decimalScale={2}
                             thousandSeparator
                             decimalSeparator="."
                             fixedDecimalScale
-                            value={data.productVariant.price}
+                            value={data.productVariant.price * data.quantity}
                           />
                         </Text>
+
                         <Text size="xs" c="dimmed">
-                          {data.productVariant.productAttribute.name +
-                            ": " +
-                            data.productVariant.name}
-                          <br />
-                          Size: {data.productVariant.size}
+                          {data.productVariant.productAttribute?.name !== "N/A" && (
+                            <>
+                              {data.productVariant.productAttribute?.name}:{" "}
+                              {data.productVariant.name}
+                              <br />
+                            </>
+                          )}
+
+                          {data.productVariant.size !== "N/A" &&
+                            `Size: ${data.productVariant.size}`}
                         </Text>
+
+                        <QuantityInput quantity={data.quantity} setQuantity={() => {}} />
                       </Stack>
                     </Group>
                     <ActionIcon
                       variant="subtle"
-                      color="red"
+                      radius="xl"
+                      color="gray"
                       onClick={() => {
                         removeMutation.mutate(data.productVariantId)
                       }}
                       loading={isRemoving}
                     >
-                      <IconX size={18} stroke={3} />
+                      <IconTrash size={18} />
                     </ActionIcon>
                   </Group>
                 </Card>
@@ -180,38 +191,61 @@ export default function Cart() {
             </Title>
 
             <Stack gap="sm">
+              {/* Header row */}
+              <Grid>
+                <Grid.Col span={2}>
+                  <Text fw={600}>Qty</Text>
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <Text fw={600}>Item</Text>
+                </Grid.Col>
+                <Grid.Col span={4} ta="right">
+                  <Text fw={600}>Price (₱)</Text>
+                </Grid.Col>
+              </Grid>
+
+              {/* Cart items */}
               {cart?.map((item: any) => (
-                <Group key={item.id} justify="space-between">
-                  <Text>
-                    {item.productVariant.product.name}
-                    <span className="text-gray-400">
-                      {" "}
-                      ({item.productVariant.size}) × {item.quantity}pc
-                    </span>
-                  </Text>
-                  <Text>₱{(item.productVariant.price * item.quantity).toFixed(2)}</Text>
-                </Group>
+                <Grid key={item.id} align="center">
+                  <Grid.Col span={2}>
+                    <Text c="dimmed">{item.quantity} pc(s)</Text>
+                  </Grid.Col>
+                  <Grid.Col span={6}>
+                    <Text>
+                      {item.productVariant.product.name}{" "}
+                      <span className="text-gray-400">({item.productVariant.size})</span>
+                    </Text>
+                  </Grid.Col>
+                  <Grid.Col span={4} ta="right">
+                    <Text>{(item.productVariant.price * item.quantity).toFixed(2)}</Text>
+                  </Grid.Col>
+                </Grid>
               ))}
 
               <Divider />
 
-              <Group justify="space-between">
-                <Text fw={700}>Total</Text>
+              {/* Total row */}
+              <Grid>
+                <Grid.Col span={8}>
+                  <Text fw={700}>Total</Text>
+                </Grid.Col>
+                <Grid.Col span={4} ta="right">
+                  <Text fw={700}>
+                    ₱
+                    {cart
+                      ? cart
+                          .reduce(
+                            (sum: number, item: any) =>
+                              sum + item.productVariant.price * item.quantity,
+                            0,
+                          )
+                          .toFixed(2)
+                      : "0.00"}
+                  </Text>
+                </Grid.Col>
+              </Grid>
 
-                <Text fw={700}>
-                  ₱
-                  {cart
-                    ? cart
-                        .reduce(
-                          (sum: number, item: any) =>
-                            sum + item.productVariant.price * item.quantity,
-                          0,
-                        )
-                        .toFixed(2)
-                    : "0.00"}
-                </Text>
-              </Group>
-
+              {/* Place order button */}
               <Button
                 fullWidth
                 mt="md"
@@ -224,6 +258,7 @@ export default function Cart() {
                 Place Order
               </Button>
 
+              {/* Confirmation modal */}
               <ConfirmationModal
                 opened={opened}
                 onClose={close}
