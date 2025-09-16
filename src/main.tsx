@@ -8,23 +8,12 @@ import "@mantine/carousel/styles.css"
 import "@mantine/notifications/styles.css"
 import "mantine-datatable/styles.css"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { MantineProvider, createTheme } from "@mantine/core"
+import { MantineProvider } from "@mantine/core"
 import { Notifications } from "@mantine/notifications"
 import { AuthProvider } from "./contexts/AuthContext"
-import { CartProvider } from "./contexts/CartContext"
+import { theme } from "./themes/theme"
 
 const queryClient = new QueryClient()
-
-const theme = createTheme({
-  breakpoints: {
-    xs: "36rem",
-    sm: "40rem",
-    md: "48rem",
-    lg: "64rem",
-    xl: "80rem",
-  },
-  fontFamily: "Inter, sans-serif",
-})
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -32,9 +21,7 @@ createRoot(document.getElementById("root")!).render(
       <MantineProvider theme={theme}>
         <Notifications position="top-right" />
         <AuthProvider>
-          <CartProvider>
-            <RouterProvider router={router} />
-          </CartProvider>
+          <RouterProvider router={router} />
         </AuthProvider>
       </MantineProvider>
     </QueryClientProvider>
