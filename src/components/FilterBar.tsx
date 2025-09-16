@@ -176,7 +176,7 @@ export default function FilterBar({
           className="shrink-0"
           variant={selectedCategory === value ? "filled" : "default"}
           radius="xl"
-          fw="500"
+          fw="400"
           onClick={() => handleCategoryClick(value)}
         >
           {label}
