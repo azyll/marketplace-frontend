@@ -1,4 +1,4 @@
-import { Button, Group, Modal, Stack, Text, Card, Title, Divider } from "@mantine/core"
+import { Button, Group, Modal, Stack, Text, Card, Title, Divider, Grid } from "@mantine/core"
 
 interface ConfirmationModalProps {
   opened: boolean
@@ -39,21 +39,49 @@ export default function ConfirmationModal({
             Order Summary
           </Title>
           <Stack gap="sm">
-            {cart?.map((item: any) => (
-              <Group key={item.id} justify="space-between">
-                <Text>
-                  {item.productVariant.product.name} x{item.quantity}
-                </Text>
-                <Text>₱{(item.productVariant.price * item.quantity).toFixed(2)}</Text>
-              </Group>
+            {/* Header row */}
+            <Grid>
+              <Grid.Col span={2}>
+                <Text fw={600}>Qty</Text>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <Text fw={600}>Item</Text>
+              </Grid.Col>
+              <Grid.Col span={4} ta="right">
+                <Text fw={600}>Price</Text>
+              </Grid.Col>
+            </Grid>
+
+            {/* Cart items */}
+            {cart?.map((item: any, idx: number) => (
+              <Grid key={item.id} align="center">
+                <Grid.Col span={2}>
+                  <Text c="dimmed">{item.quantity} pc(s)</Text>
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <Text>{item.productVariant.product.name}</Text>
+                </Grid.Col>
+                <Grid.Col span={4} ta="right">
+                  <Text>₱{(item.productVariant.price * item.quantity).toFixed(2)}</Text>
+                </Grid.Col>
+              </Grid>
             ))}
 
             <Divider />
 
-            <Group justify="space-between">
-              <Text fw={700}>Total</Text>
-              <Text fw={700}>₱{total?.toFixed(2) ?? "0.00"}</Text>
-            </Group>
+            {/* Total row */}
+            <Grid>
+              <Grid.Col span={8}>
+                <Text fw={700} size="lg">
+                  Total
+                </Text>
+              </Grid.Col>
+              <Grid.Col span={4} ta="right">
+                <Text fw={700} size="lg" c="blue">
+                  ₱{total?.toFixed(2) ?? "0.00"}
+                </Text>
+              </Grid.Col>
+            </Grid>
           </Stack>
         </Card>
 
