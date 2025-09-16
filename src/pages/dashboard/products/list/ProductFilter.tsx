@@ -89,8 +89,8 @@ export const ProductFilter = ({ filters, onFilter, disabled }: Props) => {
         clearButtonProps={{
           "aria-label": "Clear input",
         }}
-        onClear={() => handleOnFilter("departmentId", null)}
-        onChange={(value) => handleOnFilter("departmentId", value)}
+        onClear={() => handleOnFilter("department", null)}
+        onChange={(value) => handleOnFilter("department", value)}
         disabled={isDepartmentLoading || disabled}
       />
 

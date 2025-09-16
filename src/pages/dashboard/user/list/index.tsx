@@ -172,7 +172,7 @@ export const UserList = () => {
         </div>
       </Modal>
 
-      <Card.Section px={16} pt={16}>
+      <Card.Section px={24} pt={24}>
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Users</h1>
 
@@ -182,7 +182,9 @@ export const UserList = () => {
         </div>
       </Card.Section>
 
-      <Card.Section p={16}>
+      <Space h={16} />
+
+      <Card.Section px={24} pb={24}>
         <DataTable
           columns={columns}
           records={users?.data ?? []}

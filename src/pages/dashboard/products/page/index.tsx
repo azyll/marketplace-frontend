@@ -1,10 +1,10 @@
 import { Box, Button, Card, Container, LoadingOverlay, Space, Text, Title } from "@mantine/core"
 import { Ref, useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { ROUTES } from "@/constants/routes"
 import { KEY } from "@/constants/key"
-import { getProductBySlug } from "@/services/products.service"
+import { createProduct, getProductBySlug, updateProduct } from "@/services/products.service"
 import {
   ProductDetailsForm,
   ProductDetailsFormRef,
@@ -17,9 +17,16 @@ import {
   SingleVariantForm,
   SingleVariantFormRef,
 } from "@/pages/dashboard/products/page/SingleVariantForm"
-import { ICreateProductVariantInput, IProductAttribute } from "@/types/product.type"
+import {
+  ICreateProductInput,
+  ICreateProductVariantInput,
+  IProductAttribute,
+  IUpdateProductInput,
+} from "@/types/product.type"
 import { getProductAttributes } from "@/services/product-attribute.service"
 import { getImage } from "@/services/media.service"
+import { notifications } from "@mantine/notifications"
+import { AxiosError } from "axios"
 
 export const ProductPage = () => {
   const { productId } = useParams<{ productId: string }>()
@@ -47,10 +54,6 @@ export const ProductPage = () => {
     select: (attributes: IProductAttribute[]) => attributes.find(({ name }) => name === "N/A"),
   })
 
-  const isFormSubmitting = useMemo(() => {
-    return false
-  }, [])
-
   const [simpleProduct, setSimpleProduct] = useState<boolean>(true)
   const [imageDefaultValue, setImageDefaultValue] = useState<string>()
 
@@ -58,10 +61,101 @@ export const ProductPage = () => {
   const singleVariantFormRef = useRef<SingleVariantFormRef>(null)
   const multipleVariantFormRef = useRef<MultipleVariantFormRef>(null)
 
+  const createMutation = useMutation({
+    mutationFn: (payload: ICreateProductInput) => createProduct(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [KEY.PRODUCTS] })
+      notifications.show({
+        title: "Create Success",
+        message: "Successfully Created Product",
+        color: "green",
+      })
+      navigate(ROUTES.DASHBOARD.PRODUCTS.BASE)
+    },
+    onError: (error: AxiosError<{ message: string; error: string }>) => {
+      notifications.show({
+        title: "Create Failed",
+        message: error?.response?.data?.error ?? "Can't Update Product",
+        color: "red",
+      })
+    },
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ productId, payload }: { payload: IUpdateProductInput; productId: string }) =>
+      updateProduct(productId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [KEY.PRODUCTS] })
+      queryClient.invalidateQueries({ queryKey: [KEY.PRODUCT, productId] })
+      notifications.show({
+        title: "Update Success",
+        message: "Successfully Updated Product",
+        color: "green",
+      })
+      navigate(ROUTES.DASHBOARD.PRODUCTS.BASE)
+    },
+    onError: (error: AxiosError<{ message: string; error: string }>) => {
+      notifications.show({
+        title: "Update Failed",
+        message: error?.response?.data?.error ?? "Can't Update Product",
+        color: "red",
+      })
+    },
+  })
+
+  const isFormSubmitting = useMemo(
+    () => createMutation.isPending || updateMutation.isPending,
+    [createMutation.isPending, updateMutation.isPending],
+  )
+
+  const validateForms = () => {
+    const productDetailsForm = productDetailsFormRef.current?.form
+    const singleVariantForm = singleVariantFormRef.current?.form
+    const multipleVariantForm = multipleVariantFormRef.current?.form
+
+    if (!productDetailsForm || !singleVariantForm || !multipleVariantForm) return
+
+    const { hasErrors: productDetailsHasErrors } = productDetailsForm.validate()
+
+    const { hasErrors: variantHasErrors } = simpleProduct
+      ? singleVariantForm.validate()
+      : multipleVariantForm.validate()
+
+    return productDetailsHasErrors || variantHasErrors
+  }
+
   const handleOnSubmit = () => {
-    console.log("productDetailsFormRef", productDetailsFormRef.current?.form.values)
-    console.log("singleVariantFormRef", singleVariantFormRef.current?.form.values)
-    console.log("multipleVariantFormRef", multipleVariantFormRef.current?.form.values)
+    const productDetailsForm = productDetailsFormRef.current?.form
+    const singleVariantForm = singleVariantFormRef.current?.form
+    const multipleVariantForm = multipleVariantFormRef.current?.form
+
+    if (!productDetailsForm || !singleVariantForm || !multipleVariantForm) return
+
+    const productDetails = productDetailsForm.values as ICreateProductInput
+    const singleProductVariants = singleVariantForm.values.variants as ICreateProductVariantInput[]
+    const multipleProductVariants = multipleVariantForm.values
+      .variants as ICreateProductVariantInput[]
+
+    if (!productDetailsForm || !singleVariantForm || !multipleVariantForm) return
+
+    const hasErrors = validateForms()
+
+    if (!hasErrors) {
+      if (isCreate) {
+        createMutation.mutate({
+          ...productDetails,
+          variants: simpleProduct ? singleProductVariants : multipleProductVariants,
+        })
+      } else {
+        updateMutation.mutate({
+          productId: product?.id as string,
+          payload: {
+            ...productDetails,
+            variants: simpleProduct ? singleProductVariants : multipleProductVariants,
+          },
+        })
+      }
+    }
   }
 
   const initializeProductDetails = () => {
@@ -125,16 +219,6 @@ export const ProductPage = () => {
           })),
         })
         multipleVariantFormRef.current?.form.reset()
-
-        console.log(
-          variants.map((variant) => ({
-            productAttributeId: variant.productAttributeId,
-            size: variant.size,
-            price: variant.price,
-            name: variant.name,
-            stockAvailable: variant.stockAvailable,
-          })),
-        )
       }
     }
   }
@@ -176,7 +260,11 @@ export const ProductPage = () => {
         </Card.Section>
 
         <Card.Section p={24}>
-          <ProductDetailsForm ref={productDetailsFormRef} imageDefaultValue={imageDefaultValue} />
+          <ProductDetailsForm
+            ref={productDetailsFormRef}
+            imageDefaultValue={imageDefaultValue}
+            disabled={isFormSubmitting}
+          />
         </Card.Section>
       </Card>
       <Space h={24} />
@@ -186,14 +274,14 @@ export const ProductPage = () => {
           <Button
             variant={simpleProduct ? "filled" : "outline"}
             onClick={() => setSimpleProduct(true)}
-            disabled={isLoading}
+            disabled={isLoading || isFormSubmitting}
           >
             Simple Product
           </Button>
           <Button
             variant={!simpleProduct ? "filled" : "outline"}
             onClick={() => setSimpleProduct(false)}
-            disabled={isLoading}
+            disabled={isLoading || isFormSubmitting}
           >
             Multi-Variant Product
           </Button>
@@ -206,11 +294,11 @@ export const ProductPage = () => {
         <LoadingOverlay visible={isLoading} zIndex={1000} />
 
         <div className={simpleProduct ? "block" : "hidden"}>
-          <SingleVariantForm ref={singleVariantFormRef} />
+          <SingleVariantForm ref={singleVariantFormRef} disabled={isFormSubmitting} />
         </div>
 
         <div className={simpleProduct ? "hidden" : "block"}>
-          <MultipleVariantForm ref={multipleVariantFormRef} />
+          <MultipleVariantForm ref={multipleVariantFormRef} disabled={isFormSubmitting} />
         </div>
       </div>
     </div>

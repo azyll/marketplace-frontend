@@ -4,6 +4,8 @@ import { MultipleVariantFormItem } from "@/pages/dashboard/products/page/Multipl
 import { ICreateProductVariantInput } from "@/types/product.type"
 import { IconPlus } from "@tabler/icons-react"
 import { Ref, useImperativeHandle } from "react"
+import { zod4Resolver } from "mantine-form-zod-resolver"
+import { createProductSchema } from "@/schema/product.schema"
 
 export interface MultipleVariantFormRef {
   form: UseFormReturnType<{ variants: ICreateProductVariantInput[] }>
@@ -15,6 +17,8 @@ interface Props {
 }
 
 export const MultipleVariantForm = ({ disabled, ref }: Props) => {
+  const variantsSchema = createProductSchema.pick({ variants: true })
+
   const form = useForm<{ variants: ICreateProductVariantInput[] }>({
     initialValues: {
       variants: [
@@ -27,6 +31,7 @@ export const MultipleVariantForm = ({ disabled, ref }: Props) => {
         },
       ],
     },
+    validate: zod4Resolver(variantsSchema),
   })
 
   const handleOnAddVariant = () => {

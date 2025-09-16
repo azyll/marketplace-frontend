@@ -213,7 +213,7 @@ export const UserPage = () => {
 
   return (
     <Card>
-      <Card.Section px={16} pt={16}>
+      <Card.Section px={24} pt={24}>
         <div className="flex items-start justify-between gap-4">
           <div>
             <Title order={3}>{isCreate ? "Create" : "Edit"} User</Title>
@@ -241,7 +241,9 @@ export const UserPage = () => {
         </div>
       </Card.Section>
 
-      <Card.Section p={16}>
+      <Space h={16} />
+
+      <Card.Section px={24} pb={24}>
         <Box pos="relative" mih={220}>
           <LoadingOverlay
             visible={isFormSubmitting || isLoading}
@@ -252,7 +254,7 @@ export const UserPage = () => {
 
           <UserDetailsForm ref={userFormRef} user={user} onRoleChange={handleOnRoleChange} />
 
-          {isStudent && <Space h={46} />}
+          {isStudent && <Space h={38} />}
 
           <StudentDetailsForm
             ref={studentFormRef}
