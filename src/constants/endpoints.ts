@@ -2,6 +2,12 @@ export const ENDPOINT = {
   PRODUCT: {
     BASE: "/product",
     ID: "/product/:id",
+    ATTRIBUTE: {
+      BASE: "/product/create",
+    },
+    DEPARTMENT: {
+      BASE: "/product/create",
+    },
   },
 
   CART: {

@@ -1,0 +1,136 @@
+import { ComboboxItem, Grid, OptionsFilter, Select, Textarea, TextInput } from "@mantine/core"
+import { useForm, UseFormReturnType } from "@mantine/form"
+import { ICreateProductInput } from "@/types/product.type"
+import { ImageUpload } from "@/components/ImageUpload"
+import { useQuery } from "@tanstack/react-query"
+import { KEY } from "@/constants/key"
+import { getPrograms } from "@/services/program.service"
+import { PRODUCT_CATEGORY, PRODUCT_TYPE } from "@/constants/product"
+import { Ref, useImperativeHandle } from "react"
+import { getProductDepartments } from "@/services/product-department.service"
+
+export interface ProductDetailsFormRef {
+  form: UseFormReturnType<Partial<ICreateProductInput>>
+}
+
+interface Props {
+  disabled?: boolean
+  ref?: Ref<ProductDetailsFormRef>
+  imageDefaultValue?: string
+}
+
+export const ProductDetailsForm = ({ disabled, ref, imageDefaultValue }: Props) => {
+  const { data: departmentOptions, isLoading: isDepartmentLoading } = useQuery({
+    queryKey: [KEY.PRODUCT_DEPARTMENTS],
+    queryFn: () => getProductDepartments(),
+    select: (departments) => departments?.map(({ name, id }) => ({ label: name, value: id })),
+  })
+
+  const departmentOptionsFilter: OptionsFilter = ({ search }) => {
+    if (!departmentOptions) return []
+
+    const filtered = (departmentOptions as ComboboxItem[]).filter((option) =>
+      option.label.toLowerCase().trim().includes(search.toLowerCase().trim()),
+    )
+
+    filtered.sort((a, b) => a.label.localeCompare(b.label))
+    return filtered
+  }
+
+  const categoryOptions: ComboboxItem[] = [
+    { label: "Uniform", value: PRODUCT_CATEGORY.UNIFORM },
+    { label: "Proware", value: PRODUCT_CATEGORY.PROWARE },
+    { label: "Accessory", value: PRODUCT_CATEGORY.ACCESSORY },
+    { label: "Stationery", value: PRODUCT_CATEGORY.STATIONERY },
+  ]
+
+  const typeOptions: ComboboxItem[] = [
+    { label: "Upper Ware", value: PRODUCT_TYPE.UPPER_WARE },
+    { label: "Lower Ware", value: PRODUCT_TYPE.LOWER_WARE },
+    { label: "Non Wearable", value: PRODUCT_TYPE.NON_WEARABLE },
+  ]
+
+  const form = useForm<Partial<ICreateProductInput>>({
+    initialValues: {
+      name: "",
+      description: "",
+      departmentId: "",
+      category: "",
+      type: "",
+    },
+  })
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      form,
+    }),
+    [form],
+  )
+
+  return (
+    <form>
+      <Grid>
+        <Grid.Col span={12}>
+          <ImageUpload
+            maxFiles={1}
+            multiple={false}
+            onDrop={(files) => form.setFieldValue("image", files[0])}
+            defaultPreview={imageDefaultValue}
+          />
+        </Grid.Col>
+
+        <Grid.Col span={6}>
+          {/* Student ID */}
+          <TextInput label="Name" {...form.getInputProps("name")} disabled={disabled} />
+        </Grid.Col>
+
+        <Grid.Col span={12}>
+          {/* Student ID */}
+          <Textarea
+            label="Description"
+            {...form.getInputProps("description")}
+            disabled={disabled}
+            resize="vertical"
+          />
+        </Grid.Col>
+
+        <Grid.Col span={4}>
+          {/* Program/Department */}
+          <Select
+            label="Department"
+            placeholder="Select Department"
+            data={departmentOptions}
+            filter={departmentOptionsFilter}
+            nothingFoundMessage="Department Not Found."
+            searchable
+            disabled={disabled || isDepartmentLoading}
+            {...form.getInputProps("departmentId")}
+          />
+        </Grid.Col>
+
+        <Grid.Col span={4}>
+          {/* Type*/}
+          <Select
+            label="Type"
+            placeholder="Select Type"
+            data={typeOptions}
+            disabled={disabled}
+            {...form.getInputProps("type")}
+          />
+        </Grid.Col>
+
+        <Grid.Col span={4}>
+          {/* Category*/}
+          <Select
+            label="Category"
+            placeholder="Select Category"
+            data={categoryOptions}
+            disabled={disabled}
+            {...form.getInputProps("category")}
+          />
+        </Grid.Col>
+      </Grid>
+    </form>
+  )
+}

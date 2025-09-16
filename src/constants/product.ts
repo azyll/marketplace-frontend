@@ -4,7 +4,7 @@ export const PRODUCT_CATEGORY = {
   UNIFORM: "uniform",
   STATIONERY: "stationery",
   ACCESSORY: "accessory",
-};
+}
 
 export const PRODUCT_SIZE = {
   "Extra Small": "XS",
@@ -16,4 +16,10 @@ export const PRODUCT_SIZE = {
   "3 Extra Large": "3XL",
   "4 Extra Large": "4XL",
   "5 Extra Large": "5XL",
-};
+}
+
+export const PRODUCT_TYPE = {
+  UPPER_WARE: "upper-wear",
+  LOWER_WARE: "lower-wear",
+  NON_WEARABLE: "non-wearable",
+}

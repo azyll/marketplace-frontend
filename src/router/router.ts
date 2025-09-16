@@ -13,8 +13,12 @@ import { ROUTES } from "@/constants/routes"
 import { BaseLayout } from "@/layouts/BaseLayout"
 import { DashboardLayout } from "@/layouts/DashboardLayout"
 import { MarketplaceLayout } from "@/layouts/MarketplaceLayout"
+
 import { UserPage } from "@/pages/dashboard/user/page"
 import { UserList } from "@/pages/dashboard/user/list"
+import { ProductPage as DashboardProductPage } from "@/pages/dashboard/products/page"
+import { ProductList as DashboardProductList } from "@/pages/dashboard/products/list"
+import { dashboardLoader } from "@/router/loader/auth"
 
 export const router = createBrowserRouter([
   {
@@ -76,11 +80,14 @@ export const router = createBrowserRouter([
       {
         path: ROUTES.DASHBOARD.BASE,
         Component: DashboardLayout,
+        loader: dashboardLoader,
         children: [
           {
             index: true,
             loader: () => redirect(ROUTES.DASHBOARD.USER.BASE),
           },
+
+          // Users
           {
             path: ROUTES.DASHBOARD.USER.BASE,
             Component: UserList,
@@ -88,6 +95,16 @@ export const router = createBrowserRouter([
           {
             path: ROUTES.DASHBOARD.USER.ID,
             Component: UserPage,
+          },
+
+          // Products
+          {
+            path: ROUTES.DASHBOARD.PRODUCTS.BASE,
+            Component: DashboardProductList,
+          },
+          {
+            path: ROUTES.DASHBOARD.PRODUCTS.ID,
+            Component: DashboardProductPage,
           },
         ],
       },

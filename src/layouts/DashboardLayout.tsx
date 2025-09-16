@@ -1,6 +1,6 @@
 import { AppShell, Avatar, Badge, Burger, Group, Menu, NavLink, Stack, Text } from "@mantine/core"
 import { Link, Outlet, redirect, useLocation, useNavigate } from "react-router"
-import { useContext } from "react"
+import { useContext, useEffect } from "react"
 import { AuthContext } from "@/contexts/AuthContext"
 import {
   IconArrowLeft,
@@ -32,7 +32,6 @@ export const DashboardLayout = () => {
       label: "Products",
       path: ROUTES.DASHBOARD.PRODUCTS.BASE,
       icon: <IconBuildingStore size={14} />,
-      disabled: true,
     },
     {
       label: "Orders",
@@ -42,14 +41,7 @@ export const DashboardLayout = () => {
     },
   ]
 
-  if (!user) {
-    navigate(ROUTES.AUTH.BASE)
-    return null
-  }
-
-  if (user.role.systemTag !== "admin" && user.role.systemTag !== "employee") {
-    navigate("/")
-  }
+  if (!user) return null
 
   return (
     <AppShell
