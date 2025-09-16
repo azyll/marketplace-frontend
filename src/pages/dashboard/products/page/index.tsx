@@ -125,16 +125,6 @@ export const ProductPage = () => {
           })),
         })
         multipleVariantFormRef.current?.form.reset()
-
-        console.log(
-          variants.map((variant) => ({
-            productAttributeId: variant.productAttributeId,
-            size: variant.size,
-            price: variant.price,
-            name: variant.name,
-            stockAvailable: variant.stockAvailable,
-          })),
-        )
       }
     }
   }

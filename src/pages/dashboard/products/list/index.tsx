@@ -88,7 +88,7 @@ export const ProductList = () => {
 
   return (
     <Card>
-      <Card.Section px={16} pt={16}>
+      <Card.Section px={24} pt={24}>
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Products</h1>
 
@@ -100,7 +100,9 @@ export const ProductList = () => {
         <ProductFilter filters={filters} onFilter={setFilterValues} />
       </Card.Section>
 
-      <Card.Section p={16}>
+      <Space h={16} />
+
+      <Card.Section px={24} pb={24}>
         <DataTable
           columns={columns}
           records={products?.data ?? []}
