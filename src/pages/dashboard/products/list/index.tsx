@@ -1,4 +1,4 @@
-import { ActionIcon, Box, Button, Card, Image, Space } from "@mantine/core"
+import { ActionIcon, Box, Button, Card, Image, Modal, Space, Text, Title } from "@mantine/core"
 import { IconEdit, IconMoodSad, IconPlus, IconTrashX } from "@tabler/icons-react"
 import { useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
@@ -6,12 +6,17 @@ import { DataTable, DataTableColumn } from "mantine-datatable"
 import dayjs from "dayjs"
 import { IProduct, IProductListFilters } from "@/types/product.type"
 import { useFilters } from "@/hooks/useFilters"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { getProductList } from "@/services/products.service"
+import { deleteProduct, getProductList } from "@/services/products.service"
 import { getImage } from "@/services/media.service"
 import FilterBar from "@/components/FilterBar"
 import { ProductFilter } from "@/pages/dashboard/products/list/ProductFilter"
+import { notifications } from "@mantine/notifications"
+import { AxiosError } from "axios"
+import { useDisclosure } from "@mantine/hooks"
+import { useState } from "react"
+import { IUser } from "@/types/user.type"
 
 export const ProductList = () => {
   const DEFAULT_PAGE = 1
@@ -37,7 +42,50 @@ export const ProductList = () => {
     navigate(ROUTES.DASHBOARD.PRODUCTS.ID.replace(":productId", productId))
   }
 
-  const handleOnDeleteProduct = (userId: string) => {}
+  const queryClient = useQueryClient()
+
+  const [opened, { open, close }] = useDisclosure(false)
+
+  const [productForDeletion, setProductForDeletion] = useState<IProduct>()
+
+  const handleOnDeleteProduct = (product: IProduct) => {
+    if (product) {
+      setProductForDeletion(product)
+      open()
+    }
+  }
+
+  const deleteMutation = useMutation({
+    mutationFn: (productId: string) => deleteProduct(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [KEY.PRODUCTS] })
+
+      notifications.show({
+        title: "Delete Success",
+        message: "Successfully Deleted Product",
+        color: "green",
+      })
+
+      close()
+      setProductForDeletion(undefined)
+    },
+    onError: (error: AxiosError<{ message: string; error: string }>) => {
+      notifications.show({
+        title: "Delete Failed",
+        message: error?.response?.data?.error ?? "Can't Delete Product",
+        color: "red",
+      })
+    },
+  })
+
+  const handleOnCancelDeleteProduct = () => {
+    if (deleteMutation.isPending) return
+
+    close()
+    setTimeout(() => {
+      setProductForDeletion(undefined)
+    }, 200)
+  }
 
   const columns: DataTableColumn<IProduct>[] = [
     {
@@ -66,9 +114,13 @@ export const ProductList = () => {
       title: "Actions",
       width: 120,
       textAlign: "center",
-      render: ({ productSlug }) => (
+      render: (product) => (
         <div className="flex justify-center gap-4">
-          <ActionIcon size="lg" variant="light" onClick={() => handleOnEditProduct(productSlug)}>
+          <ActionIcon
+            size="lg"
+            variant="light"
+            onClick={() => handleOnEditProduct(product.productSlug)}
+          >
             <IconEdit size={14} />
           </ActionIcon>
 
@@ -76,8 +128,7 @@ export const ProductList = () => {
             size="lg"
             color="red"
             variant="light"
-            onClick={() => handleOnDeleteProduct(productSlug)}
-            disabled
+            onClick={() => handleOnDeleteProduct(product)}
           >
             <IconTrashX size={14} />
           </ActionIcon>
@@ -88,6 +139,41 @@ export const ProductList = () => {
 
   return (
     <Card>
+      <Modal
+        opened={opened}
+        onClose={() => handleOnCancelDeleteProduct()}
+        withCloseButton={false}
+        centered
+        closeOnClickOutside={!deleteMutation.isPending}
+      >
+        <Title order={5} mb={4}>
+          Delete Product
+        </Title>
+
+        <Text fz={14}>
+          Are you sure you want to delete <b>{productForDeletion?.name}</b>?
+        </Text>
+
+        <div className="mt-8 flex justify-end gap-2">
+          <Button
+            variant="light"
+            color="black"
+            onClick={() => handleOnCancelDeleteProduct()}
+            disabled={deleteMutation.isPending}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            color="red"
+            loading={deleteMutation.isPending}
+            onClick={() => deleteMutation.mutate(productForDeletion?.id ?? "")}
+          >
+            Delete
+          </Button>
+        </div>
+      </Modal>
+
       <Card.Section px={24} pt={24}>
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Products</h1>

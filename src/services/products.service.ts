@@ -70,7 +70,9 @@ export const updateProduct = async (productId: string, payload: IUpdateProductIn
 
   return response.data
 }
-// getProduct
-// createProduct
-// updateProduct
-// deleteProduct
+
+export const deleteProduct = async (productId: string) => {
+  const response = await axios.delete(ENDPOINT.PRODUCT.ID.replace(":id", productId))
+
+  return response.data
+}
