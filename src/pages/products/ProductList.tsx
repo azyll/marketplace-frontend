@@ -113,7 +113,7 @@ export default function Products() {
       {currentDepartment && (
         <section className="px-4 xl:px-0">
           <Text size="sm" c="dimmed">
-            Showing products from: {currentDepartment}
+            Filtered by: {currentDepartment}
           </Text>
           <Space h="xs" />
         </section>
