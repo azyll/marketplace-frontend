@@ -6,6 +6,7 @@ import { getPrograms } from "@/services/program.service"
 import { KeyboardEvent, useState } from "react"
 import { PRODUCT_CATEGORY } from "@/constants/product"
 import { IconSearch } from "@tabler/icons-react"
+import { getProductDepartments } from "@/services/product-department.service"
 
 interface Props {
   filters: IProductListFilters
@@ -20,14 +21,16 @@ export const ProductFilter = ({ filters, onFilter, disabled }: Props) => {
     })
   }
 
-  const { data: programOptions, isLoading: isProgramsLoading } = useQuery({
-    queryKey: [KEY.PROGRAMS],
-    queryFn: () => getPrograms({ page: 1, limit: 100 }),
-    select: (response) => response?.data?.map(({ name, id }) => ({ label: name, value: id })),
+  const { data: departmentOptions, isLoading: isDepartmentLoading } = useQuery({
+    queryKey: [KEY.PRODUCT_DEPARTMENTS],
+    queryFn: () => getProductDepartments(),
+    select: (departments) => departments?.map(({ name, id }) => ({ label: name, value: id })),
   })
 
-  const programOptionsFilter: OptionsFilter = ({ options, search }) => {
-    const filtered = (options as ComboboxItem[]).filter((option) =>
+  const departmentOptionsFilter: OptionsFilter = ({ search }) => {
+    if (!departmentOptions) return []
+
+    const filtered = (departmentOptions as ComboboxItem[]).filter((option) =>
       option.label.toLowerCase().trim().includes(search.toLowerCase().trim()),
     )
 
@@ -76,9 +79,9 @@ export const ProductFilter = ({ filters, onFilter, disabled }: Props) => {
       />
 
       <Select
-        placeholder={isProgramsLoading ? "Fetching Programs..." : "Select Program"}
-        data={programOptions}
-        filter={programOptionsFilter}
+        placeholder={isDepartmentLoading ? "Fetching Departments..." : "Select Department"}
+        data={departmentOptions}
+        filter={departmentOptionsFilter}
         nothingFoundMessage="Nothing found..."
         searchable
         w={280}
@@ -86,9 +89,9 @@ export const ProductFilter = ({ filters, onFilter, disabled }: Props) => {
         clearButtonProps={{
           "aria-label": "Clear input",
         }}
-        onClear={() => handleOnFilter("department", null)}
-        onChange={(value) => handleOnFilter("department", value)}
-        disabled={isProgramsLoading || disabled}
+        onClear={() => handleOnFilter("departmentId", null)}
+        onChange={(value) => handleOnFilter("departmentId", value)}
+        disabled={isDepartmentLoading || disabled}
       />
 
       <Select

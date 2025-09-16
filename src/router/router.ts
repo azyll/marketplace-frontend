@@ -18,6 +18,7 @@ import { UserPage } from "@/pages/dashboard/user/page"
 import { UserList } from "@/pages/dashboard/user/list"
 import { ProductPage as DashboardProductPage } from "@/pages/dashboard/products/page"
 import { ProductList as DashboardProductList } from "@/pages/dashboard/products/list"
+import { dashboardLoader } from "@/router/loader/auth"
 
 export const router = createBrowserRouter([
   {
@@ -79,6 +80,7 @@ export const router = createBrowserRouter([
       {
         path: ROUTES.DASHBOARD.BASE,
         Component: DashboardLayout,
+        loader: dashboardLoader,
         children: [
           {
             index: true,

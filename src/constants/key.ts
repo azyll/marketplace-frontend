@@ -6,4 +6,6 @@ export const KEY = {
   ROLES: "roles",
   PROGRAMS: "programs",
   ORDERS: "orders",
+  PRODUCT_ATTRIBUTES: "product-attributes",
+  PRODUCT_DEPARTMENTS: "product-departments",
 }

@@ -1,7 +1,7 @@
 import { IPagination } from "./common.type"
 
 export interface IProductListFilters extends IPagination {
-  department?: string
+  departmentId?: string
   latest?: boolean
   name?: string
   category?: string
@@ -29,7 +29,7 @@ export interface IProductVariant {
   product: IProduct
   size: string
   stockCondition: "in-stock" | "out-of-stock" | "low-stock"
-  stockQuantity: number
+  stockAvailable: number
 }
 
 export interface IProduct {
@@ -45,4 +45,22 @@ export interface IProduct {
   createdAt: Date
   deletedAt: Date | null
   updatedAt: Date | null
+}
+
+export interface ICreateProductVariantInput {
+  name: string
+  productAttributeId: string
+  size: string
+  price: number
+  stockAvailable: number
+}
+
+export interface ICreateProductInput {
+  name: string
+  description: string
+  image: File
+  type: string
+  category: string
+  departmentId: string
+  variants: ICreateProductVariantInput[]
 }
