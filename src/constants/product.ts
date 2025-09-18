@@ -19,7 +19,7 @@ export const PRODUCT_SIZE = {
 }
 
 export const PRODUCT_TYPE = {
-  UPPER_WARE: "upper-wear",
-  LOWER_WARE: "lower-wear",
+  UPPER_WEAR: "upper-wear",
+  LOWER_WEAR: "lower-wear",
   NON_WEARABLE: "non-wearable",
 }

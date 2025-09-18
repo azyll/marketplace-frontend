@@ -45,9 +45,9 @@ export const ProductDetailsForm = ({ disabled, ref, imageDefaultValue }: Props) 
   ]
 
   const typeOptions: ComboboxItem[] = [
-    { label: "Upper Ware", value: PRODUCT_TYPE.UPPER_WARE },
-    { label: "Lower Ware", value: PRODUCT_TYPE.LOWER_WARE },
-    { label: "Non Wearable", value: PRODUCT_TYPE.NON_WEARABLE },
+    { label: "Upper Wear", value: PRODUCT_TYPE.UPPER_WEAR },
+    { label: "Lower Wear", value: PRODUCT_TYPE.LOWER_WEAR },
+    { label: "Non-Wearable", value: PRODUCT_TYPE.NON_WEARABLE },
   ]
 
   const form = useForm<Partial<ICreateProductInput>>({
