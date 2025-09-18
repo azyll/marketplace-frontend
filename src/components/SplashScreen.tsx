@@ -1,4 +1,4 @@
-import { Text, Title } from "@mantine/core"
+import { Loader, Text, Title } from "@mantine/core"
 
 // components/SplashScreen.tsx
 export default function SplashScreen() {
@@ -11,6 +11,7 @@ export default function SplashScreen() {
           className="animate-fadeIn h-full w-full object-contain"
         />
       </div>
+      <Loader size="sm" color="dark" type="dots" />
     </div>
   )
 }
