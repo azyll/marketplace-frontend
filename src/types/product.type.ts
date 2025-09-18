@@ -1,7 +1,7 @@
 import { IPagination } from "./common.type"
 
 export interface IProductListFilters extends IPagination {
-  departmentId?: string
+  department?: string
   latest?: boolean
   name?: string
   category?: string
@@ -65,3 +65,5 @@ export interface ICreateProductInput {
   departmentId: string
   variants: ICreateProductVariantInput[]
 }
+
+export type IUpdateProductInput = Partial<ICreateProductInput>

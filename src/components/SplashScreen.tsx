@@ -8,7 +8,7 @@ export default function SplashScreen() {
         <img
           src="/logo.png"
           alt="STIMERCH MARKET Logo"
-          className="animate-fadeIn h-full w-full object-contain"
+          className="h-full w-full animate-bounce object-contain"
         />
       </div>
       <Loader size="sm" color="dark" type="dots" />

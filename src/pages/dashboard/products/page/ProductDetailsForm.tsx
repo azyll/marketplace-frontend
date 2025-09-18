@@ -8,6 +8,8 @@ import { getPrograms } from "@/services/program.service"
 import { PRODUCT_CATEGORY, PRODUCT_TYPE } from "@/constants/product"
 import { Ref, useImperativeHandle } from "react"
 import { getProductDepartments } from "@/services/product-department.service"
+import { createProductSchema } from "@/schema/product.schema"
+import { zod4Resolver } from "mantine-form-zod-resolver"
 
 export interface ProductDetailsFormRef {
   form: UseFormReturnType<Partial<ICreateProductInput>>
@@ -50,6 +52,8 @@ export const ProductDetailsForm = ({ disabled, ref, imageDefaultValue }: Props) 
     { label: "Non-Wearable", value: PRODUCT_TYPE.NON_WEARABLE },
   ]
 
+  const productSchema = createProductSchema.omit({ variants: true })
+
   const form = useForm<Partial<ICreateProductInput>>({
     initialValues: {
       name: "",
@@ -58,6 +62,7 @@ export const ProductDetailsForm = ({ disabled, ref, imageDefaultValue }: Props) 
       category: "",
       type: "",
     },
+    validate: zod4Resolver(productSchema),
   })
 
   useImperativeHandle(
@@ -77,6 +82,7 @@ export const ProductDetailsForm = ({ disabled, ref, imageDefaultValue }: Props) 
             multiple={false}
             onDrop={(files) => form.setFieldValue("image", files[0])}
             defaultPreview={imageDefaultValue}
+            disabled={disabled}
           />
         </Grid.Col>
 
