@@ -11,7 +11,7 @@ export default function SplashScreen() {
           className="h-full w-full animate-bounce object-contain"
         />
       </div>
-      <Loader size="sm" color="dark" type="dots" />
+      <Loader size="xs" color="dark" type="dots" />
     </div>
   )
 }
