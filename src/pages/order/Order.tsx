@@ -21,32 +21,27 @@ import { KEY } from "@/constants/key"
 import { useLocation, useParams } from "react-router"
 import { formatDate } from "@/helper/formatDate"
 import { IOrderStatusType } from "@/types/order.type"
+import SplashScreen from "@/components/SplashScreen"
 
 export default function Order() {
   const user = useContext(AuthContext)
-  const location = useLocation()
   const { orderId } = useParams()
 
-  // First try to get orderData from navigation state
-  const orderDataFromState = location.state?.orderData
-
-  // If no data from state, fetch it using the orderId from URL params
-  const { data: orderDataFromAPI, isLoading } = useQuery({
+  const { data: order, isLoading } = useQuery({
     queryKey: [KEY.ORDERS, orderId],
     queryFn: () => getOrder(orderId as string),
-    enabled: !orderDataFromState && !!orderId,
   })
 
   // Use data from state if available, otherwise use fetched data
-  const orderData = orderDataFromState || orderDataFromAPI
-
   if (isLoading) {
-    return <Loader />
+    return <SplashScreen />
   }
 
-  if (!orderData) {
+  if (!order) {
     return <div>Order not found</div>
   }
+
+  const product = order.orderItems[0].productVariant.product
 
   const getStatusColor = (status: IOrderStatusType) => {
     switch (status) {
@@ -139,7 +134,7 @@ export default function Order() {
                   <Text size="sm" fw={600} c="dimmed" tt="uppercase">
                     Order Details
                   </Text>
-                  <Badge color={getStatusColor(orderData.status)}>{orderData.status}</Badge>
+                  <Badge color={getStatusColor(order.status)}>{order.status}</Badge>
                 </Group>
 
                 <Stack gap="xs">
@@ -148,7 +143,7 @@ export default function Order() {
                       Order No.
                     </Text>
                     <Text size="sm" fw={500}>
-                      {orderData.id}
+                      {order.id}
                     </Text>
                   </Group>
 
@@ -157,7 +152,7 @@ export default function Order() {
                       Placed on
                     </Text>
                     <Text size="sm" fw={500}>
-                      {formatDate(orderData.createdAt)}
+                      {formatDate(order.createdAt)}
                     </Text>
                   </Group>
 
@@ -166,7 +161,7 @@ export default function Order() {
                       Total
                     </Text>
                     <Text size="lg" fw={700} c="blue">
-                      ₱{orderData.total}
+                      ₱{order.total}
                     </Text>
                   </Group>
                 </Stack>
@@ -230,7 +225,7 @@ export default function Order() {
                       Items
                     </Text>
                     <Text size="sm" fw={500}>
-                      -
+                      {product.name}
                     </Text>
                   </Group>
 
@@ -241,7 +236,7 @@ export default function Order() {
                       Total
                     </Text>
                     <Text size="xl" fw={700} c="blue">
-                      ₱{orderData.total}
+                      ₱{order.total}
                     </Text>
                   </Group>
                 </Stack>
@@ -263,7 +258,7 @@ export default function Order() {
                   Order Number
                 </Text>
                 <Text size="sm" fw={600}>
-                  {orderData.id}
+                  {order.id}
                 </Text>
               </div>
               <div>
@@ -290,7 +285,7 @@ export default function Order() {
                   Total Amount
                 </Text>
                 <Text size="xl" fw={700} c="blue">
-                  ₱{orderData.total}
+                  ₱{order.total}
                 </Text>
               </div>
               <Button variant="filled" color="blue">
