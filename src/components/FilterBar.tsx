@@ -7,36 +7,35 @@ import {
   CheckIcon,
   CloseButton,
   Input,
+  Text,
 } from "@mantine/core"
 import { PRODUCT_CATEGORY } from "@/constants/product"
 import { useContext, useEffect, useState } from "react"
 import { IconCheck, IconChevronDown } from "@tabler/icons-react"
 import { AuthContext } from "@/contexts/AuthContext"
+import { KEY } from "@/constants/key"
+import { getProductDepartments } from "@/services/product-department.service"
+import { useQuery } from "@tanstack/react-query"
+import { IDepartment } from "@/types/department.type"
 
 interface CategoryOption {
   label: string
   value: string
 }
 
-interface ProgramOption {
+interface DepartmentOption {
   label: string
+  value: string
+  acronyms: string[]
 }
 
 interface Props {
-  categoryValue?: string
-  programValue?: string // Add this prop
   onCategorySelect: (category: string | null) => void
-  onProgramSelect: (program: string | null) => void
-  programs?: ProgramOption[]
+  onProgramSelect: (department: string | null) => void
+  departments?: IDepartment
 }
 
-export default function FilterBar({
-  onCategorySelect,
-  onProgramSelect,
-  categoryValue,
-  programValue, // Add this prop
-  programs = [],
-}: Props) {
+export default function FilterBar({ onCategorySelect, onProgramSelect, departments }: Props) {
   const user = useContext(AuthContext)
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -46,17 +45,18 @@ export default function FilterBar({
     onDropdownClose: () => combobox.resetSelectedOption(),
   })
 
-  // Default programs if not provided
-  const defaultPrograms: ProgramOption[] = [
-    { label: "Arts & Sciences" },
-    { label: "Business & Management" },
-    { label: "Hospitality Management" },
-    { label: "Information and Communication Technology" },
-    { label: "Senior High School" },
-    { label: "Tourism Management" },
-  ]
-
-  const programOptions = programs.length > 0 ? programs : defaultPrograms
+  const { data: departmentOptions, isLoading: isDepartmentLoading } = useQuery({
+    queryKey: [KEY.PRODUCT_DEPARTMENTS],
+    queryFn: () => getProductDepartments(),
+    select: (departments) =>
+      departments
+        ?.map(({ name, id, program }) => ({
+          label: name,
+          value: id,
+          acronyms: program?.map((p) => p.acronym.toUpperCase()) ?? [],
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+  })
 
   const categoryOptions: CategoryOption[] = [
     { label: "Uniform", value: PRODUCT_CATEGORY.UNIFORM },
@@ -65,7 +65,7 @@ export default function FilterBar({
     { label: "Stationery", value: PRODUCT_CATEGORY.STATIONERY },
   ]
 
-  const handleCategoryClick = (category: string) => {
+  const handleOnClickCategory = (category: string) => {
     // Toggle behavior: if same category is clicked, deselect it
     if (selectedCategory === category) {
       setSelectedCategory(null)
@@ -76,37 +76,41 @@ export default function FilterBar({
     }
   }
 
-  const handleProgramSelect = (program: string) => {
-    setSelectedProgram(program)
-    onProgramSelect(program)
+  const handleOnSelectDepartment = (department: string) => {
+    setSelectedProgram(department)
+    onProgramSelect(department)
     combobox.closeDropdown()
   }
 
-  const handleProgramClear = () => {
+  const handleOnClearSearch = () => {
     setSelectedProgram(null)
     onProgramSelect(null)
   }
 
-  // Sync with external state changes for category
-  useEffect(() => {
-    if (categoryValue !== undefined && categoryValue !== selectedCategory) {
-      setSelectedCategory(categoryValue)
-    }
-  }, [categoryValue])
-
-  // Sync with external state changes for program
-  useEffect(() => {
-    if (programValue !== undefined && programValue !== selectedProgram) {
-      setSelectedProgram(programValue)
-    }
-  }, [programValue])
-
-  const options = programOptions.map((item) => (
-    <Combobox.Option value={item.label} key={item.label}>
+  const options = departmentOptions?.map((item) => (
+    <Combobox.Option value={item.label} key={item.label} style={{ padding: "8px 12px" }}>
       <Group gap="xs">
         {selectedProgram === item.label && <CheckIcon size={12} />}
-        <div>
-          <div>{item.label}</div>
+        <div style={{ lineHeight: 1.2, flex: 1, minWidth: 0 }}>
+          <Text
+            size="sm"
+            fw={500}
+            truncate="end"
+            title={item.label}
+            style={{ marginBottom: "1px" }}
+          >
+            {item.label}
+          </Text>
+          <div
+            style={{
+              fontSize: "11px",
+              color: "#868e96",
+              textTransform: "uppercase",
+              letterSpacing: "0.5px",
+            }}
+          >
+            {item.acronyms.join(" • ")}
+          </div>
         </div>
       </Group>
     </Combobox.Option>
@@ -114,17 +118,17 @@ export default function FilterBar({
 
   return (
     <Group gap="sm" wrap="nowrap" className="hide-scrollbar overflow-x-auto">
-      {/* Program Filter Combobox*/}
+      {/* Department Filter Combobox*/}
       {!user.user?.student ? (
         <Combobox
           store={combobox}
-          width={280}
+          width={250}
           position="bottom-start"
-          withArrow
-          onOptionSubmit={handleProgramSelect}
+          onOptionSubmit={handleOnSelectDepartment}
         >
           <Combobox.Target>
             <InputBase
+              w={250}
               radius="xl"
               variant="filled"
               component="button"
@@ -140,8 +144,8 @@ export default function FilterBar({
                   <CloseButton
                     size="sm"
                     onMouseDown={(event) => event.preventDefault()}
-                    onClick={handleProgramClear}
-                    aria-label="Clear program selection"
+                    onClick={handleOnClearSearch}
+                    aria-label="Clear department selection"
                   />
                 ) : (
                   <IconChevronDown size={14} />
@@ -157,7 +161,13 @@ export default function FilterBar({
                 transition: "all 0.2s ease",
               }}
             >
-              {selectedProgram || <Input.Placeholder>Select Program</Input.Placeholder>}
+              {selectedProgram ? (
+                <Text truncate="end" title={selectedProgram} style={{ textAlign: "left" }}>
+                  {selectedProgram}
+                </Text>
+              ) : (
+                <Input.Placeholder>Select Program</Input.Placeholder>
+              )}
             </InputBase>
           </Combobox.Target>
 
@@ -177,7 +187,7 @@ export default function FilterBar({
           variant={selectedCategory === value ? "filled" : "default"}
           radius="xl"
           fw="400"
-          onClick={() => handleCategoryClick(value)}
+          onClick={() => handleOnClickCategory(value)}
         >
           {label}
         </Button>
