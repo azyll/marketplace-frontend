@@ -13,7 +13,7 @@ import {
 import { notifications } from "@mantine/notifications"
 import { useNavigate, useParams } from "react-router"
 import { KEY } from "@/constants/key"
-import { useQuery, useMutation } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getProductBySlug } from "@/services/products.service"
 import { createOrder } from "@/services/order.service"
 import { getImage } from "@/services/media.service"
@@ -217,6 +217,8 @@ export default function ProductPage() {
     return isSexAttribute && userHasSex && sexIsAutoSelected
   }
 
+  const queryClient = useQueryClient()
+
   const handleAddToCart = async () => {
     if (isOutOfStock) {
       notifications.show({
@@ -272,6 +274,8 @@ export default function ProductPage() {
       }
 
       const response = await addItem(user.id, productId, quantity)
+
+      queryClient.invalidateQueries({ queryKey: ["cart", user.id] })
 
       let message = response.message
 
@@ -354,7 +358,7 @@ export default function ProductPage() {
         autoClose: isLowStock ? 6000 : 4000,
       })
 
-      navigate(`/order/${order?.id}?orderType=buy-now`, { state: { orderData: order } })
+      navigate(`/order/${order?.id}?orderType=buy-now`)
     },
     onError: (error: any) => {
       notifications.show({
@@ -397,13 +401,12 @@ export default function ProductPage() {
         <Grid.Col span={{ base: 12, sm: 6 }}>
           <Stack gap={10} w="100%" bg="#f2f5f9" px={{ base: 16, md: 0 }}>
             <div className="gap-2">
-              <Title order={3}>
-                {product?.data?.name} ({product?.data.category})
-              </Title>
+              <Title order={3}>{product?.data?.name}</Title>
               <Text c="dimmed">{product?.data?.description}</Text>
               <Group>
                 <Text size="xs" c="dimmed">
-                  category: {product?.data?.category}, program: product.data.department
+                  category: {product?.data?.category}, program:{" "}
+                  {product?.data.department.acronym.toUpperCase()}
                 </Text>
               </Group>
             </div>

@@ -9,6 +9,7 @@ import {
   Text,
   Badge,
   Skeleton,
+  Indicator,
 } from "@mantine/core"
 import {
   IconShoppingBag,
@@ -26,11 +27,21 @@ import { AuthContext } from "@/contexts/AuthContext"
 import { notifications } from "@mantine/notifications"
 import { ENDPOINT } from "@/constants/endpoints"
 import { ROUTES } from "@/constants/routes"
+import { useQuery } from "@tanstack/react-query"
+import { getItems } from "@/services/cart.service"
 
 export default function Header() {
   const navigate = useNavigate()
 
   const { user, logout, isLoading } = useContext(AuthContext)
+
+  const { data: cart } = useQuery({
+    queryKey: ["cart", user?.id],
+    queryFn: () => getItems(user!.id),
+    enabled: !!user?.id,
+  })
+
+  const cartCount = cart?.length ?? 0
 
   const isAdmin = useMemo(
     () => user?.role.systemTag === "admin" || user?.role.systemTag === "employee",
@@ -46,44 +57,75 @@ export default function Header() {
         wrap="nowrap"
         align="center"
       >
-        <img
-          className="z-0 cursor-pointer"
-          src="/logo.png"
-          alt=""
-          width={45}
-          onClick={() => {
-            navigate("/")
-            window.location.reload()
-          }}
-        />
+        <div className="flex items-center gap-2">
+          <img
+            className="z-0 cursor-pointer"
+            src="/logo.png"
+            alt=""
+            width={45}
+            onClick={() => {
+              navigate("/")
+              window.location.reload()
+            }}
+          />
+          <Title order={4} className="z-0 cursor-pointer" onClick={() => navigate("/")}>
+            STI Marketplace
+          </Title>
+        </div>
 
-        <Title order={4} className="z-0 cursor-pointer" onClick={() => navigate("/")}>
-          STI Marketplace
-        </Title>
-
-        <Group className="relative z-10" gap="sm" wrap="nowrap">
+        <Group className="relative z-10 !gap-4 md:!gap-6" wrap="nowrap">
           <HeaderSearchBar />
 
           {/* Cart Button */}
-          <ActionIcon
-            variant="subtle"
-            radius="xl"
-            onClick={() => {
-              if (!user) {
-                notifications.show({
-                  title: "Login required",
-                  message: "Please log in to view your cart",
-                  icon: <IconLock size={18} />,
-                })
 
-                navigate(ENDPOINT.LOGIN)
-              } else {
-                navigate(ENDPOINT.CART.BASE)
-              }
-            }}
-          >
-            <IconShoppingBag />
-          </ActionIcon>
+          {cartCount > 0 ? (
+            <Indicator
+              inline
+              label={cartCount}
+              size={18}
+              offset={3}
+              withBorder
+              classNames={{ indicator: "!text-[12px] !p-1" }}
+            >
+              <ActionIcon
+                variant="subtle"
+                radius="xl"
+                onClick={() => {
+                  if (!user) {
+                    notifications.show({
+                      title: "Login required",
+                      message: "Please log in to view your cart",
+                      icon: <IconLock size={18} />,
+                    })
+                    navigate(ENDPOINT.LOGIN)
+                  } else {
+                    navigate(ENDPOINT.CART.BASE)
+                  }
+                }}
+              >
+                <IconShoppingBag />
+              </ActionIcon>
+            </Indicator>
+          ) : (
+            <ActionIcon
+              variant="subtle"
+              radius="xl"
+              onClick={() => {
+                if (!user) {
+                  notifications.show({
+                    title: "Login required",
+                    message: "Please log in to view your cart",
+                    icon: <IconLock size={18} />,
+                  })
+                  navigate(ENDPOINT.LOGIN)
+                } else {
+                  navigate(ENDPOINT.CART.BASE)
+                }
+              }}
+            >
+              <IconShoppingBag />
+            </ActionIcon>
+          )}
 
           {/* Notifications Button */}
           <ActionIcon variant="subtle" radius="xl">
