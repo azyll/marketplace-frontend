@@ -102,7 +102,6 @@ export default function Products() {
       <section className="px-4 xl:px-0">
         <FilterBar
           onProgramSelect={(department) => setFilterValue("department", department)}
-          categoryValue={filter.category}
           onCategorySelect={(category) => handleOnCategorySelect(category)}
         />
       </section>
@@ -156,7 +155,13 @@ export default function Products() {
         )}
 
         <Pagination
-          my={"sm"}
+          my="sm"
+          radius="xl"
+          styles={{
+            control: {
+              border: 0,
+            },
+          }}
           value={filter.page}
           onChange={(page) => setFilterValue("page", page)}
           total={totalPages}

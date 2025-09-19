@@ -60,7 +60,6 @@ export default function FeaturedProducts() {
       {/*Filter & View All Section */}
       <Group px={{ base: 16, xl: 0 }} pt={10} pb={16} justify="space-between" wrap="nowrap">
         <FilterBar
-          categoryValue={filter.category}
           onCategorySelect={(category) => setFilterValue("category", category)}
           onProgramSelect={(department) => setFilterValue("department", department)}
         />
