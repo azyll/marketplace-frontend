@@ -400,6 +400,7 @@ export default function ProductPage() {
         {/* Product details */}
         <Grid.Col span={{ base: 12, sm: 6 }}>
           <Stack gap={10} w="100%" bg="#f2f5f9" px={{ base: 16, md: 0 }}>
+            {/* Description */}
             <div className="gap-2">
               <Title order={3}>{product?.data?.name}</Title>
               <Text c="dimmed">{product?.data?.description}</Text>
@@ -411,6 +412,7 @@ export default function ProductPage() {
               </Group>
             </div>
 
+            {/* Price */}
             <Text size="xl" fw={700}>
               <NumberFormatter
                 prefix="₱"
@@ -443,8 +445,7 @@ export default function ProductPage() {
                       {attributeData.values.map((value) => (
                         <Button
                           key={value}
-                          variant={selectedAttributes[attributeName] === value ? "filled" : "white"}
-                          radius="xl"
+                          variant={selectedAttributes[attributeName] === value ? "filled" : "light"}
                           onClick={() => handleAttributeChange(attributeName, value)}
                           disabled={isOutOfStock}
                         >
