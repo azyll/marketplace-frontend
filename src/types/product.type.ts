@@ -1,4 +1,5 @@
 import { IPagination } from "./common.type"
+import { IDepartment } from "./department.type"
 
 export interface IProductListFilters extends IPagination {
   department?: string
@@ -36,6 +37,7 @@ export interface IProductVariant {
 export interface IProduct {
   category: string
   departmentId: string
+  department: IDepartment
   description: string
   id: string
   image: string
