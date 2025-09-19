@@ -24,8 +24,7 @@ export default function HeroCarousel() {
         pb={16}
         controlsOffset={"md"}
         withIndicators
-        classNames={{ indicator: "indicator" }}
-        slideSize={{ base: "100%", md: "80%" }}
+        classNames={{ indicator: "indicator", slide: "mx-auto max-w-[1200px]" }}
         slideGap="lg"
         emblaOptions={{
           loop: true,
@@ -34,12 +33,7 @@ export default function HeroCarousel() {
       >
         {images.map((src, index) => (
           <Carousel.Slide key={index}>
-            <Image
-              h={{ base: "250px", md: "550px" }}
-              src={src}
-              alt={`Slide ${index + 1}`}
-              className="md:!rounded-xl"
-            />
+            <Image src={src} alt={`Slide ${index + 1}`} className="md:!rounded-xl" />
           </Carousel.Slide>
         ))}
       </Carousel>
