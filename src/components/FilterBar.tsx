@@ -17,6 +17,7 @@ import { KEY } from "@/constants/key"
 import { getProductDepartments } from "@/services/product-department.service"
 import { useQuery } from "@tanstack/react-query"
 import { IDepartment } from "@/types/department.type"
+import { useSearchParams } from "react-router"
 
 interface CategoryOption {
   label: string
@@ -30,16 +31,22 @@ interface DepartmentOption {
 }
 
 interface Props {
-  onCategorySelect: (category: string | null) => void
+  onCategorySelect: (category: string) => void
   onProgramSelect: (department: string | null) => void
   departments?: IDepartment
 }
 
 export default function FilterBar({ onCategorySelect, onProgramSelect, departments }: Props) {
   const user = useContext(AuthContext)
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [selectedProgram, setSelectedProgram] = useState<string | null>(null)
+  // Initialize state from URL parameters
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    searchParams.get("category") || "all",
+  )
+  const [selectedProgram, setSelectedProgram] = useState<string | null>(
+    searchParams.get("department") || user.user?.student.program.department.name || null,
+  )
 
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -65,27 +72,63 @@ export default function FilterBar({ onCategorySelect, onProgramSelect, departmen
     { label: "Stationery", value: PRODUCT_CATEGORY.STATIONERY },
   ]
 
+  // Update URL when filters change
+  const updateSearchParams = (category: string | null, department: string | null) => {
+    const newParams = new URLSearchParams(searchParams)
+
+    if (category) {
+      newParams.set("category", category)
+    } else {
+      newParams.delete("category")
+    }
+
+    if (department) {
+      newParams.set("department", department)
+    } else {
+      newParams.delete("department")
+    }
+
+    setSearchParams(newParams)
+  }
+
   const handleOnClickCategory = (category: string) => {
+    let newCategory: string
+
     // Toggle behavior: if same category is clicked, deselect it
     if (selectedCategory === category) {
-      setSelectedCategory(null)
-      onCategorySelect(null)
+      newCategory = "all"
+      setSelectedCategory("all")
     } else {
+      newCategory = category
       setSelectedCategory(category)
-      onCategorySelect(category)
     }
+
+    onCategorySelect(newCategory)
+    updateSearchParams(newCategory, selectedProgram)
   }
 
   const handleOnSelectDepartment = (department: string) => {
     setSelectedProgram(department)
     onProgramSelect(department)
+    updateSearchParams(selectedCategory, department)
     combobox.closeDropdown()
   }
 
   const handleOnClearSearch = () => {
     setSelectedProgram(null)
     onProgramSelect(null)
+    updateSearchParams(selectedCategory, null)
   }
+
+  // Initialize filters on component mount
+  useEffect(() => {
+    if (selectedCategory) {
+      onCategorySelect(selectedCategory)
+    }
+    if (selectedProgram) {
+      onProgramSelect(selectedProgram)
+    }
+  }, [])
 
   const options = departmentOptions?.map((item) => (
     <Combobox.Option value={item.label} key={item.label} style={{ padding: "8px 12px" }}>
@@ -121,14 +164,14 @@ export default function FilterBar({ onCategorySelect, onProgramSelect, departmen
       {/* Department Filter Combobox*/}
       {!user.user?.student ? (
         <Combobox
+          width={220}
           store={combobox}
-          width={250}
           position="bottom-start"
           onOptionSubmit={handleOnSelectDepartment}
         >
           <Combobox.Target>
             <InputBase
-              w={250}
+              w={210}
               radius="xl"
               variant="filled"
               component="button"
@@ -156,13 +199,18 @@ export default function FilterBar({ onCategorySelect, onProgramSelect, departmen
               className="shrink-0"
               style={{
                 minWidth: "200px",
-                borderRadius: "9999px", // xl radius
                 textAlign: "left",
-                transition: "all 0.2s ease",
+                transition: "all 1s ease",
               }}
             >
               {selectedProgram ? (
-                <Text truncate="end" title={selectedProgram} style={{ textAlign: "left" }}>
+                <Text
+                  truncate="end"
+                  title={selectedProgram}
+                  c="dimmed"
+                  size="sm"
+                  style={{ textAlign: "left" }}
+                >
                   {selectedProgram}
                 </Text>
               ) : (

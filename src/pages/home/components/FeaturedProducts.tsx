@@ -13,30 +13,37 @@ import { useMemo, useContext } from "react"
 import { IconMoodSad } from "@tabler/icons-react"
 import ProductCard from "@/components/ProductCard"
 import { AuthContext } from "@/contexts/AuthContext"
+import { useSearchParams } from "react-router"
 import "@/styles/carousel.css"
 
 export default function FeaturedProducts() {
   const user = useContext(AuthContext)
+  const [searchParams] = useSearchParams()
 
   const department = user.user?.student?.program?.department?.name
   const sex = user.user?.student?.sex
 
+  // Read filters from URL parameters with fallbacks
+  const urlCategory = searchParams.get("category") || PRODUCT_CATEGORY.ALL
+  const urlDepartment = searchParams.get("department") || department
+
   const [filter, setFilterValue] = useFilters<IProductListFilters>({
-    category: PRODUCT_CATEGORY.ALL,
+    category: urlCategory,
+    department: urlDepartment,
     latest: true,
   })
 
   const { data: products, isLoading } = useQuery({
-    queryKey: [KEY.PRODUCTS, filter, department, sex],
+    queryKey: [KEY.PRODUCTS, filter, sex],
     queryFn: () => {
       const queryParams: any = {
         ...filter,
         category: filter.category === PRODUCT_CATEGORY.ALL ? undefined : filter.category,
       }
 
-      // If user is logged in, add department filter
-      if (department) {
-        queryParams.department = department
+      // Use the department from filter (which includes URL parameter)
+      if (filter.department) {
+        queryParams.department = filter.department
       }
 
       if (sex) {
@@ -68,7 +75,7 @@ export default function FeaturedProducts() {
           className="shrink-0"
           component={Link}
           to={`/products?category=${filter.category}${
-            department ? `&department=${encodeURIComponent(department)}` : ""
+            filter.department ? `&department=${encodeURIComponent(filter.department)}` : ""
           }`}
           variant="default"
           fw="500"
