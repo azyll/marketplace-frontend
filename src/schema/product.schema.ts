@@ -5,7 +5,7 @@ export const createProductVariantSchema = z.object({
   productAttributeId: z.string().min(1, { message: "Attribute is required" }),
   size: z.string().min(1, { message: "Size is required. Enter 'N/A' if not applicable." }),
   price: z.number().min(1, { message: "Price is required." }),
-  stockAvailable: z.number().min(1, { message: "Stock is required." }),
+  stockQuantity: z.number().min(1, { message: "Stock is required." }),
 })
 
 export const createProductSchema = z.object({

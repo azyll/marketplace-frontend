@@ -31,6 +31,7 @@ export interface IProductVariant {
   product: IProduct
   size: string
   stockCondition: "in-stock" | "out-of-stock" | "low-stock"
+  stockQuantity: number
   stockAvailable: number
 }
 
@@ -55,7 +56,7 @@ export interface ICreateProductVariantInput {
   productAttributeId: string
   size: string
   price: number
-  stockAvailable: number
+  stockQuantity: number
 }
 
 export interface ICreateProductInput {

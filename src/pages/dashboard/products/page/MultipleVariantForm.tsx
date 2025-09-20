@@ -27,7 +27,7 @@ export const MultipleVariantForm = ({ disabled, ref }: Props) => {
           price: 0,
           size: "",
           productAttributeId: "",
-          stockAvailable: 0,
+          stockQuantity: 0,
         },
       ],
     },
@@ -40,7 +40,7 @@ export const MultipleVariantForm = ({ disabled, ref }: Props) => {
       price: 0,
       size: "",
       productAttributeId: "",
-      stockAvailable: 0,
+      stockQuantity: 0,
     })
   }
 

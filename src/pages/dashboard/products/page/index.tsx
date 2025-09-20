@@ -202,7 +202,7 @@ export const ProductPage = () => {
               size: variant.size,
               price: variant.price,
               name: variant.name,
-              stockAvailable: variant.stockAvailable,
+              stockQuantity: variant.stockQuantity,
             },
           ],
         })
@@ -215,7 +215,7 @@ export const ProductPage = () => {
             size: variant.size,
             price: variant.price,
             name: variant.name,
-            stockAvailable: variant.stockAvailable,
+            stockQuantity: variant.stockQuantity,
           })),
         })
         multipleVariantFormRef.current?.form.reset()

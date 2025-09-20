@@ -105,7 +105,7 @@ export const MultipleVariantFormItem = ({ title, disabled, form, index, onDelete
             <NumberInput
               label="Stock"
               disabled={disabled}
-              {...form.getInputProps(`variants.${index}.stockAvailable`)}
+              {...form.getInputProps(`variants.${index}.stockQuantity`)}
             />
           </Grid.Col>
         </Grid>

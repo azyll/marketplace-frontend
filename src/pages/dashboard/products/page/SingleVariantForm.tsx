@@ -36,7 +36,7 @@ export const SingleVariantForm = ({ ref, disabled }: Props) => {
           price: 0,
           size: "N/A",
           productAttributeId: naAttribute?.id ?? "N/A",
-          stockAvailable: 0,
+          stockQuantity: 0,
         },
       ],
     },
@@ -89,7 +89,7 @@ export const SingleVariantForm = ({ ref, disabled }: Props) => {
               <NumberInput
                 label="Stock"
                 disabled={disabled}
-                {...form.getInputProps("variants.0.stockAvailable")}
+                {...form.getInputProps("variants.0.stockQuantity")}
               />
             </Grid.Col>
           </Grid>
