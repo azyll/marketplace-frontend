@@ -1,7 +1,7 @@
 import { AuthContext } from "@/contexts/AuthContext"
 import { getImage } from "@/services/media.service"
 import { Avatar, Button, Group, Stack, Tabs, Text, Title } from "@mantine/core"
-import { IconMail, IconShoppingBag, IconUser } from "@tabler/icons-react"
+import { IconArrowLeft, IconShoppingBag, IconUser } from "@tabler/icons-react"
 import { useContext } from "react"
 import { Outlet, useLocation, useNavigate } from "react-router"
 import "./User.css"
@@ -31,9 +31,9 @@ export default function User() {
               </Title>
 
               <Group gap={6}>
-                <IconMail size={14} color="white" className="-mb-1" />
+                <IconUser size={14} color="white" className="-mb-1" />
                 <Text c="white" size="sm">
-                  {user.user?.email}
+                  {user.user?.username}
                 </Text>
               </Group>
 
@@ -76,8 +76,13 @@ export default function User() {
           </Group>
 
           {/* Right side: Button */}
-          <Button variant="white" onClick={() => navigate("/")}>
-            To store
+          <Button
+            leftSection={<IconArrowLeft size={16} />}
+            radius="xl"
+            variant="white"
+            onClick={() => navigate("/")}
+          >
+            Back to marketplace
           </Button>
         </Group>
       </div>

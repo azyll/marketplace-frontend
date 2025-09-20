@@ -1,6 +1,6 @@
 import { AuthContext } from "@/contexts/AuthContext"
 import { getImage } from "@/services/media.service"
-import { getItems, removeItem } from "@/services/cart.service"
+import { getItems, removeItem, updateItem } from "@/services/cart.service"
 import { createOrder } from "@/services/order.service" // Import your order service
 import {
   ActionIcon,
@@ -172,13 +172,19 @@ export default function Cart() {
                 </Card>
               ))
             ) : cart && cart.length === 0 ? (
-              <div className="flex h-full flex-col items-center justify-center">
-                <IconMoodSad color="gray" size={32} stroke={1.5} />
+              <Card h={230} bg="#e9edf3" padding="sm" radius="md">
+                <div className="flex h-full flex-col items-center justify-center">
+                  <IconMoodSad color="gray" size={32} stroke={1.5} />
 
-                <Text ta="center" c="dimmed">
-                  No items in cart.
-                </Text>
-              </div>
+                  <Text ta="center" c="dimmed">
+                    No items in cart.
+                  </Text>
+
+                  <Button mt="sm" radius="xl" onClick={() => navigate("/products")}>
+                    Browse products
+                  </Button>
+                </div>
+              </Card>
             ) : null}
           </Stack>
         </Grid.Col>
