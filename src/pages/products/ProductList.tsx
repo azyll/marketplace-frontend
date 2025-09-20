@@ -108,16 +108,6 @@ export default function Products() {
 
       <Space h="sm" />
 
-      {/* Show current department filter if applied */}
-      {currentDepartment && (
-        <section className="px-4 xl:px-0">
-          <Text size="sm" c="dimmed">
-            Filtered by: {currentDepartment}
-          </Text>
-          <Space h="xs" />
-        </section>
-      )}
-
       {/* Show current search term */}
       {filter.search && (
         <section className="px-4 xl:px-0">

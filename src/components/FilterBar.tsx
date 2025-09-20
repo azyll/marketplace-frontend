@@ -19,17 +19,6 @@ import { useQuery } from "@tanstack/react-query"
 import { IDepartment } from "@/types/department.type"
 import { useSearchParams } from "react-router"
 
-interface CategoryOption {
-  label: string
-  value: string
-}
-
-interface DepartmentOption {
-  label: string
-  value: string
-  acronyms: string[]
-}
-
 interface Props {
   onCategorySelect: (category: string) => void
   onProgramSelect: (department: string | null) => void
@@ -65,7 +54,7 @@ export default function FilterBar({ onCategorySelect, onProgramSelect, departmen
         .sort((a, b) => a.label.localeCompare(b.label)),
   })
 
-  const categoryOptions: CategoryOption[] = [
+  const categoryOptions = [
     { label: "Uniform", value: PRODUCT_CATEGORY.UNIFORM },
     { label: "Proware", value: PRODUCT_CATEGORY.PROWARE },
     { label: "Accessory", value: PRODUCT_CATEGORY.ACCESSORY },
@@ -162,27 +151,29 @@ export default function FilterBar({ onCategorySelect, onProgramSelect, departmen
   return (
     <Group gap="sm" wrap="nowrap" className="hide-scrollbar overflow-x-auto">
       {/* Department Filter Combobox*/}
-      {!user.user?.student ? (
-        <Combobox
-          width={220}
-          store={combobox}
-          position="bottom-start"
-          onOptionSubmit={handleOnSelectDepartment}
-        >
-          <Combobox.Target>
-            <InputBase
-              w={210}
-              radius="xl"
-              variant="filled"
-              component="button"
-              type="button"
-              pointer
-              styles={{
-                input: {
-                  backgroundColor: "#E9EDF3",
-                },
-              }}
-              rightSection={
+
+      <Combobox
+        width={220}
+        store={combobox}
+        position="bottom-start"
+        onOptionSubmit={handleOnSelectDepartment}
+        disabled={!!user.user?.student.program.department.name}
+      >
+        <Combobox.Target>
+          <InputBase
+            w={210}
+            radius="xl"
+            variant="filled"
+            component="button"
+            type="button"
+            pointer
+            styles={{
+              input: {
+                backgroundColor: "#E9EDF3",
+              },
+            }}
+            rightSection={
+              !user.user?.student ? (
                 selectedProgram !== null ? (
                   <CloseButton
                     size="sm"
@@ -193,39 +184,31 @@ export default function FilterBar({ onCategorySelect, onProgramSelect, departmen
                 ) : (
                   <IconChevronDown size={14} />
                 )
-              }
-              onClick={() => combobox.toggleDropdown()}
-              rightSectionPointerEvents={selectedProgram === null ? "none" : "all"}
-              className="shrink-0"
-              style={{
-                minWidth: "200px",
-                textAlign: "left",
-                transition: "all 1s ease",
-              }}
-            >
-              {selectedProgram ? (
-                <Text
-                  truncate="end"
-                  title={selectedProgram}
-                  c="dimmed"
-                  size="sm"
-                  style={{ textAlign: "left" }}
-                >
-                  {selectedProgram}
-                </Text>
-              ) : (
-                <Input.Placeholder>Select Program</Input.Placeholder>
-              )}
-            </InputBase>
-          </Combobox.Target>
+              ) : null
+            }
+            onClick={() => combobox.toggleDropdown()}
+            rightSectionPointerEvents={selectedProgram === null ? "none" : "all"}
+            className="shrink-0"
+            style={{
+              minWidth: "200px",
+              textAlign: "left",
+              transition: "all 1s ease",
+            }}
+          >
+            {selectedProgram ? (
+              <Text truncate="end" title={selectedProgram} size="sm">
+                {selectedProgram}
+              </Text>
+            ) : (
+              <Input.Placeholder>Select Program</Input.Placeholder>
+            )}
+          </InputBase>
+        </Combobox.Target>
 
-          <Combobox.Dropdown>
-            <Combobox.Options>{options}</Combobox.Options>
-          </Combobox.Dropdown>
-        </Combobox>
-      ) : (
-        <></>
-      )}
+        <Combobox.Dropdown>
+          <Combobox.Options>{options}</Combobox.Options>
+        </Combobox.Dropdown>
+      </Combobox>
 
       {/* Category Filter Buttons */}
       {categoryOptions.map(({ label, value }) => (
