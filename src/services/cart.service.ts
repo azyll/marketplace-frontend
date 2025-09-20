@@ -11,7 +11,7 @@ export const getItems = async (userId: string | undefined) => {
 }
 
 // Add a product to the cart
-export const addItem = async (userId: string, productId: string, quantity: number) => {
+export const addItem = async (userId: string, productId: string | undefined, quantity: number) => {
   const response = await axios.post(`${ENDPOINT.CART.BASE}/${userId}`, {
     product: productId,
     quantity,

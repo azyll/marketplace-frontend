@@ -39,7 +39,7 @@ export default function ProductPage() {
   const { user } = useContext(AuthContext)
 
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({})
-  const [size, setSize] = useState<string>("Small")
+  const [size, setSize] = useState<string | undefined>("Small")
   const [price, setPrice] = useState<number>()
   const [quantity, setQuantity] = useState(1)
   const [loading, setLoading] = useState(false)
