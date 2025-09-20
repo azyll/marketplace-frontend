@@ -6,7 +6,7 @@ export interface IUser {
   fullName: string
   firstName: string
   lastName: string
-  email: string
+  username: string
   roleId: string
   role: IRole
   roleSystemTag: IRoleSystemTag
