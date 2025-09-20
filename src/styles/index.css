@@ -25,7 +25,6 @@
   }
 }
 
-
 @layer mantine, mantine-datatable;
 
 .hide-scrollbar {
@@ -40,3 +39,6 @@
   @apply px-4;
 }
 
+input[type="password"] {
+  caret-color: #111 !important;
+}
