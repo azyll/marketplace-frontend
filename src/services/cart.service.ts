@@ -43,3 +43,17 @@ export const updateItem = async (userId: string, quantity: number) => {
   })
   return response.data
 }
+
+//Increase cart item quantity
+export const addItemQuantity = async (userId: string, cartId: number) => {
+  const response = await axios.put(`${ENDPOINT.CART.BASE}/${userId}/add/`, { cartId })
+
+  return response.data
+}
+
+//Deduct cart item quantity
+export const deductItemQuantity = async (userId: string, cartId: number) => {
+  const response = await axios.put(`${ENDPOINT.CART.BASE}/${userId}/deduct/`, { cartId })
+
+  return response.data
+}

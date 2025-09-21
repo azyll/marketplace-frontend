@@ -22,30 +22,25 @@ export default function QuantityInput({
     if (quantity > min) setQuantity(quantity - 1)
   }
 
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(event.target.value)
+    if (!isNaN(val)) {
+      if (val > max) return setQuantity(max)
+      if (val < min) return setQuantity(min)
+      setQuantity(val)
+    }
+  }
+
   return (
     <Group gap="sm">
       <Button.Group>
-        <Button
-          size="compact-sm"
-          variant="default"
-          // radius="xl"
-          onClick={decrement}
-          disabled={quantity <= min}
-        >
+        <Button size="compact-sm" variant="default" onClick={decrement} disabled={quantity <= min}>
           <IconMinus size={15} />
         </Button>
 
         <TextInput
-          value={quantity}
-          onChange={(val) => {
-            if (typeof val === "number") {
-              if (val > max) return setQuantity(max)
-              if (val < min) return setQuantity(min)
-              setQuantity(val)
-            }
-          }}
-          min={min}
-          max={max}
+          value={quantity.toString()}
+          onChange={handleInputChange}
           styles={{
             input: {
               height: 26,
@@ -59,13 +54,7 @@ export default function QuantityInput({
           }}
         />
 
-        <Button
-          size="compact-sm"
-          variant="default"
-          // radius="xl"
-          onClick={increment}
-          disabled={quantity >= max}
-        >
+        <Button size="compact-sm" variant="default" onClick={increment} disabled={quantity >= max}>
           <IconPlus size={15} />
         </Button>
       </Button.Group>
