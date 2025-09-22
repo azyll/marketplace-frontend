@@ -29,12 +29,12 @@ export default function FilterBar({ onCategorySelect, onProgramSelect, departmen
   const user = useContext(AuthContext)
   const [searchParams, setSearchParams] = useSearchParams()
 
-  // Initialize state from URL parameters
+  // Initialize state from URL parameters with proper null checking
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
     searchParams.get("category") || "all",
   )
   const [selectedProgram, setSelectedProgram] = useState<string | null>(
-    searchParams.get("department") || user.user?.student.program.department.name || null,
+    searchParams.get("department") || user.user?.student?.program?.department?.name || null,
   )
 
   const combobox = useCombobox({
@@ -148,6 +148,9 @@ export default function FilterBar({ onCategorySelect, onProgramSelect, departmen
     </Combobox.Option>
   ))
 
+  // Check if user is a student
+  const isStudent = user.user?.student != null
+
   return (
     <Group gap="sm" wrap="nowrap" className="hide-scrollbar overflow-x-auto">
       {/* Department Filter Combobox*/}
@@ -157,7 +160,7 @@ export default function FilterBar({ onCategorySelect, onProgramSelect, departmen
         store={combobox}
         position="bottom-start"
         onOptionSubmit={handleOnSelectDepartment}
-        disabled={!!user.user?.student.program.department.name}
+        disabled={isStudent && !!user.user?.student?.program?.department?.name}
       >
         <Combobox.Target>
           <InputBase
@@ -173,7 +176,7 @@ export default function FilterBar({ onCategorySelect, onProgramSelect, departmen
               },
             }}
             rightSection={
-              !user.user?.student ? (
+              !isStudent ? (
                 selectedProgram !== null ? (
                   <CloseButton
                     size="sm"
