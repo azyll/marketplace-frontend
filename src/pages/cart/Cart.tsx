@@ -1,12 +1,6 @@
 import { AuthContext } from "@/contexts/AuthContext"
 import { getImage } from "@/services/media.service"
-import {
-  getItems,
-  removeItem,
-  updateItem,
-  addItemQuantity,
-  deductItemQuantity,
-} from "@/services/cart.service"
+import { getItems, removeItem, addItemQuantity, deductItemQuantity } from "@/services/cart.service"
 import { createOrder } from "@/services/order.service" // Import your order service
 import {
   ActionIcon,
@@ -26,10 +20,10 @@ import { useContext } from "react"
 import CartItemSkeleton from "./components/CartItemSkeleton"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useDisclosure } from "@mantine/hooks"
-import ConfirmationModal from "./components/ConfirmationModal"
 import { notifications } from "@mantine/notifications"
 import { useNavigate } from "react-router"
 import QuantityInput from "../products/components/QuantityInput"
+import OrderConfirmationModal from "./components/OrderConfirmationModal"
 
 export default function Cart() {
   const { user } = useContext(AuthContext)
@@ -242,7 +236,7 @@ export default function Cart() {
               ))
             ) : cart && cart.length === 0 ? (
               //Empty cart
-              <Card h={230} bg="#e9edf3" padding="sm" radius="md">
+              <Card h={230} w="100%" bg="#e9edf3" padding="sm" radius="md">
                 <div className="flex h-full flex-col items-center justify-center">
                   <IconMoodSad color="gray" size={32} stroke={1.5} />
 
@@ -263,32 +257,37 @@ export default function Cart() {
         {!cart || cart.length === 0 ? null : (
           <Grid.Col span={{ base: 12, md: 6 }}>
             <Card mt="42" withBorder radius="md" padding="lg" mih={250}>
-              <Title order={4} mb="md">
+              <Title order={4} mb="xs">
                 Order Summary
               </Title>
 
-              <Stack gap="sm">
+              <Stack gap={5}>
                 {/* Header row */}
-
                 <Grid>
-                  <Grid.Col span={2}>
-                    <Text fw={600}>Qty</Text>
+                  <Grid.Col span={3}>
+                    <Text size="sm" c="dimmed">
+                      Qty
+                    </Text>
                   </Grid.Col>
-                  <Grid.Col span={6}>
-                    <Text fw={600}>Item</Text>
+                  <Grid.Col span={5}>
+                    <Text size="sm" c="dimmed">
+                      Item
+                    </Text>
                   </Grid.Col>
                   <Grid.Col span={4} ta="right">
-                    <Text fw={600}>Price</Text>
+                    <Text size="sm" c="dimmed">
+                      Price
+                    </Text>
                   </Grid.Col>
                 </Grid>
 
                 {/* Cart items */}
-                {cart?.map((item: any) => (
+                {cart?.map((item) => (
                   <Grid key={item.id} align="center">
-                    <Grid.Col span={2}>
-                      <Text c="dimmed">{item.quantity} pc(s)</Text>
+                    <Grid.Col span={3}>
+                      <Text>{item.quantity} pc(s)</Text>
                     </Grid.Col>
-                    <Grid.Col span={6}>
+                    <Grid.Col span={5}>
                       <Text>
                         {item.productVariant.product.name}{" "}
                         <span className="text-gray-400">({item.productVariant.size})</span>
@@ -337,7 +336,7 @@ export default function Cart() {
                 </Button>
 
                 {/* Confirmation modal */}
-                <ConfirmationModal
+                <OrderConfirmationModal
                   opened={opened}
                   onClose={close}
                   cart={cart ?? []}

@@ -23,6 +23,8 @@ import { AuthContext } from "@/contexts/AuthContext"
 import { IconCheck, IconX } from "@tabler/icons-react"
 import QuantityInput from "./components/QuantityInput"
 import { addItem } from "@/services/cart.service"
+import OrderConfirmationModal from "../cart/components/OrderConfirmationModal"
+import { useDisclosure } from "@mantine/hooks"
 
 const FALLBACK_IMAGE =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbrHWzlFK_PWuIk1Jglo7Avt97howljIWwAA&s"
@@ -43,6 +45,9 @@ export default function ProductPage() {
   const [price, setPrice] = useState<number>()
   const [quantity, setQuantity] = useState(1)
   const [loading, setLoading] = useState(false)
+
+  const [confirmationOpened, { open: openConfirmation, close: closeConfirmation }] =
+    useDisclosure(false)
 
   const variants = product?.data?.productVariant ?? []
 
@@ -370,6 +375,24 @@ export default function ProductPage() {
     },
   })
 
+  const handleConfirmBuyNow = () => {
+    buyNowMutation.mutate()
+    closeConfirmation()
+  }
+
+  const buyNowItem = useMemo(() => {
+    if (!product?.data || !price) return undefined
+
+    return {
+      productName: product.data.name,
+      productImage: product.data.image,
+      price: price,
+      quantity: quantity,
+      size: size && size !== "N/A" ? size : undefined,
+      attributes: Object.keys(selectedAttributes).length > 0 ? selectedAttributes : undefined,
+    }
+  }, [product?.data, price, quantity, size, selectedAttributes])
+
   return (
     <main className="relative mx-auto max-w-[1200px]">
       <Grid
@@ -513,15 +536,28 @@ export default function ProductPage() {
                 radius="xl"
                 size="lg"
                 disabled={!canOrder}
-                onClick={() => buyNowMutation.mutate()}
+                onClick={openConfirmation}
                 loading={buyNowMutation.isPending}
               >
-                Place Order
+                Buy Now
               </Button>
             </Group>
           </Stack>
         </Grid.Col>
       </Grid>
+      <OrderConfirmationModal
+        opened={confirmationOpened}
+        onClose={closeConfirmation}
+        buyNowItem={buyNowItem}
+        onConfirm={handleConfirmBuyNow}
+        isLoading={buyNowMutation.isPending}
+        title="Confirm Purchase"
+        warningMessage={
+          isLowStock
+            ? "This item is low in stock. Please confirm your order promptly."
+            : "Please review your order before confirming."
+        }
+      />
     </main>
   )
 }
