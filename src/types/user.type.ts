@@ -20,6 +20,7 @@ export interface IUser {
 export interface IStudent {
   id: number
   userId: string
+  user: IUser
   programId: string
   program: IProgram
   level: string

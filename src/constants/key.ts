@@ -8,4 +8,7 @@ export const KEY = {
   ORDERS: "orders",
   PRODUCT_ATTRIBUTES: "product-attributes",
   PRODUCT_DEPARTMENTS: "product-departments",
+  DASHBOARD: {
+    ORDERS: "dashboard-orders",
+  },
 }

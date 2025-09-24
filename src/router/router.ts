@@ -18,6 +18,7 @@ import { UserPage } from "@/pages/dashboard/user/page"
 import { UserList } from "@/pages/dashboard/user/list"
 import { ProductPage as DashboardProductPage } from "@/pages/dashboard/products/page"
 import { ProductList as DashboardProductList } from "@/pages/dashboard/products/list"
+import { OrdersList as DashboardOrdersList } from "@/pages/dashboard/orders/list"
 import { dashboardLoader } from "@/router/loader/auth"
 
 export const router = createBrowserRouter([
@@ -105,6 +106,12 @@ export const router = createBrowserRouter([
           {
             path: ROUTES.DASHBOARD.PRODUCTS.ID,
             Component: DashboardProductPage,
+          },
+
+          // Orders
+          {
+            path: ROUTES.DASHBOARD.ORDERS.BASE,
+            Component: DashboardOrdersList,
           },
         ],
       },

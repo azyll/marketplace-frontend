@@ -37,7 +37,6 @@ export const DashboardLayout = () => {
       label: "Orders",
       path: ROUTES.DASHBOARD.ORDERS.BASE,
       icon: <IconShoppingBagCheck size={14} />,
-      disabled: true,
     },
   ]
 
@@ -100,7 +99,7 @@ export const DashboardLayout = () => {
             label={item.label}
             key={index}
             active={location.pathname === item.path || location.pathname.includes(item.path)}
-            disabled={item.disabled}
+            // disabled={item.disabled}
             component={Link}
             to={item.path}
           />
