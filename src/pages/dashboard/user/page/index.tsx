@@ -55,7 +55,7 @@ export const UserPage = () => {
       userFormRef.current?.form.setInitialValues({
         firstName: user.firstName,
         lastName: user.lastName,
-        email: user.email,
+        username: user.username,
         password: "",
         roleId: user.role.id,
       })

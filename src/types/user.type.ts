@@ -36,7 +36,7 @@ export interface IGetUserFilter extends IPagination {
 export interface ICreateUserInput {
   firstName: string
   lastName: string
-  email: string
+  username: string
   password: string
   roleId: string
 }
