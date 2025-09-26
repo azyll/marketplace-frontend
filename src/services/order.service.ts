@@ -1,6 +1,7 @@
 import { ENDPOINT } from "@/constants/endpoints"
-import { IOrder, IOrderStatusType } from "@/types/order.type"
+import { IOrder, IOrderFilters, IOrderStatusType } from "@/types/order.type"
 import axios from "@/utils/axios"
+import { IPaginatedResponse } from "@/types/common.type"
 
 export const createOrder = async (
   studentId: string,
@@ -30,10 +31,12 @@ export const getOrder = async (orderId: string) => {
   return response.data.data
 }
 
-export const getOrders = async () => {
-  const response = await axios.get<IOrder>(ENDPOINT.ORDER.STUDENT)
+export const getOrders = async (filters: Partial<IOrderFilters>) => {
+  const response = await axios.get<IPaginatedResponse<IOrder[]>>(ENDPOINT.ORDER.BASE, {
+    params: filters,
+  })
 
-  return response.data.data
+  return response.data
 }
 
 export const getStudentOrders = async (

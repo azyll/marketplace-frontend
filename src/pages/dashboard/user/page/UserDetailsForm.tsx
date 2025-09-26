@@ -26,7 +26,7 @@ export const UserDetailsForm = ({ ref, disabled, user, onRoleChange }: Props) =>
     initialValues: {
       firstName: undefined,
       lastName: undefined,
-      email: undefined,
+      username: undefined,
       password: undefined,
       roleId: undefined,
     },
@@ -88,11 +88,11 @@ export const UserDetailsForm = ({ ref, disabled, user, onRoleChange }: Props) =>
           </Grid.Col>
 
           <Grid.Col span={4}>
-            {/* User Email */}
+            {/* Username */}
             <TextInput
-              label="Email"
+              label="Username"
               disabled={isUpdate || disabled}
-              {...form.getInputProps("email")}
+              {...form.getInputProps("username")}
             />
           </Grid.Col>
 

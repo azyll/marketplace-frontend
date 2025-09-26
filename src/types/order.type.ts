@@ -1,4 +1,6 @@
 import { IProductVariant } from "./product.type"
+import { IPagination } from "@/types/common.type"
+import { IStudent } from "@/types/user.type"
 
 export type IOrderStatusType = "ongoing" | "cancelled" | "completed"
 
@@ -7,6 +9,7 @@ export interface IOrder {
   total: number
   status: IOrderStatusType
   studentId: number
+  student: IStudent
   orderItems?: IOrderItems[]
   createdAt: Date
   deletedAt: Date | null
@@ -22,4 +25,10 @@ export interface IOrderItems {
   createdAt: Date
   deletedAt: Date | null
   updatedAt: Date | null
+}
+
+export interface IOrderFilters extends IPagination {
+  from: string
+  to: string
+  status: IOrderStatusType
 }
