@@ -13,15 +13,18 @@ import {
   Flex,
   Center,
   Skeleton,
+  Grid,
 } from "@mantine/core"
 import { IconAlertCircle, IconMoodSad, IconRefresh } from "@tabler/icons-react"
-import { IOrder, IOrderStatusType } from "@/types/order.type"
+import { IOrder, IOrderItems, IOrderStatusType } from "@/types/order.type"
 import { AuthContext } from "@/contexts/AuthContext"
 import { getStudentOrders } from "@/services/order.service"
 import { useFilters } from "@/hooks/useFilters"
 import { OrderHistorySkeleton } from "./components/OrderHistorySkeleton"
 import { useNavigate } from "react-router"
 import { formatDate } from "@/helper/formatDate"
+import { ICart } from "@/types/cart.type"
+import { IProduct, IProductVariant } from "@/types/product.type"
 
 // Define the filter state type
 interface FilterState {
@@ -104,10 +107,6 @@ export default function OrderHistory() {
     setFilter("page", 1)
   }
 
-  const handleLoadMore = () => {
-    setFilter("page", filters.page + 1)
-  }
-
   const getStatusColor = (status: IOrderStatusType) => {
     switch (status) {
       case "ongoing":
@@ -125,7 +124,7 @@ export default function OrderHistory() {
   if (loading && orders.length === 0) {
     return (
       <div className="max-w-page-width page-x-padding mx-auto mt-4">
-        <Stack gap="lg">
+        <Stack gap={"lg"}>
           <div>
             <Skeleton height={28} width={150} className="mb-4" />
 
@@ -148,50 +147,20 @@ export default function OrderHistory() {
     )
   }
 
-  if (error) {
-    return (
-      <div className="max-w-page-width page-x-padding mx-auto mt-4">
-        <Alert
-          icon={<IconAlertCircle size="1rem" />}
-          title="Error"
-          color="red"
-          variant="light"
-          withCloseButton={false}
-        >
-          <Stack gap="sm">
-            <Text>{error}</Text>
-
-            <Button
-              leftSection={<IconRefresh size="1rem" />}
-              onClick={refetch}
-              variant="light"
-              color="red"
-              size="sm"
-            >
-              Retry
-            </Button>
-          </Stack>
-        </Alert>
-      </div>
-    )
-  }
-
   return (
     <div className="max-w-page-width page-x-padding mx-auto mt-4">
-      <Stack gap="lg">
+      <Stack gap={0}>
         <div>
-          <Title order={3} className="mb-4">
-            Order History
-          </Title>
+          <Title order={3}>Order History</Title>
 
           {/* Filter Buttons */}
-          <Group gap="xs" className="hide-scrollbar mb-4 overflow-x-auto" wrap="nowrap">
+          <Group gap="xs" className="hide-scrollbar mt-2 mb-4 overflow-x-auto" wrap="nowrap">
             {(["all", "ongoing", "completed", "cancelled"] as const).map((status) => (
               <Button
                 className="shrink-0"
                 key={status}
                 onClick={() => handleFilterChange(status)}
-                variant={filters.status === status ? "filled" : "outline"}
+                variant={filters.status === status ? "filled" : "white"}
                 color="blue"
                 size="sm"
                 radius="xl"
@@ -214,11 +183,7 @@ export default function OrderHistory() {
             </div>
           </Card>
         ) : (
-          <Stack
-            className="cursor-pointer"
-            gap="md"
-            onClick={() => navigate(`/order/${orders[0].id}`)}
-          >
+          <Stack gap="md">
             {orders.map((order) => (
               <Card key={order.id} shadow="sm" padding="lg" radius="md" withBorder>
                 <Stack gap="md">
@@ -244,20 +209,16 @@ export default function OrderHistory() {
                     <Group justify="space-between">
                       <div>
                         <Text size="sm" c="dimmed">
-                          Order Number:
+                          Item(s)
                         </Text>
 
-                        <Text size="sm" fw={500}>
-                          {order.id}
-                        </Text>
-                      </div>
-                      <div>
-                        <Text size="sm" c="dimmed">
-                          Student ID:
-                        </Text>
-
-                        <Text size="sm" fw={500}>
-                          0{order.studentId}
+                        <Text size="sm" fw={500} style={{ whiteSpace: "pre-line" }}>
+                          {order.orderItems
+                            ?.map(
+                              (item) =>
+                                `${item.productVariant.product.name} (${item.productVariant.size})`,
+                            )
+                            .join("\n")}
                         </Text>
                       </div>
                     </Group>
@@ -265,23 +226,22 @@ export default function OrderHistory() {
                     {order.updatedAt && (
                       <Group justify="space-between" className="mt-2">
                         <div>
-                          <Text size="sm" c="dimmed">
+                          {/* <Text size="sm" c="dimmed">
                             Last Updated:
                           </Text>
 
-                          <Text size="xs">{formatDate(order.updatedAt)}</Text>
+                          <Text size="xs">{formatDate(order.updatedAt)}</Text> */}
                         </div>
-                        {order.deletedAt && (
-                          <div>
-                            <Text size="sm" c="dimmed">
-                              Deleted At:
-                            </Text>
 
-                            <Text size="xs" c="red">
-                              {formatDate(order.deletedAt)}
-                            </Text>
-                          </div>
-                        )}
+                        <div>
+                          <Text size="sm" c="dimmed">
+                            Student ID:
+                          </Text>
+
+                          <Text size="sm" fw={500}>
+                            0{order.studentId}
+                          </Text>
+                        </div>
                       </Group>
                     )}
                   </div>
@@ -298,6 +258,15 @@ export default function OrderHistory() {
                         ₱{order.total.toFixed(2)}
                       </Text>
                     </Group>
+                    <Button
+                      onClick={() => navigate(`/order/${order.id}`)}
+                      variant="light"
+                      color="blue"
+                      size="sm"
+                      radius="xl"
+                    >
+                      View Details
+                    </Button>
                   </Group>
                 </Stack>
               </Card>

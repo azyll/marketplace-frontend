@@ -8,20 +8,19 @@ import {
   Title,
   Button,
   Divider,
-  Loader,
   Card,
   Group,
   Badge,
-  Container,
 } from "@mantine/core"
 import { useContext } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { getOrder } from "@/services/order.service"
 import { KEY } from "@/constants/key"
-import { useLocation, useParams } from "react-router"
-import { formatDate } from "@/helper/formatDate"
-import { IOrderStatusType } from "@/types/order.type"
+import { useParams } from "react-router"
+import { IOrderItems, IOrderStatusType } from "@/types/order.type"
 import SplashScreen from "@/components/SplashScreen"
+import { useMediaQuery } from "@mantine/hooks"
+import { formatDate } from "@/helper/formatDate"
 
 export default function Order() {
   const user = useContext(AuthContext)
@@ -32,6 +31,9 @@ export default function Order() {
     queryFn: () => getOrder(orderId as string),
   })
 
+  // Move all hooks before any conditional returns
+  const isMobile = useMediaQuery("(max-width: 768px)")
+
   // Use data from state if available, otherwise use fetched data
   if (isLoading) {
     return <SplashScreen />
@@ -40,8 +42,6 @@ export default function Order() {
   if (!order) {
     return <div>Order not found</div>
   }
-
-  const product = order.orderItems[0].productVariant.product
 
   const getStatusColor = (status: IOrderStatusType) => {
     switch (status) {
@@ -57,9 +57,8 @@ export default function Order() {
   }
 
   return (
-    <Container size="xl" px="md" py="xl">
-      {/* Option 1: Full Width with Floating Summary Card */}
-      <Stack gap="xl">
+    <main className="mx-auto max-w-[1200px] py-4">
+      <Stack gap="md" px={{ base: 16, sm: "xl", xl: 0 }}>
         {/* ORDER STATUS - Full Width */}
         <Paper shadow="sm" radius="md" p="xl" withBorder>
           <Stack align="center" gap="xl">
@@ -76,19 +75,19 @@ export default function Order() {
             </div>
 
             {/* ORDER STEPS */}
-            <div className="w-full max-w-4xl">
+            <div className="w-full max-w-4xl justify-center">
               <Stepper
-                active={0}
+                active={-1}
                 allowNextStepsSelect={false}
                 size="lg"
-                color="blue"
-                orientation="horizontal"
+                orientation={isMobile ? "vertical" : "horizontal"}
+                className="!hide-scrollbar flex !flex-nowrap justify-center !overflow-x-auto"
               >
                 <Stepper.Step
                   label="ORDER PLACED"
                   ta="center"
                   description={
-                    <Text size="xs" c="dimmed" ta="center">
+                    <Text size="xs" c="dimmed" ta="center" style={{ maxWidth: "140px" }}>
                       Successfully placed order
                     </Text>
                   }
@@ -125,19 +124,80 @@ export default function Order() {
           </Stack>
         </Paper>
 
-        {/* ORDER DETAILS - Horizontal Cards Layout */}
+        {/* ORDER DETAILS - Responsive Cards Layout */}
         <Grid gutter="md">
-          <Grid.Col span={{ base: 12, sm: 6, md: 4 }}>
-            <Card shadow="sm" padding="lg" radius="md" withBorder>
+          {/* Student Information Card */}
+          <Grid.Col span={{ base: 12, sm: 6, md: 6 }}>
+            <Card shadow="sm" padding="lg" radius="md" withBorder h="100%">
               <Stack gap="sm">
-                <Group justify="space-between" align="flex-start">
-                  <Text size="sm" fw={600} c="dimmed" tt="uppercase">
-                    Order Details
-                  </Text>
-                  <Badge color={getStatusColor(order.status)}>{order.status}</Badge>
-                </Group>
+                <Text size="sm" fw={600} c="dimmed" tt="uppercase">
+                  Student Information
+                </Text>
 
                 <Stack gap="xs">
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="sm" c="dimmed" style={{ minWidth: "fit-content" }}>
+                      ID
+                    </Text>
+                    <Text size="sm" fw={500} ta="right">
+                      0{user.user?.student.id}
+                    </Text>
+                  </Group>
+
+                  <Group justify="space-between" align="flex-start" wrap="nowrap">
+                    <Text size="sm" c="dimmed" style={{ minWidth: "fit-content" }}>
+                      Name
+                    </Text>
+                    <Text
+                      size="sm"
+                      fw={500}
+                      ta="right"
+                      style={{
+                        wordBreak: "break-word",
+                        hyphens: "auto",
+                        maxWidth: "60%",
+                      }}
+                    >
+                      {user.user?.fullName}
+                    </Text>
+                  </Group>
+
+                  <Group justify="space-between" align="flex-start" wrap="nowrap">
+                    <Text size="sm" c="dimmed" style={{ minWidth: "fit-content" }}>
+                      Program
+                    </Text>
+                    <Text
+                      size="sm"
+                      fw={500}
+                      ta="right"
+                      style={{
+                        wordBreak: "break-word",
+                        hyphens: "auto",
+                        maxWidth: "60%",
+                      }}
+                    >
+                      {user.user?.student.program.name}
+                    </Text>
+                  </Group>
+                </Stack>
+              </Stack>
+            </Card>
+          </Grid.Col>
+
+          {/* Order Summary Card */}
+          <Grid.Col span={{ base: 12, sm: 6, md: 6 }}>
+            <Card shadow="sm" padding="lg" radius="md" withBorder h="100%">
+              <Stack gap="sm" h="100%" justify="space-between">
+                <div>
+                  <Group justify="space-between" align="center" mb="sm">
+                    <Text size="sm" fw={600} c="dimmed" tt="uppercase">
+                      Order Summary
+                    </Text>
+                    <Badge m={0} color={getStatusColor(order.status)}>
+                      {order.status}
+                    </Badge>
+                  </Group>
+
                   <Group justify="space-between">
                     <Text size="sm" c="dimmed">
                       Order No.
@@ -156,15 +216,46 @@ export default function Order() {
                     </Text>
                   </Group>
 
-                  <Group justify="space-between">
-                    <Text size="sm" c="dimmed">
-                      Total
-                    </Text>
-                    <Text size="lg" fw={700} c="blue">
-                      ₱{order.total}
-                    </Text>
-                  </Group>
-                </Stack>
+                  <Divider my="xs" />
+
+                  <Stack gap="xs">
+                    <Group justify="space-between" align="flex-start" wrap="nowrap">
+                      <Text size="sm" c="dimmed" style={{ minWidth: "fit-content" }}>
+                        Items
+                      </Text>
+
+                      <Text
+                        size="sm"
+                        fw={500}
+                        ta="right"
+                        style={{
+                          wordBreak: "break-word",
+                          hyphens: "auto",
+                          maxWidth: "60%",
+                        }}
+                      >
+                        {order?.orderItems?.map((item: IOrderItems) => (
+                          <div key={item.id}>
+                            {item.productVariant.product.name} - ${item.productVariant.price}
+                          </div>
+                        ))}
+                      </Text>
+                    </Group>
+
+                    <Group justify="space-between" wrap="nowrap">
+                      <Text size="md" fw={600}>
+                        Total
+                      </Text>
+                      <Text size="xl" fw={700} c="blue">
+                        ₱{order.total}
+                      </Text>
+                    </Group>
+                  </Stack>
+
+                  <Text size="xs" c="red" ta="center" mt="sm">
+                    Pay within 24 hours to avoid cancellation
+                  </Text>
+                </div>
 
                 <Button variant="light" color="blue" size="sm" fullWidth mt="xs">
                   Download Order Slip
@@ -172,129 +263,8 @@ export default function Order() {
               </Stack>
             </Card>
           </Grid.Col>
-
-          <Grid.Col span={{ base: 12, sm: 6, md: 4 }}>
-            <Card shadow="sm" padding="lg" radius="md" withBorder>
-              <Stack gap="sm">
-                <Text size="sm" fw={600} c="dimmed" tt="uppercase">
-                  Student Information
-                </Text>
-
-                <Stack gap="xs">
-                  <Group justify="space-between">
-                    <Text size="sm" c="dimmed">
-                      ID
-                    </Text>
-                    <Text size="sm" fw={500}>
-                      0{user.user?.student.id}
-                    </Text>
-                  </Group>
-
-                  <Group justify="space-between">
-                    <Text size="sm" c="dimmed">
-                      Name
-                    </Text>
-                    <Text size="sm" fw={500} style={{ maxWidth: "150px", textAlign: "right" }}>
-                      {user.user?.fullName}
-                    </Text>
-                  </Group>
-
-                  <Group justify="space-between">
-                    <Text size="sm" c="dimmed">
-                      Program
-                    </Text>
-                    <Text size="sm" fw={500}>
-                      {user.user?.student.program.acronym.toUpperCase()}
-                    </Text>
-                  </Group>
-                </Stack>
-              </Stack>
-            </Card>
-          </Grid.Col>
-
-          <Grid.Col span={{ base: 12, sm: 12, md: 4 }}>
-            <Card shadow="sm" padding="lg" radius="md" withBorder>
-              <Stack gap="sm">
-                <Text size="sm" fw={600} c="dimmed" tt="uppercase">
-                  Order Summary
-                </Text>
-
-                <Stack gap="xs">
-                  <Group justify="space-between">
-                    <Text size="sm" c="dimmed">
-                      Items
-                    </Text>
-                    <Text size="sm" fw={500}>
-                      {product.name}
-                    </Text>
-                  </Group>
-
-                  <Divider my="xs" />
-
-                  <Group justify="space-between">
-                    <Text size="md" fw={600}>
-                      Total
-                    </Text>
-                    <Text size="xl" fw={700} c="blue">
-                      ₱{order.total}
-                    </Text>
-                  </Group>
-                </Stack>
-
-                <Text size="xs" c="red" ta="center" mt="sm">
-                  Pay within 24 hours to avoid cancellation
-                </Text>
-              </Stack>
-            </Card>
-          </Grid.Col>
         </Grid>
-
-        {/* Alternative: Compact Summary Bar */}
-        <Paper shadow="xs" radius="md" p="md" withBorder bg="gray.0">
-          <Group justify="space-between" align="center">
-            <Group gap="xl">
-              <div>
-                <Text size="xs" c="dimmed">
-                  Order Number
-                </Text>
-                <Text size="sm" fw={600}>
-                  {order.id}
-                </Text>
-              </div>
-              <div>
-                <Text size="xs" c="dimmed">
-                  Student
-                </Text>
-                <Text size="sm" fw={600}>
-                  {user.user?.fullName}
-                </Text>
-              </div>
-              <div>
-                <Text size="xs" c="dimmed">
-                  Program
-                </Text>
-                <Text size="sm" fw={600}>
-                  {user.user?.student.program.name}
-                </Text>
-              </div>
-            </Group>
-
-            <Group gap="md">
-              <div className="text-right">
-                <Text size="xs" c="dimmed">
-                  Total Amount
-                </Text>
-                <Text size="xl" fw={700} c="blue">
-                  ₱{order.total}
-                </Text>
-              </div>
-              <Button variant="filled" color="blue">
-                Download Order Slip
-              </Button>
-            </Group>
-          </Group>
-        </Paper>
       </Stack>
-    </Container>
+    </main>
   )
 }
