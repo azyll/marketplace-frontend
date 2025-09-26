@@ -42,7 +42,7 @@ export default function Login() {
   return (
     <main className="flex min-h-screen">
       <div className="flex w-full items-center justify-center bg-[#0078D4] p-4 lg:w-1/2">
-        <Paper className="w-full max-w-md" shadow="md" radius="md" p="xl" withBorder>
+        <Paper className="w-full max-w-md" shadow="md" radius="md" p={50} withBorder>
           <Title order={2} ta="center" mb="xs">
             Sign in to your account
           </Title>
@@ -57,7 +57,6 @@ export default function Login() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 variant="filled"
-                radius="xl"
                 label="Username"
                 description="Enter only the part before @ (e.g., lastname.123456)"
                 placeholder="Enter your username"
@@ -69,7 +68,6 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 variant="filled"
-                radius="xl"
                 label="Password"
                 description="Use the password format from your RAF"
                 placeholder="Enter your password"
@@ -77,7 +75,7 @@ export default function Login() {
                 disabled={isLoading}
               />
 
-              <Button radius="xl" type="submit" loading={isLoading} mt="md">
+              <Button type="submit" loading={isLoading} mt="md">
                 Sign In
               </Button>
             </Stack>
@@ -86,6 +84,8 @@ export default function Login() {
       </div>
 
       <div className="relative hidden lg:block lg:w-1/2">
+        {" "}
+        1
         <Image
           className="absolute inset-0 h-full w-full object-cover brightness-80 grayscale-100"
           src="https://www.sti.edu/uploads/pr-2024-thumbnail-horizantal.webp"
