@@ -6,6 +6,7 @@ interface QuantityInputProps {
   setQuantity: (value: number) => void
   min?: number
   max?: number
+  disabled?: boolean
 }
 
 export default function QuantityInput({
@@ -13,16 +14,21 @@ export default function QuantityInput({
   setQuantity,
   min = 1,
   max = 3,
+  disabled = false,
 }: QuantityInputProps) {
   const increment = () => {
-    if (quantity < max) setQuantity(quantity + 1)
+    if (disabled || quantity >= max) return
+    setQuantity(quantity + 1)
   }
 
   const decrement = () => {
-    if (quantity > min) setQuantity(quantity - 1)
+    if (disabled || quantity <= min) return
+    setQuantity(quantity - 1)
   }
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return
+
     const val = parseInt(event.target.value)
     if (!isNaN(val)) {
       if (val > max) return setQuantity(max)
@@ -34,13 +40,19 @@ export default function QuantityInput({
   return (
     <Group gap="sm">
       <Button.Group>
-        <Button size="compact-sm" variant="default" onClick={decrement} disabled={quantity <= min}>
+        <Button
+          size="compact-sm"
+          variant="default"
+          onClick={decrement}
+          disabled={disabled || quantity <= min}
+        >
           <IconMinus size={15} />
         </Button>
 
         <TextInput
           value={quantity.toString()}
           onChange={handleInputChange}
+          disabled={disabled}
           styles={{
             input: {
               height: 26,
@@ -54,7 +66,12 @@ export default function QuantityInput({
           }}
         />
 
-        <Button size="compact-sm" variant="default" onClick={increment} disabled={quantity >= max}>
+        <Button
+          size="compact-sm"
+          variant="default"
+          onClick={increment}
+          disabled={disabled || quantity >= max}
+        >
           <IconPlus size={15} />
         </Button>
       </Button.Group>
