@@ -276,7 +276,7 @@ export default function Cart() {
                   </Grid.Col>
                   <Grid.Col span={4} ta="right">
                     <Text size="sm" c="dimmed">
-                      Price
+                      Amount
                     </Text>
                   </Grid.Col>
                 </Grid>
