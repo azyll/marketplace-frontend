@@ -171,7 +171,7 @@ const OrderSlipPDF: React.FC<OrderSlipPDFProps> = ({
             <Text style={styles.studentValue}>{studentName}</Text>
           </View>
           <View style={styles.studentInfoRow}>
-            <Text style={styles.studentLabel}>Student #:</Text>
+            <Text style={styles.studentLabel}>STUDENT NO:</Text>
             <Text style={styles.studentValue}>{studentId}</Text>
           </View>
           <View style={styles.studentInfoRow}>
