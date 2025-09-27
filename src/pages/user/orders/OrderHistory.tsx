@@ -111,6 +111,8 @@ export default function OrderHistory() {
     switch (status) {
       case "ongoing":
         return "yellow"
+      case "confirmed":
+        return "blue"
       case "completed":
         return "green"
       case "cancelled":
@@ -155,7 +157,7 @@ export default function OrderHistory() {
 
           {/* Filter Buttons */}
           <Group gap="xs" className="hide-scrollbar mt-2 mb-4 overflow-x-auto" wrap="nowrap">
-            {(["all", "ongoing", "completed", "cancelled"] as const).map((status) => (
+            {(["all", "ongoing", "confirmed", "completed", "cancelled"] as const).map((status) => (
               <Button
                 className="shrink-0"
                 key={status}
@@ -216,7 +218,7 @@ export default function OrderHistory() {
                           {order.orderItems
                             ?.map(
                               (item) =>
-                                `${item.productVariant.product.name} (${item.productVariant.size})`,
+                                `${item.productVariant.product.name} (${item.productVariant.size}) × ${item.quantity}`,
                             )
                             .join("\n")}
                         </Text>

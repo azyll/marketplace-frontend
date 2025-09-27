@@ -2,7 +2,7 @@ import { IProductVariant } from "./product.type"
 import { IPagination } from "@/types/common.type"
 import { IStudent } from "@/types/user.type"
 
-export type IOrderStatusType = "ongoing" | "cancelled" | "completed"
+export type IOrderStatusType = "ongoing" | "confirmed" | "completed" | "cancelled"
 
 export interface IOrder {
   id: string

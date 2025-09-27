@@ -11,6 +11,7 @@ import {
   Card,
   Group,
   Badge,
+  NumberFormatter,
 } from "@mantine/core"
 import { useContext } from "react"
 import { useQuery } from "@tanstack/react-query"
@@ -48,6 +49,8 @@ export default function Order() {
     switch (status) {
       case "ongoing":
         return "yellow"
+      case "confirmed":
+        return "blue"
       case "completed":
         return "green"
       case "cancelled":
@@ -242,31 +245,45 @@ export default function Order() {
                       <Text size="sm" c="dimmed" style={{ minWidth: "fit-content" }}>
                         Items
                       </Text>
-
-                      <Text
-                        size="sm"
-                        fw={500}
-                        ta="right"
-                        style={{
-                          wordBreak: "break-word",
-                          hyphens: "auto",
-                          maxWidth: "60%",
-                        }}
-                      >
-                        {order?.orderItems?.map((item: IOrderItems) => (
-                          <div key={item.id}>
-                            {item.productVariant.product.name} - ${item.productVariant.price}
-                          </div>
-                        ))}
-                      </Text>
                     </Group>
+
+                    {order?.orderItems?.map((item: IOrderItems) => (
+                      <div key={item.id}>
+                        <Group
+                          justify="space-between"
+                          align="center"
+                          wrap="nowrap"
+                          gap="xs"
+                          style={{ fontSize: "13px", lineHeight: "1.2" }}
+                        >
+                          <Text style={{ fontSize: "13px", lineHeight: "1.2" }}>
+                            {item.productVariant.product.name} × {item.quantity} pc(s)
+                          </Text>
+                          <NumberFormatter
+                            prefix="₱"
+                            value={item.quantity * item.productVariant.price}
+                            decimalSeparator="."
+                            decimalScale={2}
+                            fixedDecimalScale
+                            style={{ fontSize: "13px", lineHeight: "1.2" }}
+                          />
+                        </Group>
+                      </div>
+                    ))}
 
                     <Group justify="space-between" wrap="nowrap">
                       <Text size="md" fw={600}>
                         Total
                       </Text>
+
                       <Text size="xl" fw={700} c="blue">
-                        ₱{order.total}
+                        <NumberFormatter
+                          prefix="₱"
+                          value={order.total}
+                          decimalSeparator="."
+                          decimalScale={2}
+                          fixedDecimalScale
+                        />
                       </Text>
                     </Group>
                   </Stack>
