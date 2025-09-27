@@ -370,9 +370,13 @@ export default function ProductPage() {
               <NumberFormatter
                 prefix="₱"
                 value={
-                  currentVariant.price ?? productData.basePrice ?? productData.variants[0]?.price
+                  (currentVariant.price ??
+                    productData.basePrice ??
+                    productData.variants[0]?.price) * quantity
                 }
-                decimalSeparator=""
+                decimalSeparator="."
+                decimalScale={2}
+                fixedDecimalScale
               />
             </Text>
 
@@ -396,7 +400,7 @@ export default function ProductPage() {
                       </Text>
                     </>
                   ) : (
-                    <>
+                    <Group gap={5}>
                       {attributeData.values.map((value) => (
                         <Button
                           key={value}
@@ -406,7 +410,7 @@ export default function ProductPage() {
                           {value}
                         </Button>
                       ))}
-                    </>
+                    </Group>
                   )}
                 </Stack>
               ))}
