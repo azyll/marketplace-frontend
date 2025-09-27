@@ -21,6 +21,7 @@ import { IOrderItems, IOrderStatusType } from "@/types/order.type"
 import SplashScreen from "@/components/SplashScreen"
 import { useMediaQuery } from "@mantine/hooks"
 import { formatDate } from "@/helper/formatDate"
+import { downloadOrderSlip } from "./OrderSlipPDF"
 
 export default function Order() {
   const user = useContext(AuthContext)
@@ -53,6 +54,24 @@ export default function Order() {
         return "red"
       default:
         return "gray"
+    }
+  }
+
+  const handleDownloadSlip = async () => {
+    try {
+      await downloadOrderSlip({
+        studentName: user.user?.fullName || "",
+        studentId: user.user?.student.id,
+        sex: user.user?.student.sex,
+        program: user.user?.student.program.name || "",
+        orderItems: order.orderItems,
+        total: order.total,
+        orderId: order.id.toString(),
+        createdAt: formatDate(order.createdAt),
+      })
+    } catch (error) {
+      console.error("Error generating PDF:", error)
+      // You might want to show a notification here
     }
   }
 
@@ -257,7 +276,14 @@ export default function Order() {
                   </Text>
                 </div>
 
-                <Button variant="light" color="blue" size="sm" fullWidth mt="xs">
+                <Button
+                  variant="light"
+                  color="blue"
+                  size="sm"
+                  fullWidth
+                  mt="xs"
+                  onClick={handleDownloadSlip}
+                >
                   Download Order Slip
                 </Button>
               </Stack>
