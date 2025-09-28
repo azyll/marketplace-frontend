@@ -96,11 +96,11 @@ export default function Order() {
                 {isCancelled ? "Order Cancelled" : "Order Placed Successfully"}
               </Title>
               <Text c="dimmed" size="sm">
-                Make a copy of this receipt for your reference.
+                Make a copy of this slip for your reference.
               </Text>
-              {!isCancelled && (
+              {!isCancelled && order.status === "ongoing" && (
                 <Text c="red" size="sm" mt="xs">
-                  Your order will be cancelled if you do not pay it within 24 hours.
+                  Your order will be cancelled if you do not confirm it at proware within 24 hours.
                 </Text>
               )}
             </div>
@@ -128,7 +128,7 @@ export default function Order() {
                 className="!hide-scrollbar flex !flex-nowrap justify-center !overflow-x-auto"
               >
                 <Stepper.Step
-                  label="ORDER"
+                  label="PLACED"
                   completedIcon={<IconCheck stroke={4} />}
                   description={
                     <Text size="xs" c="dimmed">
@@ -138,7 +138,7 @@ export default function Order() {
                   className={"!items-start"}
                 />
                 <Stepper.Step
-                  label="CONFIRMATION"
+                  label="CONFIRM"
                   completedIcon={completedIcon}
                   color={order.status === "cancelled" ? "red" : undefined}
                   description={
@@ -317,10 +317,6 @@ export default function Order() {
                       </Text>
                     </Group>
                   </Stack>
-
-                  <Text size="xs" c="red" mt="sm">
-                    Pay within 24 hours to avoid cancellation
-                  </Text>
                 </div>
 
                 <Button
