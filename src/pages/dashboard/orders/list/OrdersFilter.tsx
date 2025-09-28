@@ -25,6 +25,10 @@ export const OrdersFilter = ({ filters, onFilter, disabled }: Props) => {
       value: ORDER_STATUS.ONGOING,
     },
     {
+      label: "Confirmed",
+      value: ORDER_STATUS.CONFIRMED,
+    },
+    {
       label: "Completed",
       value: ORDER_STATUS.COMPLETED,
     },
