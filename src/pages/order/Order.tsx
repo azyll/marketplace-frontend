@@ -99,7 +99,20 @@ export default function Order() {
             {/* ORDER STEPS */}
             <div className="w-full max-w-4xl justify-center">
               <Stepper
-                active={-1}
+                active={(() => {
+                  switch (order.status) {
+                    case "cancelled":
+                      return 0
+                    case "ongoing":
+                      return 1
+                    case "confirmed":
+                      return 2
+                    case "completed":
+                      return 4
+                    default:
+                      return 0
+                  }
+                })()}
                 allowNextStepsSelect={false}
                 size="lg"
                 orientation={isMobile ? "vertical" : "horizontal"}
