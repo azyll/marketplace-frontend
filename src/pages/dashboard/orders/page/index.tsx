@@ -62,7 +62,7 @@ export const OrdersPage = () => {
                 )}
               </div>
 
-              <Text c="dimmed">{dayjs(order?.createdAt).format("MMMM DD YYYY")}</Text>
+              <Text c="dimmed">{dayjs(order?.createdAt).format("MMMM DD YYYY • hh:mm A")}</Text>
             </div>
           </div>
 
