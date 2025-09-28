@@ -25,7 +25,7 @@ export const createOrder = async (
   return response.data.data
 }
 
-export const getOrder = async (orderId: string) => {
+export const getOrder = async (orderId: string): Promise<IOrder> => {
   const response = await axios.get<IOrder>(`${ENDPOINT.ORDER.BASE}/${orderId}`)
 
   return response.data.data
