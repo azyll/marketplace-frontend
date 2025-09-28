@@ -13,7 +13,7 @@ import {
   Badge,
   NumberFormatter,
 } from "@mantine/core"
-import { useContext } from "react"
+import { useContext, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { getOrder } from "@/services/order.service"
 import { KEY } from "@/constants/key"
@@ -23,6 +23,8 @@ import SplashScreen from "@/components/SplashScreen"
 import { useMediaQuery } from "@mantine/hooks"
 import { formatDate } from "@/helper/formatDate"
 import { downloadOrderSlip } from "./OrderSlipPDF"
+import { IconCheck, IconReceiptDollar, IconX } from "@tabler/icons-react"
+import "./Orders.css"
 
 export default function Order() {
   const user = useContext(AuthContext)
@@ -35,15 +37,6 @@ export default function Order() {
 
   // Move all hooks before any conditional returns
   const isMobile = useMediaQuery("(max-width: 768px)")
-
-  // Use data from state if available, otherwise use fetched data
-  if (isLoading) {
-    return <SplashScreen />
-  }
-
-  if (!order) {
-    return <div>Order not found</div>
-  }
 
   const getStatusColor = (status: IOrderStatusType) => {
     switch (status) {
@@ -74,8 +67,22 @@ export default function Order() {
       })
     } catch (error) {
       console.error("Error generating PDF:", error)
-      // You might want to show a notification here
     }
+  }
+
+  const isCancelled = useMemo(() => order?.status === "cancelled", [order?.status])
+
+  const completedIcon = useMemo(
+    () => (isCancelled ? <IconX stroke={4} /> : <IconCheck stroke={4} />),
+    [isCancelled],
+  )
+
+  if (isLoading) {
+    return <SplashScreen />
+  }
+
+  if (!order) {
+    return <div>Order not found</div>
   }
 
   return (
@@ -86,14 +93,16 @@ export default function Order() {
           <Stack align="center" gap="xl">
             <div className="text-center">
               <Title order={2} c="blue" mb="xs">
-                Order Placed Successfully
+                {isCancelled ? "Order Cancelled" : "Order Placed Successfully"}
               </Title>
               <Text c="dimmed" size="sm">
                 Make a copy of this receipt for your reference.
               </Text>
-              <Text c="red" size="sm" mt="xs">
-                Your order will be cancelled if you do not pay it within 24 hours.
-              </Text>
+              {!isCancelled && (
+                <Text c="red" size="sm" mt="xs">
+                  Your order will be cancelled if you do not pay it within 24 hours.
+                </Text>
+              )}
             </div>
 
             {/* ORDER STEPS */}
@@ -102,7 +111,7 @@ export default function Order() {
                 active={(() => {
                   switch (order.status) {
                     case "cancelled":
-                      return 0
+                      return 4
                     case "ongoing":
                       return 1
                     case "confirmed":
@@ -114,52 +123,60 @@ export default function Order() {
                   }
                 })()}
                 allowNextStepsSelect={false}
-                size="lg"
                 orientation={isMobile ? "vertical" : "horizontal"}
+                wrap={false}
                 className="!hide-scrollbar flex !flex-nowrap justify-center !overflow-x-auto"
               >
                 <Stepper.Step
-                  label="ORDER PLACED"
-                  ta="center"
+                  label="ORDER"
+                  completedIcon={<IconCheck stroke={4} />}
                   description={
-                    <Text size="xs" c="dimmed" ta="center" style={{ maxWidth: "140px" }}>
+                    <Text size="xs" c="dimmed">
                       Successfully placed order
                     </Text>
                   }
+                  className={"!items-start"}
                 />
                 <Stepper.Step
-                  label="CONFIRM ORDER"
-                  ta="center"
+                  label="CONFIRMATION"
+                  completedIcon={completedIcon}
+                  color={order.status === "cancelled" ? "red" : undefined}
                   description={
-                    <Text size="xs" c="dimmed" ta="center" style={{ maxWidth: "140px" }}>
-                      Show order number & claim slip at Proware
+                    <Text size="xs" c="dimmed">
+                      Go to proware to confirm order
                     </Text>
                   }
+                  className={"!items-start"}
                 />
                 <Stepper.Step
                   label="PAYMENT"
-                  ta="center"
+                  //
+                  completedIcon={completedIcon}
+                  color={order.status === "cancelled" ? "red" : undefined}
                   description={
-                    <Text size="xs" c="dimmed" ta="center" style={{ maxWidth: "140px" }}>
-                      Show slip & pay at the Cashier
+                    <Text size="xs" c="dimmed">
+                      Go to cashier & show order slip and pay
                     </Text>
                   }
+                  className={"!items-start"}
                 />
                 <Stepper.Step
-                  label="CLAIM ORDER"
-                  ta="center"
+                  label="CLAIM"
+                  //
+                  completedIcon={completedIcon}
+                  color={order.status === "cancelled" ? "red" : undefined}
                   description={
-                    <Text size="xs" c="dimmed" ta="center" style={{ maxWidth: "120px" }}>
-                      Show receipt & claim at Proware
+                    <Text size="xs" c="dimmed">
+                      Show sales invoice to claim at proware
                     </Text>
                   }
+                  className={"!items-start"}
                 />
               </Stepper>
             </div>
           </Stack>
         </Paper>
 
-        {/* ORDER DETAILS - Responsive Cards Layout */}
         <Grid gutter="md">
           {/* Student Information Card */}
           <Grid.Col span={{ base: 12, sm: 6, md: 6 }}>
@@ -301,7 +318,7 @@ export default function Order() {
                     </Group>
                   </Stack>
 
-                  <Text size="xs" c="red" ta="center" mt="sm">
+                  <Text size="xs" c="red" mt="sm">
                     Pay within 24 hours to avoid cancellation
                   </Text>
                 </div>
