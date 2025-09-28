@@ -12,13 +12,15 @@ import {
   IconNotes,
   IconTrashX,
 } from "@tabler/icons-react"
-import { ORDER_STATUS } from "@/constants/order"
+import { ORDER_STATUS, orderStatusColor, orderStatusLabel } from "@/constants/order"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
 import { getProductList } from "@/services/products.service"
 import { getOrders } from "@/services/order.service"
 import dayjs from "dayjs"
 import { useClipboard } from "@mantine/hooks"
+import { useNavigate } from "react-router"
+import { ROUTES } from "@/constants/routes"
 
 export const OrdersList = () => {
   const DEFAULT_PAGE = 1
@@ -35,17 +37,7 @@ export const OrdersList = () => {
     queryFn: () => getOrders(filters),
   })
 
-  const orderStatusLabel = {
-    [ORDER_STATUS.ONGOING]: "On Going",
-    [ORDER_STATUS.COMPLETED]: "Completed",
-    [ORDER_STATUS.CANCELLED]: "Cancelled",
-  }
-
-  const orderStatusColor = {
-    [ORDER_STATUS.ONGOING]: "orange",
-    [ORDER_STATUS.COMPLETED]: "green",
-    [ORDER_STATUS.CANCELLED]: "red",
-  }
+  const navigate = useNavigate()
 
   const columns: DataTableColumn<IOrder>[] = [
     {
@@ -109,9 +101,13 @@ export const OrdersList = () => {
       title: "Actions",
       width: 120,
       textAlign: "center",
-      render: (product) => (
+      render: (order) => (
         <div className="flex justify-center gap-4">
-          <ActionIcon size="lg" variant="light">
+          <ActionIcon
+            size="lg"
+            variant="light"
+            onClick={() => navigate(ROUTES.DASHBOARD.ORDERS.ID.replace(":orderId", order.id))}
+          >
             <IconNotes size={14} />
           </ActionIcon>
         </div>
