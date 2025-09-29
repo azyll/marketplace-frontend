@@ -2,7 +2,7 @@ import { ActionIcon, Badge, Box, Button, Card, CopyButton, Space, Tooltip } from
 import { OrdersFilter } from "@/pages/dashboard/orders/list/OrdersFilter"
 import { useFilters } from "@/hooks/useFilters"
 import { IProductListFilters } from "@/types/product.type"
-import { IOrder, IOrderFilters } from "@/types/order.type"
+import { IOrder, IOrderFilters, IOrderStatusType } from "@/types/order.type"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import {
   IconCheck,
@@ -29,7 +29,7 @@ export const OrdersList = () => {
   const [filters, setFilters, setFilterValues] = useFilters<Partial<IOrderFilters>>({
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
-    status: undefined,
+    status: ORDER_STATUS.ONGOING as IOrderStatusType,
   })
 
   const { data: orders, isLoading } = useQuery({

@@ -1,21 +1,9 @@
-import {
-  ActionIcon,
-  Badge,
-  Button,
-  Card,
-  CopyButton,
-  LoadingOverlay,
-  Skeleton,
-  Space,
-  Text,
-  Title,
-  Tooltip,
-} from "@mantine/core"
+import { Badge, Button, Card, Skeleton, Space, Text, Title } from "@mantine/core"
 import { Link, useParams } from "react-router"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
 import { getOrder } from "@/services/order.service"
-import { IconArrowLeft, IconCheck, IconCopy, IconUser } from "@tabler/icons-react"
+import { IconArrowLeft } from "@tabler/icons-react"
 import { ROUTES } from "@/constants/routes"
 import { orderStatusColor, orderStatusLabel } from "@/constants/order"
 import { useMemo } from "react"
@@ -24,6 +12,7 @@ import { StudentCard } from "@/pages/dashboard/orders/page/StudentCard"
 import { TotalCard } from "@/pages/dashboard/orders/page/TotalCard"
 import pluralize from "pluralize"
 import { OrderItem, OrderItemSkeleton } from "@/pages/dashboard/orders/page/OrderItem"
+import { OrderActions } from "@/pages/dashboard/orders/components/OrderActions"
 
 export const OrdersPage = () => {
   const { orderId } = useParams<{ orderId: string }>()
@@ -40,38 +29,36 @@ export const OrdersPage = () => {
   return (
     <Card pos="relative" mih={400}>
       <Card.Section px={24} py={12} pos="relative">
-        <div className="flex items-start justify-between gap-4">
+        <Button
+          component={Link}
+          variant="transparent"
+          size="compact-sm"
+          ml={-10}
+          to={ROUTES.DASHBOARD.ORDERS.BASE}
+        >
+          <IconArrowLeft size={16} stroke={2} className="mr-1" /> Go Back
+        </Button>
+
+        <div className="mt-4 flex w-full items-start justify-between">
           <div>
-            <Button
-              component={Link}
-              variant="transparent"
-              size="compact-sm"
-              ml={-10}
-              to={ROUTES.DASHBOARD.ORDERS.BASE}
-            >
-              <IconArrowLeft size={16} stroke={2} className="mr-1" /> Go Back
-            </Button>
+            <div className="flex items-center gap-4">
+              <Title order={3}># {orderId}</Title>
 
-            <div className="mt-4">
-              <div className="flex items-center gap-4">
-                <Title order={3}># {orderId}</Title>
-
-                {order?.status && (
-                  <Badge color={orderStatusColor[order?.status]}>
-                    {orderStatusLabel[order?.status]}
-                  </Badge>
-                )}
-              </div>
-
-              {isLoading ? (
-                <Skeleton w={200} h={22} mt={4} />
-              ) : (
-                <Text c="dimmed">{dayjs(order?.createdAt).format("MMMM DD YYYY • hh:mm A")}</Text>
+              {order?.status && (
+                <Badge color={orderStatusColor[order?.status]}>
+                  {orderStatusLabel[order?.status]}
+                </Badge>
               )}
             </div>
+
+            {isLoading ? (
+              <Skeleton w={200} h={22} mt={4} />
+            ) : (
+              <Text c="dimmed">{dayjs(order?.createdAt).format("MMMM DD YYYY • hh:mm A")}</Text>
+            )}
           </div>
 
-          <div className="flex gap-2"></div>
+          {order && <OrderActions status={order?.status} selectedOrders={[order]} />}
         </div>
       </Card.Section>
 

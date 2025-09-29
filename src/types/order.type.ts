@@ -2,7 +2,7 @@ import { IProductVariant } from "./product.type"
 import { IPagination } from "@/types/common.type"
 import { IStudent } from "@/types/user.type"
 
-export type IOrderStatusType = "ongoing" | "cancelled" | "completed"
+export type IOrderStatusType = "ongoing" | "cancelled" | "confirmed" | "completed"
 
 export interface IOrder {
   id: string
@@ -31,4 +31,10 @@ export interface IOrderFilters extends IPagination {
   from: string
   to: string
   status: IOrderStatusType
+}
+
+export interface IUpdateOrderStatusInput {
+  orderId: string
+  newStatus: IOrderStatusType
+  oracleInvoice?: string
 }
