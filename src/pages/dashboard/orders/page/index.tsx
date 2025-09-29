@@ -5,6 +5,7 @@ import {
   Card,
   CopyButton,
   LoadingOverlay,
+  Skeleton,
   Space,
   Text,
   Title,
@@ -22,7 +23,7 @@ import dayjs from "dayjs"
 import { StudentCard } from "@/pages/dashboard/orders/page/StudentCard"
 import { TotalCard } from "@/pages/dashboard/orders/page/TotalCard"
 import pluralize from "pluralize"
-import { OrderItem } from "@/pages/dashboard/orders/page/OrderItem"
+import { OrderItem, OrderItemSkeleton } from "@/pages/dashboard/orders/page/OrderItem"
 
 export const OrdersPage = () => {
   const { orderId } = useParams<{ orderId: string }>()
@@ -62,7 +63,11 @@ export const OrdersPage = () => {
                 )}
               </div>
 
-              <Text c="dimmed">{dayjs(order?.createdAt).format("MMMM DD YYYY • hh:mm A")}</Text>
+              {isLoading ? (
+                <Skeleton w={200} h={22} mt={4} />
+              ) : (
+                <Text c="dimmed">{dayjs(order?.createdAt).format("MMMM DD YYYY • hh:mm A")}</Text>
+              )}
             </div>
           </div>
 
@@ -91,15 +96,20 @@ export const OrdersPage = () => {
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {order?.orderItems?.map((item, index) => (
-            <OrderItem item={item} key={index} />
-          ))}
+          {isLoading ? (
+            <>
+              <OrderItemSkeleton />
+              <OrderItemSkeleton />
+            </>
+          ) : (
+            order?.orderItems?.map((item, index) => <OrderItem item={item} key={index} />)
+          )}
         </div>
       </Card.Section>
 
       <Space h={0} />
 
-      <LoadingOverlay visible={isLoading} zIndex={1000} />
+      {/*<LoadingOverlay visible={isLoading} zIndex={1000} />*/}
     </Card>
   )
 }
