@@ -1,5 +1,10 @@
 import { ENDPOINT } from "@/constants/endpoints"
-import { IOrder, IOrderFilters, IOrderStatusType } from "@/types/order.type"
+import {
+  IOrder,
+  IOrderFilters,
+  IOrderStatusType,
+  IUpdateOrderStatusInput,
+} from "@/types/order.type"
 import axios from "@/utils/axios"
 import { IPaginatedResponse } from "@/types/common.type"
 
@@ -50,6 +55,18 @@ export const getStudentOrders = async (
   const response = await axios.get(`${ENDPOINT.ORDER.STUDENT}/${userId}`, {
     params,
   })
+
+  return response.data
+}
+
+export const updateOrderStatus = async (
+  studentNumber: number,
+  payload: IUpdateOrderStatusInput,
+) => {
+  const response = await axios.put(
+    ENDPOINT.ORDER.STATUS.replace(":studentNumber", studentNumber.toString()),
+    payload,
+  )
 
   return response.data
 }

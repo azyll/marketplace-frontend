@@ -38,7 +38,9 @@ export const OrdersFilter = ({ filters, onFilter, disabled }: Props) => {
     },
   ]
 
-  const [status, setStatus] = useState<OrderFilterStatusType>("all")
+  const [status, setStatus] = useState<OrderFilterStatusType>(
+    ORDER_STATUS.ONGOING as IOrderStatusType,
+  )
 
   const handleOnSetStatus = (value: OrderFilterStatusType) => {
     onFilter({ status: value === "all" ? undefined : value })

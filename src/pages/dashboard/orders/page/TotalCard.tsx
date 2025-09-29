@@ -1,4 +1,4 @@
-import { ActionIcon, Card, CopyButton, Tooltip } from "@mantine/core"
+import { ActionIcon, Card, CopyButton, Skeleton, Tooltip } from "@mantine/core"
 import { IconCheck, IconCopy, IconCurrencyPeso, IconUser } from "@tabler/icons-react"
 import { IOrder } from "@/types/order.type"
 import pluralize from "pluralize"
@@ -7,6 +7,15 @@ import { useMemo } from "react"
 interface Props {
   order?: IOrder
   isLoading?: boolean
+}
+
+const TotalDetailsSkeleton = () => {
+  return (
+    <div>
+      <Skeleton height={20} radius="sm" w={120} />
+      <Skeleton height={16} mt={8} w={100} radius="sm" />
+    </div>
+  )
 }
 
 export const TotalCard = ({ order, isLoading }: Props) => {
@@ -41,12 +50,16 @@ export const TotalCard = ({ order, isLoading }: Props) => {
           )}
         </div>
 
-        <div>
-          <p className="text-lg font-semibold">₱ {order?.total.toLocaleString()}</p>
-          <p className="text-sm text-neutral-500">
-            Total {pluralize("Item", totalQuantity)}: {totalQuantity}
-          </p>
-        </div>
+        {isLoading ? (
+          <TotalDetailsSkeleton />
+        ) : (
+          <div>
+            <p className="text-lg font-semibold">₱ {order?.total.toLocaleString()}</p>
+            <p className="text-sm text-neutral-500">
+              Total {pluralize("Item", totalQuantity)}: {totalQuantity}
+            </p>
+          </div>
+        )}
       </div>
     </Card>
   )

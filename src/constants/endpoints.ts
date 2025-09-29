@@ -17,6 +17,7 @@ export const ENDPOINT = {
   ORDER: {
     BASE: "/order",
     STUDENT: "/order/student",
+    STATUS: "/order/status/:studentNumber",
   },
 
   LOGIN: "/auth/login",

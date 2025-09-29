@@ -32,3 +32,9 @@ export interface IOrderFilters extends IPagination {
   to: string
   status: IOrderStatusType
 }
+
+export interface IUpdateOrderStatusInput {
+  orderId: string
+  newStatus: IOrderStatusType
+  oracleInvoice?: string
+}
