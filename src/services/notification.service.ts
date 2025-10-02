@@ -1,0 +1,9 @@
+import { ENDPOINT } from "@/constants/endpoints"
+import { INotification } from "@/types/notification.type"
+import axios from "@/utils/axios"
+
+export const getUserNotifications = async (userId: string) => {
+  const response = await axios.get<INotification>(`${ENDPOINT.NOTIFICATION}/${userId}`)
+
+  return response.data
+}

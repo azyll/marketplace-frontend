@@ -10,6 +10,7 @@ import {
   Badge,
   Skeleton,
   Indicator,
+  Popover,
 } from "@mantine/core"
 import {
   IconShoppingBag,
@@ -22,13 +23,15 @@ import {
 } from "@tabler/icons-react"
 import HeaderSearchBar from "./HeaderSearchBar"
 import { useNavigate } from "react-router"
-import { useContext, useMemo } from "react"
+import { useContext, useEffect, useMemo } from "react"
 import { AuthContext } from "@/contexts/AuthContext"
 import { notifications } from "@mantine/notifications"
 import { ENDPOINT } from "@/constants/endpoints"
 import { ROUTES } from "@/constants/routes"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { getItems } from "@/services/cart.service"
+import { supabase } from "@/utils/supabase"
+import { getUserNotifications } from "@/services/notification.service"
 
 export default function Header() {
   const navigate = useNavigate()
@@ -128,9 +131,16 @@ export default function Header() {
           )}
 
           {/* Notifications Button */}
-          <ActionIcon variant="subtle" radius="xl">
-            <IconBell />
-          </ActionIcon>
+          <Popover>
+            <Popover.Target>
+              <div>
+                <ActionIcon variant="subtle" radius="xl">
+                  <IconBell />
+                </ActionIcon>
+              </div>
+            </Popover.Target>
+            {user && <Popover.Dropdown>{}</Popover.Dropdown>}
+          </Popover>
 
           {/* Loading State */}
           {isLoading ? (

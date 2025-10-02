@@ -42,4 +42,9 @@ export const ENDPOINT = {
     ID: "/student/:studentId",
     USER_ID: "/student/user/:userId",
   },
+
+  NOTIFICATION: {
+    BASE: "/notification",
+    RECEIVER: "/notification/receiver",
+  },
 }
