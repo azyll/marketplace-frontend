@@ -41,7 +41,7 @@ export const getOrders = async (filters: Partial<IOrderFilters>) => {
     params: filters,
   })
 
-  return response.data
+  return response.data.data
 }
 
 export const getStudentOrders = async (

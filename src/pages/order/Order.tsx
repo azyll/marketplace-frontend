@@ -54,19 +54,21 @@ export default function Order() {
   }
 
   const handleDownloadSlip = async () => {
-    try {
-      await downloadOrderSlip({
-        studentName: user.user?.fullName || "",
-        studentId: user.user?.student.id,
-        sex: user.user?.student.sex,
-        program: user.user?.student.program.name || "",
-        orderItems: order.orderItems,
-        total: order.total,
-        orderId: order.id.toString(),
-        createdAt: formatDate(order.createdAt),
-      })
-    } catch (error) {
-      console.error("Error generating PDF:", error)
+    if (order) {
+      try {
+        await downloadOrderSlip({
+          studentName: user.user?.fullName || "",
+          studentId: user.user?.student.id,
+          sex: user.user?.student.sex,
+          program: user.user?.student.program.name || "",
+          orderItems: order.orderItems ?? [],
+          total: order.total,
+          orderId: order.id.toString(),
+          createdAt: formatDate(order.createdAt),
+        })
+      } catch (error) {
+        console.error("Error generating PDF:", error)
+      }
     }
   }
 
