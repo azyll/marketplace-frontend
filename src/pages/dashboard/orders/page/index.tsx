@@ -20,6 +20,7 @@ export const OrdersPage = () => {
   const { data: order, isLoading } = useQuery({
     queryKey: [KEY.DASHBOARD.ORDER, orderId],
     queryFn: () => getOrder(orderId ?? ""),
+    select: (response) => response.data,
   })
 
   const student = useMemo(() => order?.student, [order?.student])

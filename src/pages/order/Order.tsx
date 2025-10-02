@@ -25,6 +25,7 @@ import { formatDate } from "@/helper/formatDate"
 import { downloadOrderSlip } from "./OrderSlipPDF"
 import { IconCheck, IconReceiptDollar, IconX } from "@tabler/icons-react"
 import "./Orders.css"
+import { orderStatusColor, orderStatusLabel } from "@/constants/order"
 
 export default function Order() {
   const user = useContext(AuthContext)
@@ -33,25 +34,11 @@ export default function Order() {
   const { data: order, isLoading } = useQuery({
     queryKey: [KEY.ORDERS, orderId],
     queryFn: () => getOrder(orderId as string),
+    select: (response) => response.data,
   })
 
   // Move all hooks before any conditional returns
   const isMobile = useMediaQuery("(max-width: 768px)")
-
-  const getStatusColor = (status: IOrderStatusType) => {
-    switch (status) {
-      case "ongoing":
-        return "yellow"
-      case "confirmed":
-        return "blue"
-      case "completed":
-        return "green"
-      case "cancelled":
-        return "red"
-      default:
-        return "gray"
-    }
-  }
 
   const handleDownloadSlip = async () => {
     if (order) {
@@ -247,8 +234,8 @@ export default function Order() {
                     <Text size="sm" fw={600} c="dimmed" tt="uppercase">
                       Order Summary
                     </Text>
-                    <Badge m={0} color={getStatusColor(order.status)}>
-                      {order.status}
+                    <Badge m={0} color={orderStatusColor[order.status]} tt="capitalize">
+                      {orderStatusLabel[order.status]}
                     </Badge>
                   </Group>
 

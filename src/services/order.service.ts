@@ -6,14 +6,14 @@ import {
   IUpdateOrderStatusInput,
 } from "@/types/order.type"
 import axios from "@/utils/axios"
-import { IPaginatedResponse } from "@/types/common.type"
+import { IPaginatedResponse, IResponse } from "@/types/common.type"
 
 export const createOrder = async (
   studentId: string,
   orderItems: { productVariantId: string; quantity: number }[],
   orderType: "cart" | "buy-now",
 ) => {
-  const response = await axios.post<IOrder>(
+  const response = await axios.post<IResponse<IOrder>>(
     `${ENDPOINT.ORDER.BASE}/${studentId}`,
     {
       studentId,
@@ -27,13 +27,13 @@ export const createOrder = async (
     },
   )
 
-  return response.data.data
+  return response.data
 }
 
-export const getOrder = async (orderId: string): Promise<IOrder> => {
-  const response = await axios.get<IOrder>(`${ENDPOINT.ORDER.BASE}/${orderId}`)
+export const getOrder = async (orderId: string) => {
+  const response = await axios.get<IResponse<IOrder>>(`${ENDPOINT.ORDER.BASE}/${orderId}`)
 
-  return response.data.data
+  return response.data
 }
 
 export const getOrders = async (filters: Partial<IOrderFilters>) => {
@@ -41,7 +41,7 @@ export const getOrders = async (filters: Partial<IOrderFilters>) => {
     params: filters,
   })
 
-  return response.data.data
+  return response.data
 }
 
 export const getStudentOrders = async (
@@ -52,9 +52,12 @@ export const getStudentOrders = async (
     status?: IOrderStatusType
   },
 ) => {
-  const response = await axios.get(`${ENDPOINT.ORDER.STUDENT}/${userId}`, {
-    params,
-  })
+  const response = await axios.get<IPaginatedResponse<IOrder[]>>(
+    `${ENDPOINT.ORDER.STUDENT}/${userId}`,
+    {
+      params,
+    },
+  )
 
   return response.data
 }
