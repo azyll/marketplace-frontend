@@ -279,16 +279,13 @@ export default function ProductPage() {
       const selectedItem = getSelectedItem()
       if (!selectedItem.id) throw new Error("Please select all required options")
 
-      const orderItems =
-        selectedItem.type === "product"
-          ? [{ productId: selectedItem.id, quantity }]
-          : [{ productVariantId: selectedItem.id, quantity }]
+      const orderItems = [{ productVariantId: selectedItem.id, quantity }]
 
       return await createOrder(user.id, orderItems, "buy-now")
     },
     onSuccess: (order) => {
-      showNotification("Success!", "Your order has been created successfully.", "success")
-      navigate(`/order/${order?.id}?orderType=buy-now`)
+      showNotification("Success!", order.message)
+      navigate(`/order/${order?.data.id}?orderType=buy-now`)
     },
     onError: (error: any) => {
       showNotification("Error", error.response?.data?.error)
@@ -308,7 +305,7 @@ export default function ProductPage() {
       productImage: product.data.image,
       price: currentVariant.price,
       quantity: quantity,
-      size: size && size !== "N/A" ? size : undefined,
+      size: size !== "N/A" ? size : undefined,
       attributes: Object.keys(selectedAttributes).length > 0 ? selectedAttributes : undefined,
     }
   }, [product?.data, currentVariant.price, quantity, size, selectedAttributes])

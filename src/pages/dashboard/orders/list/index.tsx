@@ -16,11 +16,12 @@ import { ORDER_STATUS, orderStatusColor, orderStatusLabel } from "@/constants/or
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
 import { getProductList } from "@/services/products.service"
-import { getOrders } from "@/services/order.service"
+import { getAnnualOrders, getOrders } from "@/services/order.service"
 import dayjs from "dayjs"
 import { useClipboard } from "@mantine/hooks"
 import { useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
+import AnnualChart from "../../components/AnnualChart"
 
 export const OrdersList = () => {
   const DEFAULT_PAGE = 1
@@ -116,43 +117,62 @@ export const OrdersList = () => {
   ]
 
   return (
-    <Card>
-      <Card.Section px={24} pt={24}>
-        <div className="flex items-center justify-between gap-4">
-          <h1 className="text-xl font-bold">Manage Orders</h1>
-        </div>
+    <>
+      <Card>
+        <Card.Section px={24} pt={24}>
+          <h1 className="text-xl font-bold">Orders Per Month</h1>
+        </Card.Section>
 
-        <OrdersFilter filters={filters} onFilter={setFilterValues} />
-      </Card.Section>
+        <Space h={20} />
+
+        <AnnualChart
+          queryKey="annual-orders"
+          queryFn={getAnnualOrders}
+          label="Orders"
+          dataKey="orders"
+        />
+      </Card>
 
       <Space h={16} />
 
-      <Card.Section px={24} pb={24}>
-        <DataTable
-          columns={columns}
-          records={orders?.data ?? []}
-          // State
-          fetching={isLoading}
-          noRecordsIcon={
-            <Box p={4} mb={4}>
-              <IconMoodSad size={36} strokeWidth={1.5} />
-            </Box>
-          }
-          noRecordsText="No Orders found"
-          // Styling
-          verticalSpacing="md"
-          highlightOnHover
-          withTableBorder
-          striped
-          borderRadius={6}
-          minHeight={340}
-          // Pagination
-          totalRecords={orders?.meta.totalItems ?? 0}
-          recordsPerPage={filters.limit ?? DEFAULT_LIMIT}
-          page={filters.page ?? DEFAULT_PAGE}
-          onPageChange={(p) => setFilters("page", p)}
-        />
-      </Card.Section>
-    </Card>
+      <Card>
+        <Card.Section px={24} pt={24}>
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="text-xl font-bold">Manage Orders</h1>
+          </div>
+
+          <OrdersFilter filters={filters} onFilter={setFilterValues} />
+        </Card.Section>
+
+        <Space h={16} />
+
+        <Card.Section px={24} pb={24}>
+          <DataTable
+            columns={columns}
+            records={orders?.data ?? []}
+            // State
+            fetching={isLoading}
+            noRecordsIcon={
+              <Box p={4} mb={4}>
+                <IconMoodSad size={36} strokeWidth={1.5} />
+              </Box>
+            }
+            noRecordsText="No Orders found"
+            // Styling
+            verticalSpacing="md"
+            highlightOnHover
+            withTableBorder
+            striped
+            borderRadius={6}
+            minHeight={340}
+            // Pagination
+            totalRecords={orders?.meta.totalItems ?? 0}
+            recordsPerPage={filters.limit ?? DEFAULT_LIMIT}
+            page={filters.page ?? DEFAULT_PAGE}
+            onPageChange={(p) => setFilters("page", p)}
+          />
+        </Card.Section>
+      </Card>
+    </>
   )
 }

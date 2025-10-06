@@ -91,7 +91,7 @@ export default function Cart() {
     onSuccess: (order) => {
       notifications.show({
         title: "Success!",
-        message: "Your order has been created successfully.",
+        message: order.message,
         color: "green",
       })
 
@@ -99,7 +99,7 @@ export default function Cart() {
       // queryClient.invalidateQueries({ queryKey: ["cart", user?.id] })
 
       // Navigate to order confirmation page with orderType parameter
-      navigate(`/order/${order.id}?orderType=cart`)
+      navigate(`/order/${order.data.id}?orderType=cart`)
     },
     onError: (error: any) => {
       notifications.show({

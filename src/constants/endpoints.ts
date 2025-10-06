@@ -1,3 +1,5 @@
+import { A } from "node_modules/react-router/dist/development/route-data-CqEmXQub.mjs"
+
 export const ENDPOINT = {
   PRODUCT: {
     BASE: "/product",
@@ -18,6 +20,7 @@ export const ENDPOINT = {
     BASE: "/order",
     STUDENT: "/order/student",
     STATUS: "/order/status/:studentNumber",
+    ANNUAL: "/order/annual",
   },
 
   LOGIN: "/auth/login",
@@ -46,5 +49,10 @@ export const ENDPOINT = {
   NOTIFICATION: {
     BASE: "/notification",
     RECEIVER: "/notification/receiver",
+  },
+
+  SALES: {
+    BASE: "/sales",
+    ANNUAL: "/sales/annual",
   },
 }
