@@ -62,6 +62,12 @@ export const getStudentOrders = async (
   return response.data
 }
 
+export const getAnnualOrders = async () => {
+  const response = (await axios.get)(ENDPOINT.ORDER.ANNUAL)
+
+  return response
+}
+
 export const updateOrderStatus = async (
   studentNumber: number,
   payload: IUpdateOrderStatusInput,
