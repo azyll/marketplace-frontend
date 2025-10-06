@@ -1,9 +1,8 @@
 export const PRODUCT_CATEGORY = {
   ALL: "all",
-  PROWARE: "proware",
+  PROWARE: "proware-item",
   UNIFORM: "uniform",
-  STATIONERY: "stationery",
-  ACCESSORY: "accessory",
+  FABRIC: "fabric",
 }
 
 export const PRODUCT_SIZE = {
@@ -22,4 +21,5 @@ export const PRODUCT_TYPE = {
   UPPER_WEAR: "upper-wear",
   LOWER_WEAR: "lower-wear",
   NON_WEARABLE: "non-wearable",
+  ACCESSORY: "accessory",
 }
