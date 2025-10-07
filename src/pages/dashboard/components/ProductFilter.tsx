@@ -24,7 +24,7 @@ export const ProductFilter = ({ filters, onFilter, disabled }: Props) => {
   const { data: departmentOptions, isLoading: isDepartmentLoading } = useQuery({
     queryKey: [KEY.PRODUCT_DEPARTMENTS],
     queryFn: () => getProductDepartments(),
-    select: (departments) => departments?.map(({ name, id }) => ({ label: name, value: id })),
+    select: (departments) => departments?.map(({ name }) => ({ label: name, value: name })),
   })
 
   const departmentOptionsFilter: OptionsFilter = ({ search }) => {
@@ -53,9 +53,8 @@ export const ProductFilter = ({ filters, onFilter, disabled }: Props) => {
 
   const categoryOptions: ComboboxItem[] = [
     { label: "Uniform", value: PRODUCT_CATEGORY.UNIFORM },
-    { label: "Proware", value: PRODUCT_CATEGORY.PROWARE },
-    { label: "Accessory", value: PRODUCT_CATEGORY.ACCESSORY },
-    { label: "Stationery", value: PRODUCT_CATEGORY.STATIONERY },
+    { label: "Proware Item", value: PRODUCT_CATEGORY.PROWARE },
+    { label: "Fabric", value: PRODUCT_CATEGORY.FABRIC },
   ]
 
   return (
