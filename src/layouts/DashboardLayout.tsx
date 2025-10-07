@@ -5,6 +5,7 @@ import { AuthContext } from "@/contexts/AuthContext"
 import {
   IconArrowLeft,
   IconBuildingStore,
+  IconBuildingWarehouse,
   IconLogout,
   IconShoppingBagCheck,
   IconUser,
@@ -37,6 +38,11 @@ export const DashboardLayout = () => {
       label: "Orders",
       path: ROUTES.DASHBOARD.ORDERS.BASE,
       icon: <IconShoppingBagCheck size={14} />,
+    },
+    {
+      label: "Inventory",
+      path: ROUTES.DASHBOARD.INVENTORY.BASE,
+      icon: <IconBuildingWarehouse size={14} />,
     },
   ]
 
