@@ -10,6 +10,9 @@ export const ENDPOINT = {
     DEPARTMENT: {
       BASE: "/product/create",
     },
+    INVENTORY: {
+      BASE: "/product/inventory",
+    },
   },
 
   CART: {
