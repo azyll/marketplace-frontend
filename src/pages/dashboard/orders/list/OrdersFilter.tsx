@@ -2,9 +2,10 @@ import { IProductListFilters } from "@/types/product.type"
 import { IOrderFilters, IOrderStatusType } from "@/types/order.type"
 import { Button, ComboboxItem, Group } from "@mantine/core"
 import { ORDER_STATUS } from "@/constants/order"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { DateInput, DatePicker, DatePickerInput } from "@mantine/dates"
 import { IconCalendar } from "@tabler/icons-react"
+import { useParams, useSearchParams } from "react-router"
 
 type OrderFilterStatusType = IOrderStatusType | "all"
 
@@ -15,6 +16,8 @@ interface Props {
 }
 
 export const OrdersFilter = ({ filters, onFilter, disabled }: Props) => {
+  const [searchParams, setSearchParams] = useSearchParams()
+
   const statusOptions: ComboboxItem[] = [
     {
       label: "All",
@@ -38,13 +41,19 @@ export const OrdersFilter = ({ filters, onFilter, disabled }: Props) => {
     },
   ]
 
+  const initialStatus = useMemo(
+    () => searchParams.get("status") as IOrderStatusType,
+    [searchParams],
+  )
+
   const [status, setStatus] = useState<OrderFilterStatusType>(
-    ORDER_STATUS.ONGOING as IOrderStatusType,
+    initialStatus ?? (ORDER_STATUS.ONGOING as IOrderStatusType),
   )
 
   const handleOnSetStatus = (value: OrderFilterStatusType) => {
     onFilter({ status: value === "all" ? undefined : value })
     setStatus(value)
+    setSearchParams({ status: value })
   }
 
   const [dateRange, setDateRange] = useState<[string | null, string | null]>([null, null])

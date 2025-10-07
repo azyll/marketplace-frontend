@@ -19,18 +19,26 @@ import { getProductList } from "@/services/products.service"
 import { getAnnualOrders, getOrders } from "@/services/order.service"
 import dayjs from "dayjs"
 import { useClipboard } from "@mantine/hooks"
-import { useNavigate } from "react-router"
+import { useNavigate, useSearchParams } from "react-router"
 import { ROUTES } from "@/constants/routes"
 import AnnualChart from "../../components/AnnualChart"
+import { useEffect, useMemo, useState } from "react"
+import { OrderActions } from "@/pages/dashboard/orders/components/OrderActions"
 
 export const OrdersList = () => {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const initialStatus = useMemo(
+    () => searchParams.get("status") as IOrderStatusType,
+    [searchParams],
+  )
+
   const DEFAULT_PAGE = 1
   const DEFAULT_LIMIT = 10
 
   const [filters, setFilters, setFilterValues] = useFilters<Partial<IOrderFilters>>({
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
-    status: ORDER_STATUS.ONGOING as IOrderStatusType,
+    status: initialStatus ?? (ORDER_STATUS.ONGOING as IOrderStatusType),
   })
 
   const { data: orders, isLoading } = useQuery({
@@ -116,6 +124,18 @@ export const OrdersList = () => {
     },
   ]
 
+  const [selectedOrders, setSelectedOrders] = useState<IOrder[]>([])
+
+  useEffect(() => {
+    setSelectedOrders([])
+  }, [filters.status])
+
+  const showCheckbox = useMemo(() => {
+    const allowedStatus = [ORDER_STATUS.ONGOING, ORDER_STATUS.CONFIRMED]
+
+    return filters.status && allowedStatus.includes(filters.status)
+  }, [filters.status])
+
   return (
     <>
       <Card>
@@ -137,8 +157,16 @@ export const OrdersList = () => {
 
       <Card>
         <Card.Section px={24} pt={24}>
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex h-[36px] items-center justify-between gap-4">
             <h1 className="text-xl font-bold">Manage Orders</h1>
+
+            {selectedOrders.length > 0 && (
+              <OrderActions
+                status={filters?.status as IOrderStatusType}
+                selectedOrders={selectedOrders}
+                onSuccess={() => setSelectedOrders([])}
+              />
+            )}
           </div>
 
           <OrdersFilter filters={filters} onFilter={setFilterValues} />
@@ -170,6 +198,8 @@ export const OrdersList = () => {
             recordsPerPage={filters.limit ?? DEFAULT_LIMIT}
             page={filters.page ?? DEFAULT_PAGE}
             onPageChange={(p) => setFilters("page", p)}
+            selectedRecords={showCheckbox ? selectedOrders : undefined}
+            onSelectedRecordsChange={showCheckbox ? setSelectedOrders : undefined}
           />
         </Card.Section>
       </Card>

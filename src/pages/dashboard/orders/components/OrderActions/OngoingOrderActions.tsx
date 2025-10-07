@@ -14,11 +14,12 @@ import { KEY } from "@/constants/key"
 
 interface Props {
   selectedOrders?: IOrder[]
+  onSuccess?: () => void
 }
 
 type ActionType = "confirm" | "cancel"
 
-export const OngoingOrderActions = ({ selectedOrders = [] }: Props) => {
+export const OngoingOrderActions = ({ selectedOrders = [], onSuccess }: Props) => {
   const [actionType, setActionType] = useState<ActionType | undefined>()
 
   const [opened, { open, close }] = useDisclosure()
@@ -88,6 +89,7 @@ export const OngoingOrderActions = ({ selectedOrders = [] }: Props) => {
       )
 
       handleOnCloseConfirmation()
+      onSuccess?.()
     } catch (error: any) {
       if (Axios.isAxiosError(error)) {
         notifications.show({
@@ -115,6 +117,7 @@ export const OngoingOrderActions = ({ selectedOrders = [] }: Props) => {
         onClose={() => handleOnCloseConfirmation()}
         onYes={() => handleOnYes()}
         loading={updateMutation.isPending}
+        size={480}
       />
 
       <div className="flex gap-4">

@@ -9,30 +9,36 @@ import {
   ModalProps,
   Text,
   TextInput,
-  ThemeIcon,
   Title,
   Tooltip,
 } from "@mantine/core"
 import { IOrder } from "@/types/order.type"
-import { IconCheck, IconCopy, IconProgressCheck } from "@tabler/icons-react"
-import pluralize from "pluralize"
+import { IconCheck, IconCopy } from "@tabler/icons-react"
 import { OrderItem } from "@/pages/dashboard/orders/page/OrderItem"
 import { useEffect, useMemo, useState } from "react"
+import pluralize from "pluralize"
 
 interface Props extends Omit<ModalProps, "onSubmit"> {
   order: IOrder
   onSubmit: (salesInvoice: string) => void
   loading?: boolean
+  remaining: number
 }
 
-export const ConfirmOrderActionsModal = ({ order, onSubmit, loading, ...modalProps }: Props) => {
+export const ConfirmOrderActionsModal = ({
+  order,
+  onSubmit,
+  loading,
+  remaining = 0,
+  ...modalProps
+}: Props) => {
   const student = useMemo(() => order?.student, [order])
 
-  const [salesInvoice, setSalesInvoice] = useState<string>()
+  const [salesInvoice, setSalesInvoice] = useState<string>("")
 
   useEffect(() => {
-    setSalesInvoice(undefined)
-  }, [modalProps.opened])
+    setSalesInvoice("")
+  }, [modalProps.opened, order, remaining])
 
   return (
     <Modal
@@ -44,11 +50,19 @@ export const ConfirmOrderActionsModal = ({ order, onSubmit, loading, ...modalPro
       size="lg"
     >
       {/* Title */}
-      <Title order={4}>Complete Order</Title>
+      <div className="flex items-center justify-between">
+        <Title order={4}>Complete Order</Title>
 
-      <Text size="sm" c="dimmed">
-        Do you really want to complete this order? This action cannot be undone.
-      </Text>
+        {remaining > 0 && (
+          <Text size="sm" c={"dimmed"}>
+            {remaining} {pluralize("order", remaining)} remaining
+          </Text>
+        )}
+      </div>
+
+      {/*<Text size="sm" c="dimmed">*/}
+      {/*  Do you really want to complete this order? This action cannot be undone.*/}
+      {/*</Text>*/}
 
       <div className="mt-4 grid grid-cols-2 divide-x divide-neutral-200">
         <Card withBorder p={16} radius={0} className="!border-b-0">
@@ -114,6 +128,7 @@ export const ConfirmOrderActionsModal = ({ order, onSubmit, loading, ...modalPro
       <TextInput
         mt={16}
         placeholder="Sales Invoice"
+        key={order.id}
         value={salesInvoice}
         onChange={(e) => setSalesInvoice(e.target.value)}
       />

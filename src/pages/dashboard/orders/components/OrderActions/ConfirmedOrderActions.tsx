@@ -14,15 +14,18 @@ import Axios from "axios"
 
 interface Props {
   selectedOrders?: IOrder[]
+  onSuccess?: () => void
 }
 
-export const ConfirmedOrderActions = ({ selectedOrders = [] }: Props) => {
+export const ConfirmedOrderActions = ({ selectedOrders = [], onSuccess }: Props) => {
+  const [orders, setOrders] = useState<IOrder[]>(selectedOrders)
   const [activeOrderIndex, setActiveOrderIndex] = useState<number>(0)
 
-  const activeOrder = useMemo(
-    () => selectedOrders[activeOrderIndex],
-    [activeOrderIndex, activeOrderIndex],
-  )
+  const remaining = useMemo(() => {
+    return orders.length - (activeOrderIndex + 1)
+  }, [activeOrderIndex, orders])
+
+  const activeOrder = useMemo(() => orders[activeOrderIndex], [activeOrderIndex, orders])
 
   const [opened, { open, close }] = useDisclosure()
 
@@ -53,6 +56,13 @@ export const ConfirmedOrderActions = ({ selectedOrders = [] }: Props) => {
 
       await queryClient.invalidateQueries({ queryKey: [KEY.DASHBOARD.ORDERS] })
       await queryClient.invalidateQueries({ queryKey: [KEY.DASHBOARD.ORDER, activeOrder.id] })
+
+      if (activeOrderIndex + 1 === orders.length) {
+        handleOnCloseConfirmation()
+        onSuccess?.()
+      } else {
+        setActiveOrderIndex((prev) => prev + 1)
+      }
     },
     onError: (error: any) => {
       if (Axios.isAxiosError(error)) {
@@ -91,6 +101,7 @@ export const ConfirmedOrderActions = ({ selectedOrders = [] }: Props) => {
         onClose={() => handleOnCloseConfirmation()}
         onSubmit={handleOnSubmit}
         loading={updateMutation.isPending}
+        remaining={remaining}
       />
 
       <div className="flex gap-2">

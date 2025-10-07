@@ -65,7 +65,8 @@ export const OngoingOrderActionsModal = ({
           onClick={() => modalProps.onClose()}
           disabled={loading}
         >
-          No, don't {infinitiveLabel.toLocaleLowerCase()} {pluralize("order", itemsCount)}
+          No, don't {infinitiveLabel.toLocaleLowerCase()} {itemsCount <= 1 ? "" : itemsCount}{" "}
+          {pluralize("order", itemsCount)}
         </Button>
 
         <Button
@@ -73,7 +74,8 @@ export const OngoingOrderActionsModal = ({
           onClick={() => onYes()}
           loading={loading}
         >
-          Yes, {infinitiveLabel.toLocaleLowerCase()} {pluralize("order", itemsCount)}
+          Yes, {infinitiveLabel.toLocaleLowerCase()} {itemsCount <= 1 ? "" : itemsCount}{" "}
+          {pluralize("order", itemsCount)}
         </Button>
       </Group>
     </Modal>
