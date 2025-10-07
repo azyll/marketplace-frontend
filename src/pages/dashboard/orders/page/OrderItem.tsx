@@ -52,6 +52,13 @@ export const OrderItem = ({ item, size = "lg", bordered = true, padding = 18 }: 
     }
   }, [size])
 
+  const attrs = useMemo(() => {
+    const variantName = item.productVariant.name
+    const size = item.productVariant.size
+
+    return [variantName, size].filter((i) => i && i !== "N/A")
+  }, [item])
+
   return (
     <Card withBorder={bordered} radius="md" className="!border-gray-200" style={{ padding }}>
       <div className="flex" style={{ gap: sizes.gap }}>
@@ -66,9 +73,7 @@ export const OrderItem = ({ item, size = "lg", bordered = true, padding = 18 }: 
         <div className="flex w-full flex-col justify-between gap-2">
           <div>
             <p className="font-semibold">{product?.name}</p>
-            <p className="text-sm text-neutral-600">
-              {attribute?.name && <span>{attribute.name}: </span>} {variant?.name}
-            </p>
+            <p className="text-sm text-neutral-600">{attrs.join(", ")}</p>
           </div>
 
           <div className="flex w-full items-end justify-between gap-2">
