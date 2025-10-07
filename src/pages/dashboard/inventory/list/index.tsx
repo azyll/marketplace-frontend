@@ -1,17 +1,15 @@
 import { ActionIcon, Box, Card, Image, Space, Badge } from "@mantine/core"
-import { IconChevronRight, IconEdit, IconMoodSad } from "@tabler/icons-react"
-import { useNavigate } from "react-router"
-import { ROUTES } from "@/constants/routes"
+import { IconEdit, IconMoodSad } from "@tabler/icons-react"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import dayjs from "dayjs"
 import { IProductVariant, IProductListFilters, IProduct } from "@/types/product.type"
 import { useFilters } from "@/hooks/useFilters"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { getInventoryProducts, getProductList } from "@/services/products.service"
+import { getInventoryProducts } from "@/services/products.service"
 import { getImage } from "@/services/media.service"
 import { ProductFilter } from "@/pages/dashboard/components/ProductFilter"
-import { useEffect, useState } from "react"
+import { stockConditionColor } from "@/constants/stock"
 
 export const InventoryList = () => {
   const DEFAULT_PAGE = 1
@@ -82,31 +80,22 @@ export const InventoryList = () => {
       title: "Total Stock",
       textAlign: "center",
     },
-    {
-      accessor: "stockAvailable",
-      title: "Available",
-      textAlign: "center",
-    },
-    {
-      accessor: "stockReserved",
-      title: "Reserved",
-      textAlign: "center",
-    },
+    // {
+    //   accessor: "stockAvailable",
+    //   title: "Available",
+    //   textAlign: "center",
+    // },
+    // {
+    //   accessor: "stockReserved",
+    //   title: "Reserved",
+    //   textAlign: "center",
+    // },
     {
       accessor: "stockCondition",
       title: "Status",
+      textAlign: "center",
       render: ({ stockCondition }) => (
-        <Badge
-          color={
-            stockCondition === "in-stock"
-              ? "green"
-              : stockCondition === "low-stock"
-                ? "yellow"
-                : "red"
-          }
-        >
-          {stockCondition}
-        </Badge>
+        <Badge color={stockConditionColor[stockCondition]}>{stockCondition}</Badge>
       ),
     },
     {
