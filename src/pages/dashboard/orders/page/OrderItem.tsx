@@ -29,20 +29,36 @@ export const OrderItemSkeleton = () => {
 
 interface Props {
   item: IOrderItems
+  size?: "sm" | "md" | "lg"
+  bordered?: boolean
+  padding?: string | number
 }
 
-export const OrderItem = ({ item }: Props) => {
+export const OrderItem = ({ item, size = "lg", bordered = true, padding = 18 }: Props) => {
   const product = useMemo(() => item?.productVariant.product, [item])
   const variant = useMemo(() => item?.productVariant, [item])
   const attribute = useMemo(() => item?.productVariant.productAttribute, [item])
 
+  const sizes = useMemo(() => {
+    switch (size) {
+      case "sm":
+        return { w: 80, h: 80, gap: 12 }
+      case "md":
+        return { w: 100, h: 100, gap: 14 }
+      case "lg":
+        return { w: 120, h: 120, gap: 16 }
+      default:
+        return { w: 120, h: 120, gap: 16 }
+    }
+  }, [size])
+
   return (
-    <Card withBorder radius="md" className="!border-gray-200">
-      <div className="flex gap-4">
+    <Card withBorder={bordered} radius="md" className="!border-gray-200" style={{ padding }}>
+      <div className="flex" style={{ gap: sizes.gap }}>
         <Image
           radius="md"
-          w={120}
-          h={120}
+          w={sizes.w}
+          h={sizes.h}
           src={getImage(product?.image)}
           className="!aspect-square"
         />

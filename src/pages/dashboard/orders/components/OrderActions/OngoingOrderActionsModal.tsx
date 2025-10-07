@@ -31,7 +31,7 @@ export const OngoingOrderActionsModal = ({
       closeOnClickOutside={!loading}
     >
       {/*  Icon */}
-      <div className="mt-6 flex w-full justify-center">
+      <div className="mt-2 flex w-full justify-center">
         {actionType === "confirm" ? (
           <ThemeIcon variant="transparent" color="blue.6" size={48}>
             <IconProgressCheck size={48} stroke={2} />
@@ -58,7 +58,7 @@ export const OngoingOrderActionsModal = ({
       </div>
 
       {/* Action Buttons */}
-      <Group mt={40} justify="end">
+      <Group mt={56} justify="end">
         <Button
           variant="subtle"
           color="gray"

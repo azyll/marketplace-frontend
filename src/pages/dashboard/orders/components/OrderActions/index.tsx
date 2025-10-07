@@ -13,7 +13,7 @@ export const OrderActions = ({ status, selectedOrders }: Props) => {
   }
 
   if (status === ORDER_STATUS.CONFIRMED) {
-    return <ConfirmedOrderActions />
+    return <ConfirmedOrderActions selectedOrders={selectedOrders} />
   }
 
   return null
