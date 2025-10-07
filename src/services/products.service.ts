@@ -4,6 +4,7 @@ import {
   ICreateProductInput,
   IProduct,
   IProductListFilters,
+  IProductVariant,
   IUpdateProductInput,
 } from "@/types/product.type"
 import axios from "@/utils/axios"
@@ -12,6 +13,16 @@ export const getProductList = async (filters: IProductListFilters) => {
   const response = await axios.get<IPaginatedResponse<IProduct[]>>(ENDPOINT.PRODUCT.BASE, {
     params: filters,
   })
+  return response.data
+}
+
+export const getInventoryProducts = async (filters: IProductListFilters) => {
+  const response = await axios.get<IPaginatedResponse<IProduct[]>>(
+    ENDPOINT.PRODUCT.INVENTORY.BASE,
+    {
+      params: filters,
+    },
+  )
   return response.data
 }
 

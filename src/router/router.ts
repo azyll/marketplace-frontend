@@ -20,6 +20,8 @@ import { ProductPage as DashboardProductPage } from "@/pages/dashboard/products/
 import { ProductList as DashboardProductList } from "@/pages/dashboard/products/list"
 import { OrdersList as DashboardOrdersList } from "@/pages/dashboard/orders/list"
 import { OrdersPage as DashboardOrdersPage } from "@/pages/dashboard/orders/page"
+import { InventoryList as DashboardInventoryList } from "@/pages/dashboard/inventory/list"
+
 import { dashboardLoader } from "@/router/loader/auth"
 
 export const router = createBrowserRouter([
@@ -117,6 +119,12 @@ export const router = createBrowserRouter([
           {
             path: ROUTES.DASHBOARD.ORDERS.ID,
             Component: DashboardOrdersPage,
+          },
+          // Inventory
+
+          {
+            path: ROUTES.DASHBOARD.INVENTORY.BASE,
+            Component: DashboardInventoryList,
           },
         ],
       },
