@@ -1,7 +1,8 @@
 import { ActionIcon, Box, Card, Image, Space, Badge } from "@mantine/core"
-import { IconEdit, IconMoodSad } from "@tabler/icons-react"
+import { IconEdit, IconMoodSad, IconChevronDown, IconChevronRight } from "@tabler/icons-react"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import dayjs from "dayjs"
+import { useState } from "react"
 import { IProductVariant, IProductListFilters, IProduct } from "@/types/product.type"
 import { useFilters } from "@/hooks/useFilters"
 import { useQuery } from "@tanstack/react-query"
@@ -20,6 +21,8 @@ export const InventoryList = () => {
     limit: DEFAULT_LIMIT,
   })
 
+  const [expandedRecordIds, setExpandedRecordIds] = useState<string[]>([])
+
   const { data: products, isLoading } = useQuery({
     queryKey: [KEY.PRODUCTS, filters],
     queryFn: () => getInventoryProducts(filters),
@@ -27,7 +30,29 @@ export const InventoryList = () => {
 
   const handleOnEditProduct = (productId: string) => {}
 
+  const isRowExpanded = (productId: string) => expandedRecordIds.includes(productId)
+
   const productColumns: DataTableColumn<IProduct>[] = [
+    {
+      accessor: "expand",
+      title: "",
+      width: 50,
+      render: ({ id }) => (
+        <Box style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Box
+            style={{
+              transform: isRowExpanded(id) ? "rotate(90deg)" : "rotate(0deg)",
+              transition: "transform 200ms ease",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <IconChevronRight size={16} />
+          </Box>
+        </Box>
+      ),
+    },
     {
       accessor: "image",
       title: "Image",
@@ -153,12 +178,17 @@ export const InventoryList = () => {
           recordsPerPage={filters.limit ?? DEFAULT_LIMIT}
           page={filters.page ?? DEFAULT_PAGE}
           onPageChange={(p) => setFilters("page", p)}
-          // Expandable rows configuration
+          // Controlled row expansion
           rowExpansion={{
             allowMultiple: true,
+            expanded: {
+              recordIds: expandedRecordIds,
+              onRecordIdsChange: setExpandedRecordIds,
+            },
             content: ({ record }) => (
-              <Box p="md" className="bg-gray-50">
+              <Box p="sm" className="bg-gray-50">
                 <DataTable
+                  mx={45}
                   columns={variantColumns}
                   records={record.productVariant ?? []}
                   noRecordsText="No variants available"
