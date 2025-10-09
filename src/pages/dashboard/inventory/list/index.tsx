@@ -7,10 +7,16 @@ import { IProductVariant, IProductListFilters, IProduct } from "@/types/product.
 import { useFilters } from "@/hooks/useFilters"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { getInventoryProducts } from "@/services/products.service"
+import {
+  getInventoryProducts,
+  updateProduct,
+  updateProductStock,
+} from "@/services/products.service"
 import { getImage } from "@/services/media.service"
 import { ProductFilter } from "@/pages/dashboard/components/ProductFilter"
 import { stockConditionColor } from "@/constants/stock"
+import { EditStockModal } from "./EditStockModal"
+import { useDisclosure } from "@mantine/hooks"
 
 export const InventoryList = () => {
   const DEFAULT_PAGE = 1
@@ -23,12 +29,18 @@ export const InventoryList = () => {
 
   const [expandedRecordIds, setExpandedRecordIds] = useState<string[]>([])
 
+  const [opened, { open, close }] = useDisclosure(false)
+
   const { data: products, isLoading } = useQuery({
     queryKey: [KEY.PRODUCTS, filters],
     queryFn: () => getInventoryProducts(filters),
   })
 
-  const handleOnEditProduct = (productId: string) => {}
+  const [selectedVariantId, setSelectedVariantId] = useState<string>()
+  const handleOnEditProduct = (productVariantId: string) => {
+    setSelectedVariantId(productVariantId)
+    open()
+  }
 
   const isRowExpanded = (productId: string) => expandedRecordIds.includes(productId)
 
@@ -128,14 +140,8 @@ export const InventoryList = () => {
       title: "Actions",
       width: 100,
       textAlign: "center",
-      render: (product) => (
-        <ActionIcon
-          size="lg"
-          variant="light"
-          onClick={() => {
-            handleOnEditProduct(product.productId)
-          }}
-        >
+      render: (variant) => (
+        <ActionIcon size="lg" variant="light" onClick={() => handleOnEditProduct(variant.id)}>
           <IconEdit size={14} />
         </ActionIcon>
       ),
@@ -201,6 +207,7 @@ export const InventoryList = () => {
             ),
           }}
         />
+        <EditStockModal opened={opened} onClose={close} productVariantId={selectedVariantId} />
       </Card.Section>
     </Card>
   )

@@ -82,6 +82,17 @@ export const updateProduct = async (productId: string, payload: IUpdateProductIn
   return response.data
 }
 
+export const updateProductStock = async (
+  action: "add" | "minus",
+  payload: { productVariantId: string; newStockQuantity: number },
+) => {
+  const response = await axios.patch(`${ENDPOINT.PRODUCT.BASE}/stock`, payload, {
+    params: { action },
+  })
+
+  return response.data
+}
+
 export const deleteProduct = async (productId: string) => {
   const response = await axios.delete(ENDPOINT.PRODUCT.ID.replace(":id", productId))
 
