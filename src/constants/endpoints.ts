@@ -56,6 +56,9 @@ export const ENDPOINT = {
 
   SALES: {
     BASE: "/sales",
+    ID: "/sales/:salesId",
     ANNUAL: "/sales/annual",
+    DEPARTMENT: "/sales/total-per-department",
+    TREND: "/sales/trend",
   },
 }

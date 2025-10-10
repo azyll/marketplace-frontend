@@ -1,5 +1,5 @@
 import { IconCheck, IconCopy, IconUser } from "@tabler/icons-react"
-import { ActionIcon, Card, CopyButton, Skeleton, Tooltip } from "@mantine/core"
+import { ActionIcon, Badge, Card, CopyButton, Skeleton, Tooltip } from "@mantine/core"
 import { IStudent } from "@/types/user.type"
 
 interface Props {
@@ -48,7 +48,10 @@ export const StudentCard = ({ student, isLoading }: Props) => {
           <StudentDetailsSkeleton />
         ) : (
           <div>
-            <p className="text-lg font-semibold">{student?.user.fullName}</p>
+            <span className="flex items-center space-x-2">
+              <p className="text-lg font-semibold">{student?.user.fullName}</p>
+              <Badge variant="light">{student?.program.acronym}</Badge>
+            </span>
             <p className="text-sm text-neutral-500">{student?.user.username}@fairview.sti.edu.ph</p>
             <p className="text-sm text-neutral-500">{student?.id}</p>
           </div>

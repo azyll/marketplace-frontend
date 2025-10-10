@@ -11,5 +11,6 @@ export const KEY = {
   DASHBOARD: {
     ORDERS: "dashboard-orders",
     ORDER: "dashboard-order",
+    SALES: "dashboard-sales",
   },
 }

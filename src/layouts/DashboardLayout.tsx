@@ -7,6 +7,7 @@ import {
   IconBuildingStore,
   IconBuildingWarehouse,
   IconLogout,
+  IconReportMoney,
   IconShoppingBagCheck,
   IconUser,
 } from "@tabler/icons-react"
@@ -43,6 +44,11 @@ export const DashboardLayout = () => {
       label: "Inventory",
       path: ROUTES.DASHBOARD.INVENTORY.BASE,
       icon: <IconBuildingWarehouse size={14} />,
+    },
+    {
+      label: "Sales",
+      path: ROUTES.DASHBOARD.SALES.BASE,
+      icon: <IconReportMoney size={14} />,
     },
   ]
 
