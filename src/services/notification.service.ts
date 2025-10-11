@@ -7,3 +7,9 @@ export const getUserNotifications = async (userId: string) => {
 
   return response.data
 }
+
+export const getLogs = async (type: string) => {
+  const response = await axios.get(ENDPOINT.LOG.BASE, { params: { type } })
+
+  return response.data
+}

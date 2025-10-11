@@ -1,6 +1,6 @@
 import { ENDPOINT } from "@/constants/endpoints"
 import { IPagination, IResponse } from "@/types/common.type"
-import { IPaginatedSalesResponse, ISales, ISalesFilter } from "@/types/sale.type"
+import { IPaginatedSalesResponse, ISales, ISalesFilter, ISalesTrend } from "@/types/sale.type"
 import axios from "@/utils/axios"
 
 //Get All Sales
@@ -21,19 +21,19 @@ export const getSale = async (oracleInvoice: string | undefined) => {
 
 //Chart Data
 export const getAnnualSales = async () => {
-  const response = (await axios.get)(ENDPOINT.SALES.ANNUAL)
+  const response = await axios.get(ENDPOINT.SALES.ANNUAL)
 
   return response
 }
 
 export const getSalesPerDepartment = async () => {
-  const response = (await axios.get)(ENDPOINT.SALES.DEPARTMENT)
+  const response = await axios.get(ENDPOINT.SALES.DEPARTMENT)
 
   return response
 }
 
 export const getSalesTrend = async () => {
-  const response = (await axios.get)(ENDPOINT.SALES.TREND)
+  const response = await axios.get<IResponse<ISalesTrend>>(ENDPOINT.SALES.TREND)
 
   return response
 }
