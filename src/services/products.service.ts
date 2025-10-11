@@ -9,13 +9,7 @@ import {
 } from "@/types/product.type"
 import axios from "@/utils/axios"
 
-export const getProductList = async (filters: IProductListFilters) => {
-  const response = await axios.get<IPaginatedResponse<IProduct[]>>(ENDPOINT.PRODUCT.BASE, {
-    params: filters,
-  })
-  return response.data
-}
-
+//Inventory
 export const getInventoryProducts = async (filters: IProductListFilters) => {
   const response = await axios.get<IPaginatedResponse<IProduct[]>>(
     ENDPOINT.PRODUCT.INVENTORY.BASE,
@@ -23,6 +17,26 @@ export const getInventoryProducts = async (filters: IProductListFilters) => {
       params: filters,
     },
   )
+  return response.data
+}
+
+export const getInventoryAlerts = async () => {
+  const response = await axios.get(ENDPOINT.PRODUCT.INVENTORY.ALERT)
+
+  return response.data
+}
+
+export const getInventoryValue = async () => {
+  const response = await axios.get(ENDPOINT.PRODUCT.INVENTORY.VALUE)
+
+  return response.data
+}
+
+//Products
+export const getProductList = async (filters: IProductListFilters) => {
+  const response = await axios.get<IPaginatedResponse<IProduct[]>>(ENDPOINT.PRODUCT.BASE, {
+    params: filters,
+  })
   return response.data
 }
 

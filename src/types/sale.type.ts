@@ -29,3 +29,14 @@ export interface IPaginatedSalesResponse {
   data: ISales[]
   meta: IPaginatedResponseMeta
 }
+
+export interface ISalesTrend {
+  previousMonth: {
+    totalSales: number
+  }
+  currentMonth: {
+    totalSales: number
+    increasePercentage?: string
+    decreasePercentage?: string
+  }
+}

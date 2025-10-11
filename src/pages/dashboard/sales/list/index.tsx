@@ -1,13 +1,29 @@
 import { KEY } from "@/constants/key"
 import { ROUTES } from "@/constants/routes"
 import { useFilters } from "@/hooks/useFilters"
-import { getSales } from "@/services/sales.service"
+import { getAnnualSales, getSales, getSalesTrend } from "@/services/sales.service"
 import { ISales } from "@/types/sale.type"
-import { ActionIcon, Badge, Box, Card, CopyButton, Space, Tooltip } from "@mantine/core"
+import {
+  ActionIcon,
+  Badge,
+  Box,
+  Card,
+  CopyButton,
+  Flex,
+  Group,
+  Space,
+  Stack,
+  Tooltip,
+} from "@mantine/core"
 import { IconCheck, IconCopy, IconMoodSad, IconNotes } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import { useNavigate } from "react-router"
+import AnnualChart from "../../components/AnnualChart"
+import { LogsCard } from "../../components/LogsCard"
+import { SalesTrendCard } from "./SalesTrendCard"
+import { DepartmentSalesChart } from "./DepartmentSalesChart"
+import { AnnualSalesCard } from "./AnnualSalesCard"
 
 export const SalesList = () => {
   const DEFAULT_PAGE = 1
@@ -59,7 +75,7 @@ export const SalesList = () => {
         <div className="flex flex-col text-sm">
           <div className="flex items-center gap-0.5">
             <p className="shrink-0">
-              {sale.order.student.user.fullName}{" "}
+              {sale.order.student.user.fullName}
               <span className="text-neutral-500">({sale.order.student.id})</span>
             </p>
           </div>
@@ -106,6 +122,50 @@ export const SalesList = () => {
   ]
   return (
     <>
+      <Flex align="flex-start" justify="flex-start" wrap="wrap" gap="lg">
+        <Stack style={{ flex: "1 1 calc(30% - 0.75rem)" }}>
+          <SalesTrendCard />
+          <AnnualSalesCard />
+        </Stack>
+
+        <Card style={{ flex: "1 1 calc(50% - 0.75rem)" }}>
+          <Card.Section px={24} pt={24}>
+            <h1 className="text-sm font-semibold">Sales Per Month</h1>
+          </Card.Section>
+
+          <Space h={16} />
+
+          <AnnualChart
+            queryKey="annual-sales"
+            queryFn={getAnnualSales}
+            label="Sales"
+            dataKey="sales"
+          />
+        </Card>
+      </Flex>
+
+      <Space h={16} />
+
+      <Flex align="flex-start" justify="flex-start" wrap="wrap" gap="lg">
+        <Card style={{ flex: "1 1 calc(50% - 0.75rem)" }}>
+          <Card.Section px={24} pt={24} pb={12}>
+            <h1 className="text-sm font-semibold">Sales By Department</h1>
+          </Card.Section>
+
+          <DepartmentSalesChart />
+        </Card>
+
+        <Card style={{ flex: "1 1 calc(40% - 0.75rem)" }}>
+          <Card.Section px={24} pt={24} pb={12}>
+            <h1 className="text-sm font-semibold">Sales Activity</h1>
+          </Card.Section>
+
+          <LogsCard type="sales" />
+        </Card>
+      </Flex>
+
+      <Space h={16} />
+
       <Card>
         <Card.Section px={24} pt={24}>
           <div className="flex h-[36px] items-center justify-between gap-4">
