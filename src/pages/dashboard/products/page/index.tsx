@@ -164,6 +164,7 @@ export const ProductPage = () => {
         name: product?.name,
         type: product.type,
         category: product.category,
+        level: product.level,
         departmentId: product.departmentId,
         description: product.description,
       })
@@ -198,6 +199,7 @@ export const ProductPage = () => {
         singleVariantFormRef.current?.form.setInitialValues({
           variants: [
             {
+              id: variant?.id,
               productAttributeId: variant.productAttributeId,
               size: variant.size,
               price: variant.price,
@@ -211,6 +213,7 @@ export const ProductPage = () => {
         const variants = product?.productVariant ?? []
         multipleVariantFormRef.current?.form.setInitialValues({
           variants: variants.map((variant) => ({
+            id: variant.id,
             productAttributeId: variant.productAttributeId,
             size: variant.size,
             price: variant.price,

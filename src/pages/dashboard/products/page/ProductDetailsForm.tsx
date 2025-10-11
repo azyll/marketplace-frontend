@@ -42,8 +42,7 @@ export const ProductDetailsForm = ({ disabled, ref, imageDefaultValue }: Props) 
   const categoryOptions: ComboboxItem[] = [
     { label: "Uniform", value: PRODUCT_CATEGORY.UNIFORM },
     { label: "Proware", value: PRODUCT_CATEGORY.PROWARE },
-    { label: "Accessory", value: PRODUCT_CATEGORY.ACCESSORY },
-    { label: "Stationery", value: PRODUCT_CATEGORY.STATIONERY },
+    { label: "Fabric", value: PRODUCT_CATEGORY.FABRIC },
   ]
 
   const typeOptions: ComboboxItem[] = [
@@ -61,6 +60,7 @@ export const ProductDetailsForm = ({ disabled, ref, imageDefaultValue }: Props) 
       departmentId: "",
       category: "",
       type: "",
+      level: "",
     },
     validate: zod4Resolver(productSchema),
   })

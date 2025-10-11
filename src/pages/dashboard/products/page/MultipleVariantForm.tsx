@@ -23,6 +23,7 @@ export const MultipleVariantForm = ({ disabled, ref }: Props) => {
     initialValues: {
       variants: [
         {
+          id: undefined,
           name: "",
           price: 0,
           size: "",
@@ -36,6 +37,7 @@ export const MultipleVariantForm = ({ disabled, ref }: Props) => {
 
   const handleOnAddVariant = () => {
     form.insertListItem("variants", {
+      id: undefined,
       name: "",
       price: 0,
       size: "",

@@ -46,12 +46,14 @@ export interface IProduct {
   productSlug: string
   productVariant: IProductVariant[]
   type: string
+  level: string
   createdAt: Date
   deletedAt: Date | null
   updatedAt: Date | null
 }
 
 export interface ICreateProductVariantInput {
+  id?: string
   name: string
   productAttributeId: string
   size: string
@@ -65,6 +67,7 @@ export interface ICreateProductInput {
   image: File
   type: string
   category: string
+  level: string
   departmentId: string
   variants: ICreateProductVariantInput[]
 }

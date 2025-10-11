@@ -32,6 +32,7 @@ export const SingleVariantForm = ({ ref, disabled }: Props) => {
     initialValues: {
       variants: [
         {
+          id: "",
           name: "N/A",
           price: 0,
           size: "N/A",
