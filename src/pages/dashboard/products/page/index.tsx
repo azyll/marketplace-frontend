@@ -22,6 +22,7 @@ import {
   ICreateProductVariantInput,
   IProductAttribute,
   IUpdateProductInput,
+  IUpdateProductVariantInput,
 } from "@/types/product.type"
 import { getProductAttributes } from "@/services/product-attribute.service"
 import { getImage } from "@/services/media.service"
@@ -72,10 +73,10 @@ export const ProductPage = () => {
       })
       navigate(ROUTES.DASHBOARD.PRODUCTS.BASE)
     },
-    onError: (error: AxiosError<{ message: string; error: string }>) => {
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
       notifications.show({
         title: "Create Failed",
-        message: error?.response?.data?.error ?? "Can't Update Product",
+        message: error?.response?.data?.error?.[0]?.message ?? "Can't Create Product",
         color: "red",
       })
     },
@@ -94,10 +95,10 @@ export const ProductPage = () => {
       })
       navigate(ROUTES.DASHBOARD.PRODUCTS.BASE)
     },
-    onError: (error: AxiosError<{ message: string; error: string }>) => {
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
       notifications.show({
         title: "Update Failed",
-        message: error?.response?.data?.error ?? "Can't Update Product",
+        message: error?.response?.data?.error?.[0]?.message ?? "Can't Update Product",
         color: "red",
       })
     },
@@ -131,22 +132,27 @@ export const ProductPage = () => {
 
     if (!productDetailsForm || !singleVariantForm || !multipleVariantForm) return
 
-    const productDetails = productDetailsForm.values as ICreateProductInput
-    const singleProductVariants = singleVariantForm.values.variants as ICreateProductVariantInput[]
-    const multipleProductVariants = multipleVariantForm.values
-      .variants as ICreateProductVariantInput[]
-
-    if (!productDetailsForm || !singleVariantForm || !multipleVariantForm) return
-
     const hasErrors = validateForms()
 
     if (!hasErrors) {
       if (isCreate) {
+        const productDetails = productDetailsForm.values as ICreateProductInput
+        const singleProductVariants = singleVariantForm.values
+          .variants as ICreateProductVariantInput[]
+        const multipleProductVariants = multipleVariantForm.values
+          .variants as ICreateProductVariantInput[]
+
         createMutation.mutate({
           ...productDetails,
           variants: simpleProduct ? singleProductVariants : multipleProductVariants,
         })
       } else {
+        const productDetails = productDetailsForm.values as IUpdateProductInput
+        const singleProductVariants = singleVariantForm.values
+          .variants as IUpdateProductVariantInput[]
+        const multipleProductVariants = multipleVariantForm.values
+          .variants as IUpdateProductVariantInput[]
+
         updateMutation.mutate({
           productId: product?.id as string,
           payload: {

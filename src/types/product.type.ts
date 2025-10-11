@@ -1,5 +1,6 @@
 import { IPagination } from "./common.type"
 import { IDepartment } from "./department.type"
+import { IStudentLevel } from "@/types/student.type"
 
 export interface IProductListFilters extends IPagination {
   department?: string
@@ -46,7 +47,7 @@ export interface IProduct {
   productSlug: string
   productVariant: IProductVariant[]
   type: string
-  level: string
+  level: IProductStudentLevel
   createdAt: Date
   deletedAt: Date | null
   updatedAt: Date | null
@@ -61,15 +62,23 @@ export interface ICreateProductVariantInput {
   stockQuantity: number
 }
 
+export interface IUpdateProductVariantInput extends ICreateProductVariantInput {
+  id: string
+}
+
 export interface ICreateProductInput {
   name: string
   description: string
   image: File
   type: string
   category: string
-  level: string
+  level: IProductStudentLevel
   departmentId: string
   variants: ICreateProductVariantInput[]
 }
 
-export type IUpdateProductInput = Partial<ICreateProductInput>
+export type IUpdateProductInput = Partial<Omit<ICreateProductInput, "variants">> & {
+  variants?: IUpdateProductVariantInput[]
+}
+
+export type IProductStudentLevel = IStudentLevel | "all"

@@ -19,6 +19,7 @@ export const createProductSchema = z.object({
   departmentId: z.string().min(1, { message: "Department is required" }),
   variants: z.array(createProductVariantSchema),
   category: z.string().min(1, { message: "Category is required" }),
+  level: z.enum(["shs", "tertiary", "all"]),
 })
 
 export const updateUserSchema = createProductSchema.partial()
