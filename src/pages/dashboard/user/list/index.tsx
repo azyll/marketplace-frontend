@@ -80,10 +80,6 @@ export const UserList = () => {
       title: "Name",
     },
     {
-      accessor: "email",
-      title: "Email",
-    },
-    {
       accessor: "role.name",
       title: "Role",
     },
