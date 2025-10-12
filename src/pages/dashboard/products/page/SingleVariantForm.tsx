@@ -1,8 +1,6 @@
 import { useForm, UseFormReturnType } from "@mantine/form"
 import { Ref, useEffect, useImperativeHandle } from "react"
-import { StudentDetailsFormRef } from "@/pages/dashboard/user/page/StudentDetailsForm"
-import { ICreateStudentInput } from "@/types/student.type"
-import { Card, Grid, NumberInput, Text, TextInput, Title } from "@mantine/core"
+import { Card, Grid, NumberInput, Text, Title } from "@mantine/core"
 import { ICreateProductVariantInput, IProductAttribute } from "@/types/product.type"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
@@ -32,7 +30,7 @@ export const SingleVariantForm = ({ ref, disabled }: Props) => {
     initialValues: {
       variants: [
         {
-          id: "",
+          id: undefined,
           name: "N/A",
           price: 0,
           size: "N/A",
