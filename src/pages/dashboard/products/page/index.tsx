@@ -62,6 +62,40 @@ export const ProductPage = () => {
   const singleVariantFormRef = useRef<SingleVariantFormRef>(null)
   const multipleVariantFormRef = useRef<MultipleVariantFormRef>(null)
 
+  const notifyResponseError = (
+    error: AxiosError<{ message: string; error: string | any[] }>,
+    type: "create" | "update",
+  ) => {
+    const label = type === "create" ? "Create" : "Update"
+
+    if (Array.isArray(error?.response?.data?.error)) {
+      notifications.show({
+        title: `${label} Failed`,
+        message:
+          error?.response?.data?.error?.[0]?.message ??
+          error?.response?.data?.error ??
+          `Can't ${label} Product`,
+        color: "red",
+      })
+      return
+    }
+
+    if (typeof error?.response?.data?.error === "string") {
+      notifications.show({
+        title: `${label} Failed`,
+        message: error?.response?.data?.error ?? `Can't ${label} Product`,
+        color: "red",
+      })
+      return
+    }
+
+    notifications.show({
+      title: `${label} Failed`,
+      message: `Can't ${label} Product`,
+      color: "red",
+    })
+  }
+
   const createMutation = useMutation({
     mutationFn: (payload: ICreateProductInput) => createProduct(payload),
     onSuccess: () => {
@@ -74,11 +108,7 @@ export const ProductPage = () => {
       navigate(ROUTES.DASHBOARD.PRODUCTS.BASE)
     },
     onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
-      notifications.show({
-        title: "Create Failed",
-        message: error?.response?.data?.error?.[0]?.message ?? "Can't Create Product",
-        color: "red",
-      })
+      notifyResponseError(error, "create")
     },
   })
 
@@ -96,11 +126,7 @@ export const ProductPage = () => {
       navigate(ROUTES.DASHBOARD.PRODUCTS.BASE)
     },
     onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
-      notifications.show({
-        title: "Update Failed",
-        message: error?.response?.data?.error?.[0]?.message ?? "Can't Update Product",
-        color: "red",
-      })
+      notifyResponseError(error, "update")
     },
   })
 
