@@ -25,6 +25,7 @@ import { SalesTrendCard } from "./SalesTrendCard"
 import { DepartmentSalesChart } from "./DepartmentSalesChart"
 import { AnnualSalesCard } from "./AnnualSalesCard"
 import { SalesFilter } from "./SalesFilter"
+import dayjs from "dayjs"
 
 export const SalesList = () => {
   const DEFAULT_PAGE = 1
@@ -100,6 +101,11 @@ export const SalesList = () => {
       accessor: "total",
       title: "Total",
       render: (sale) => `₱ ${sale.total.toFixed(2)}`,
+    },
+    {
+      accessor: "createdAt",
+      title: "Created At",
+      render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM DD, YYYY") : "-"),
     },
     {
       accessor: "actions",
