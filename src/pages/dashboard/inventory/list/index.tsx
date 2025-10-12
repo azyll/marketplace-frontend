@@ -1,21 +1,19 @@
-import { ActionIcon, Box, Card, Image, Space, Badge } from "@mantine/core"
-import { IconEdit, IconMoodSad, IconChevronDown, IconChevronRight } from "@tabler/icons-react"
+import { ActionIcon, Box, Card, Image, Space, Badge, Text } from "@mantine/core"
+import { IconEdit, IconMoodSad, IconChevronRight } from "@tabler/icons-react"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import dayjs from "dayjs"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { IProductVariant, IProductListFilters, IProduct } from "@/types/product.type"
 import { useFilters } from "@/hooks/useFilters"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import {
-  getInventoryProducts,
-  updateProduct,
-  updateProductStock,
-} from "@/services/products.service"
+import { getInventoryProducts, getInventoryValue } from "@/services/products.service"
 import { getImage } from "@/services/media.service"
 import { ProductFilter } from "@/pages/dashboard/components/ProductFilter"
 import { stockConditionColor } from "@/constants/stock"
 import { LogsCard } from "../../components/LogsCard"
+import { useDisclosure } from "@mantine/hooks"
+import { EditStockModal } from "./EditStockModal"
 
 export const InventoryList = () => {
   const DEFAULT_PAGE = 1
@@ -27,16 +25,53 @@ export const InventoryList = () => {
   })
 
   const [expandedRecordIds, setExpandedRecordIds] = useState<string[]>([])
-
   const [opened, { open, close }] = useDisclosure(false)
+  const [selectedVariantId, setSelectedVariantId] = useState<string>()
 
   const { data: products, isLoading } = useQuery({
     queryKey: [KEY.PRODUCTS, filters],
     queryFn: () => getInventoryProducts(filters),
   })
 
-  const [selectedVariantId, setSelectedVariantId] = useState<string>()
+  const { data: inventoryValues } = useQuery({
+    queryKey: [KEY.PRODUCTS, "inventory-values"],
+    queryFn: () => getInventoryValue(),
+  })
+
+  // Create a lookup map for variant values
+  const variantValueMap = useMemo(() => {
+    const map = new Map<string, number>()
+
+    if (inventoryValues?.data?.data) {
+      inventoryValues.data.data.forEach((product: any) => {
+        product.variants?.forEach((variant: any) => {
+          // Create a unique key using product name and variant size
+          const key = `${product.productName}-${variant.size}`
+          // Parse the total value (remove ₱ and commas)
+          const totalValue = parseFloat(variant.total.replace(/[₱,]/g, ""))
+          map.set(key, totalValue)
+        })
+      })
+    }
+
+    return map
+  }, [inventoryValues])
+
+  // Create a lookup map for product total values
+  const productValueMap = useMemo(() => {
+    const map = new Map<string, number>()
+
+    if (inventoryValues?.data?.data) {
+      inventoryValues.data.data.forEach((product: any) => {
+        map.set(product.productName, product.totalValue)
+      })
+    }
+
+    return map
+  }, [inventoryValues])
+
   const handleOnEditProduct = (productVariantId: string) => {
+    console.log("Opening modal for variant:", productVariantId)
     setSelectedVariantId(productVariantId)
     open()
   }
@@ -91,6 +126,17 @@ export const InventoryList = () => {
       render: ({ productVariant }) => productVariant?.length || 0,
     },
     {
+      accessor: "totalValue",
+      title: "≈ Total Value",
+      textAlign: "right",
+      render: ({ name }) => {
+        const totalValue = productValueMap.get(name)
+        return totalValue
+          ? `₱ ${totalValue.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+          : "-"
+      },
+    },
+    {
       accessor: "updatedAt",
       title: "Updated At",
       render: ({ updatedAt }) => (updatedAt ? dayjs(updatedAt).format("MMM DD, YYYY") : "-"),
@@ -116,16 +162,26 @@ export const InventoryList = () => {
       title: "Total Stock",
       textAlign: "center",
     },
-    // {
-    //   accessor: "stockAvailable",
-    //   title: "Available",
-    //   textAlign: "center",
-    // },
-    // {
-    //   accessor: "stockReserved",
-    //   title: "Reserved",
-    //   textAlign: "center",
-    // },
+    {
+      accessor: "stockValue",
+      title: "≈ Stock Value",
+      textAlign: "right",
+      render: (variant) => {
+        // Get the parent product name from the record
+        const productName = products?.data?.find((p) =>
+          p.productVariant?.some((v) => v.id === variant.id),
+        )?.name
+
+        if (!productName) return "-"
+
+        const key = `${productName}-${variant.size}`
+        const stockValue = variantValueMap.get(key)
+
+        return stockValue
+          ? `₱ ${stockValue.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+          : "-"
+      },
+    },
     {
       accessor: "stockCondition",
       title: "Status",
@@ -149,6 +205,10 @@ export const InventoryList = () => {
 
   return (
     <>
+      {selectedVariantId && (
+        <EditStockModal opened={opened} onClose={close} variantId={selectedVariantId} />
+      )}
+
       <Card style={{ flex: "1 1 calc(50% - 0.75rem)" }} withBorder>
         <Card.Section px={24} pt={24} pb={12}>
           <h1 className="text-xl font-bold">Inventory Activity</h1>
@@ -173,7 +233,6 @@ export const InventoryList = () => {
           <DataTable
             columns={productColumns}
             records={products?.data ?? []}
-            // State
             fetching={isLoading}
             noRecordsIcon={
               <Box p={4} mb={4}>
@@ -181,19 +240,16 @@ export const InventoryList = () => {
               </Box>
             }
             noRecordsText="No products found"
-            // Styling
             verticalSpacing="md"
             highlightOnHover
             withTableBorder
             striped
             borderRadius={6}
             minHeight={340}
-            // Pagination
             totalRecords={products?.meta?.totalItems ?? 0}
             recordsPerPage={filters.limit ?? DEFAULT_LIMIT}
             page={filters.page ?? DEFAULT_PAGE}
             onPageChange={(p) => setFilters("page", p)}
-            // Controlled row expansion
             rowExpansion={{
               allowMultiple: true,
               expanded: {
@@ -201,9 +257,8 @@ export const InventoryList = () => {
                 onRecordIdsChange: setExpandedRecordIds,
               },
               content: ({ record }) => (
-                <Box p="sm" className="bg-gray-50">
+                <Box className="bg-gray-50">
                   <DataTable
-                    mx={45}
                     columns={variantColumns}
                     records={record.productVariant ?? []}
                     noRecordsText="No variants available"

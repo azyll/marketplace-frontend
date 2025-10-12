@@ -96,11 +96,14 @@ export const updateProduct = async (productId: string, payload: IUpdateProductIn
   return response.data
 }
 
-export const updateProductStock = async (
-  action: "add" | "minus",
-  payload: { productVariantId: string; newStockQuantity: number },
-) => {
-  const response = await axios.patch(`${ENDPOINT.PRODUCT.BASE}/stock`, payload, {
+export const updateProductStock = async (payload: {
+  productVariantId: string
+  newStockQuantity: number
+  action: "add" | "minus"
+}) => {
+  const { action, ...body } = payload
+
+  const response = await axios.put(`${ENDPOINT.PRODUCT.BASE}/stock`, body, {
     params: { action },
   })
 
