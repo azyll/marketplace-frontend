@@ -105,9 +105,13 @@ export const OrdersList = () => {
       ),
     },
     {
-      accessor: "student.program.name",
+      accessor: "student.program.acronym",
       title: "Program",
+      render: ({ student }) => (
+        <Badge variant="light">{student?.program?.acronym?.toUpperCase()}</Badge>
+      ),
     },
+
     {
       accessor: "total",
       title: "Total",
