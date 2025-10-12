@@ -1,4 +1,4 @@
-import { Card, Center, Loader, Text } from "@mantine/core"
+import { Card, Center, Loader, Skeleton, Text } from "@mantine/core"
 import { useQuery } from "@tanstack/react-query"
 import { getDepartments } from "@/services/department.service"
 import { getSalesPerDepartment } from "@/services/sales.service"
@@ -24,6 +24,7 @@ export const DepartmentSalesChart = () => {
 
   const chartData = departments.map((dept: any) => ({
     department: dept.acronym.toUpperCase(),
+    departmentName: dept.name,
     sales: salesMap[dept.acronym] ?? 0,
   }))
 
@@ -42,7 +43,7 @@ export const DepartmentSalesChart = () => {
       return (
         <Card p="xs" withBorder shadow="sm">
           <Text fw={600} size="sm">
-            {payload[0].payload.department}
+            {payload[0].payload.departmentName}
           </Text>
           <Text size="sm" mt={2}>
             ₱ {payload[0].value.toFixed(2)}
@@ -56,9 +57,7 @@ export const DepartmentSalesChart = () => {
   return (
     <Card withBorder mx={9} p={0}>
       {isLoading ? (
-        <Center py="md">
-          <Loader size="sm" />
-        </Center>
+        <Skeleton h={250} />
       ) : chartData.length === 0 ? (
         <Center py="md">
           <Text size="sm" c="dimmed">
