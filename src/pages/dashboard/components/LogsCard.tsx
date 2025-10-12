@@ -67,14 +67,19 @@ export const LogsCard = ({ type, limit = 5, height = 250 }: LogsProps) => {
                       case "sales": {
                         const invoice =
                           log.content.match(/Oracle Invoice Number:\s*(.+)/)?.[1] ?? ""
-
                         navigate(ROUTES.DASHBOARD.SALES.ID.replace(":salesId", invoice))
+                        break
                       }
+                      case "order": {
+                        const order = log.content.match(/(?:Order #|ID:\s*)(ORD-[\d-]+)/)?.[1] ?? ""
+
+                        navigate(ROUTES.DASHBOARD.ORDERS.ID.replace(":orderId", order))
+                        break
+                      }
+
                       case "inventory": {
                       }
                       case "user": {
-                      }
-                      case "order": {
                       }
                     }
                   }}

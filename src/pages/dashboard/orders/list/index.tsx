@@ -1,4 +1,14 @@
-import { ActionIcon, Badge, Box, Button, Card, CopyButton, Space, Tooltip } from "@mantine/core"
+import {
+  ActionIcon,
+  Badge,
+  Box,
+  Button,
+  Card,
+  CopyButton,
+  Flex,
+  Space,
+  Tooltip,
+} from "@mantine/core"
 import { OrdersFilter } from "@/pages/dashboard/orders/list/OrdersFilter"
 import { useFilters } from "@/hooks/useFilters"
 import { IProductListFilters } from "@/types/product.type"
@@ -24,6 +34,7 @@ import { ROUTES } from "@/constants/routes"
 import AnnualChart from "../../components/AnnualChart"
 import { useEffect, useMemo, useState } from "react"
 import { OrderActions } from "@/pages/dashboard/orders/components/OrderActions"
+import { LogsCard } from "../../components/LogsCard"
 
 export const OrdersList = () => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -158,20 +169,31 @@ export const OrdersList = () => {
 
   return (
     <>
-      <Card>
-        <Card.Section px={24} pt={24}>
-          <h1 className="text-xl font-bold">Orders Per Month</h1>
-        </Card.Section>
+      <Flex align="flex-start" justify="flex-start" wrap="wrap" gap="lg">
+        <Card style={{ flex: "1 1 calc(60% - 0.75rem)" }}>
+          <Card.Section px={24} pt={24}>
+            <h1 className="text-sm font-semibold">Orders Per Month</h1>
+          </Card.Section>
 
-        <Space h={20} />
+          <Space h={20} />
 
-        <AnnualChart
-          queryKey="annual-orders"
-          queryFn={getAnnualOrders}
-          label="Orders"
-          dataKey="orders"
-        />
-      </Card>
+          <AnnualChart
+            queryKey="annual-orders"
+            queryFn={getAnnualOrders}
+            label="Orders"
+            dataKey="orders"
+          />
+        </Card>
+
+        {/* Activity Logs */}
+        <Card style={{ flex: "1 1 calc(40% - 0.75rem)" }}>
+          <Card.Section px={24} pt={24} pb={12}>
+            <h1 className="text-sm font-semibold">Orders Activity</h1>
+          </Card.Section>
+
+          <LogsCard type="order" />
+        </Card>
+      </Flex>
 
       <Space h={16} />
 
