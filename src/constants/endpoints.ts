@@ -49,6 +49,7 @@ export const ENDPOINT = {
     BASE: "/student",
     ID: "/student/:studentId",
     USER_ID: "/student/user/:userId",
+    BULK: "/student/bulk",
   },
 
   NOTIFICATION: {

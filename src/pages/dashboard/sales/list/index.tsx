@@ -50,7 +50,7 @@ export const SalesList = () => {
     {
       accessor: "oracleInvoice",
       title: "Sales Invoice #",
-      width: 100,
+      width: 120,
       render: (sale) => (
         <div className="flex items-center gap-1">
           <p className="shrink-0">{sale.oracleInvoice}</p>

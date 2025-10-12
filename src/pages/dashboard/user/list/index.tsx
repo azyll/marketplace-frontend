@@ -3,9 +3,9 @@ import { KEY } from "@/constants/key"
 import { deleteUser, getUsers } from "@/services/user.service"
 import { useFilters } from "@/hooks/useFilters"
 import { IGetUserFilter, IUser } from "@/types/user.type"
-import { ActionIcon, Box, Button, Card, List, Modal, Space, Text, Title } from "@mantine/core"
+import { ActionIcon, Box, Button, Card, FileButton, Modal, Space, Text, Title } from "@mantine/core"
 import dayjs from "dayjs"
-import { IconEdit, IconMoodSad, IconPlus, IconTrashX } from "@tabler/icons-react"
+import { IconEdit, IconFileTypeXls, IconMoodSad, IconPlus, IconTrashX } from "@tabler/icons-react"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import { useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
@@ -13,6 +13,7 @@ import { useDisclosure } from "@mantine/hooks"
 import { useState } from "react"
 import { notifications } from "@mantine/notifications"
 import Axios from "axios"
+import { bulkCreateStudent } from "@/services/student.service"
 
 export const UserList = () => {
   const DEFAULT_PAGE = 1
@@ -30,12 +31,47 @@ export const UserList = () => {
 
   const navigate = useNavigate()
 
+  const queryClient = useQueryClient()
+
   const handleOnCreateUser = () => {
     navigate(ROUTES.DASHBOARD.USER.ID.replace(":userId", "create"))
   }
 
   const handleOnEditUser = (userId: string) => {
     navigate(ROUTES.DASHBOARD.USER.ID.replace(":userId", userId))
+  }
+
+  const bulkUploadMutation = useMutation({
+    mutationFn: (file: File) => bulkCreateStudent(file),
+
+    onSuccess: async (data) => {
+      notifications.show({
+        title: "Upload Successful",
+        message: data?.message || "Students were uploaded successfully.",
+        color: "green",
+      })
+
+      await queryClient.invalidateQueries({ queryKey: [KEY.USERS], exact: false })
+    },
+
+    onError: (error) => {
+      let errorMessage = "Upload failed. Please try again."
+
+      if (Axios.isAxiosError(error)) {
+        errorMessage =
+          error.response?.data?.message ?? error.response?.data?.error?.[0]?.message ?? errorMessage
+      }
+
+      notifications.show({
+        title: "Upload Failed",
+        message: errorMessage,
+        color: "red",
+      })
+    },
+  })
+
+  const handleOnBulkUploadStudent = (file: File) => {
+    bulkUploadMutation.mutate(file)
   }
 
   const columns: DataTableColumn<IUser>[] = [
@@ -63,7 +99,6 @@ export const UserList = () => {
       render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM DD, YYYY") : "-"),
     },
     {
-      // Required yung 'accessor' kaya nilagyan ko nalang ng value kahit wala sa IUser na type
       accessor: "actions",
       title: "Actions",
       width: 120,
@@ -81,8 +116,6 @@ export const UserList = () => {
       ),
     },
   ]
-
-  const queryClient = useQueryClient()
 
   const [opened, { open, close }] = useDisclosure(false)
 
@@ -175,10 +208,22 @@ export const UserList = () => {
       <Card.Section px={24} pt={24}>
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Users</h1>
+          <div className="flex">
+            <FileButton onChange={() => handleOnBulkUploadStudent} accept=".xlsx,.xls">
+              {(props) => (
+                <Button variant="light" {...props} loading={bulkUploadMutation.isPending}>
+                  <IconFileTypeXls size={14} /> <Space w={6} />
+                  Bulk Upload Students
+                </Button>
+              )}
+            </FileButton>
 
-          <Button onClick={() => handleOnCreateUser()}>
-            <IconPlus size={14} /> <Space w={6} /> Create User
-          </Button>
+            <Space w={10} />
+
+            <Button onClick={() => handleOnCreateUser()}>
+              <IconPlus size={14} /> <Space w={6} /> Create User
+            </Button>
+          </div>
         </div>
       </Card.Section>
 
