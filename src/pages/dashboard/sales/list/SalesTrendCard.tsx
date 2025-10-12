@@ -1,4 +1,4 @@
-import { Card, Text, Group, Badge, Stack, NumberFormatter } from "@mantine/core"
+import { Card, Text, Group, Badge, Stack, NumberFormatter, Skeleton } from "@mantine/core"
 import { IconTrendingUp, IconTrendingDown } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { getSalesTrend } from "@/services/sales.service"
@@ -13,7 +13,14 @@ export const SalesTrendCard = () => {
   if (isLoading || !salesTrend) {
     return (
       <Card p="lg">
-        <Text c="dimmed">Loading...</Text>
+        <Skeleton w={180} h={20} mb="md"></Skeleton>
+        <div className="flex justify-between">
+          <Skeleton w={160} h={40} mb="sm"></Skeleton>
+
+          <Skeleton w={90} h={20} mb="md" radius="lg"></Skeleton>
+        </div>
+
+        <Skeleton w={140} h={15} mb="md"></Skeleton>
       </Card>
     )
   }

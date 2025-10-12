@@ -1,4 +1,4 @@
-import { Card, Text, NumberFormatter } from "@mantine/core"
+import { Card, Text, NumberFormatter, Skeleton } from "@mantine/core"
 import { useQuery } from "@tanstack/react-query"
 import { getSales } from "@/services/sales.service"
 import { useFilters } from "@/hooks/useFilters"
@@ -19,10 +19,12 @@ export const AnnualSalesCard = () => {
 
   const totalSales = data?.meta?.totalSales
 
-  if (isLoading || totalSales === undefined) {
+  if (isLoading) {
     return (
       <Card p="lg">
-        <Text c="dimmed">Loading...</Text>
+        <Skeleton w={180} h={20} mb="md"></Skeleton>
+
+        <Skeleton w={160} h={40}></Skeleton>
       </Card>
     )
   }
@@ -38,7 +40,7 @@ export const AnnualSalesCard = () => {
         fixedDecimalScale
         prefix="₱ "
         thousandSeparator=","
-        value={totalSales}
+        value={totalSales ? totalSales : "₱ 0.00"}
         className="text-3xl font-bold"
       />
     </Card>
