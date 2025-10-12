@@ -12,6 +12,8 @@ export const ENDPOINT = {
     },
     INVENTORY: {
       BASE: "/product/inventory",
+      ALERT: "/product/inventory/alerts",
+      VALUE: "product/inventory/value",
     },
   },
 
@@ -47,6 +49,7 @@ export const ENDPOINT = {
     BASE: "/student",
     ID: "/student/:studentId",
     USER_ID: "/student/user/:userId",
+    BULK: "/student/bulk",
   },
 
   NOTIFICATION: {
@@ -54,8 +57,19 @@ export const ENDPOINT = {
     RECEIVER: "/notification/receiver",
   },
 
+  LOG: {
+    BASE: "/log",
+  },
+
   SALES: {
     BASE: "/sales",
+    ID: "/sales/:salesId",
     ANNUAL: "/sales/annual",
+    DEPARTMENT: "/sales/total-per-department",
+    TREND: "/sales/trend",
+  },
+
+  DEPARTMENT: {
+    BASE: "/department",
   },
 }

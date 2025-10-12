@@ -18,3 +18,13 @@ export interface INotificationReceiver {
   deletedAt: Date | null
   updatedAt: Date | null
 }
+
+export interface ILog {
+  id: number
+  title: string
+  content: string
+  type: string
+  createdAt: string
+  updatedAt: string
+  deletedAt: string | null
+}

@@ -94,6 +94,26 @@ export const OrdersList = () => {
       ),
     },
     {
+      accessor: "total",
+      title: "Total",
+      width: 130,
+      render: (sale) => (
+        <div className="flex items-center gap-1">
+          <p className="shrink-0">{`₱ ${sale.total.toFixed(2)}`}</p>
+
+          <CopyButton value={sale.total.toString()} timeout={500}>
+            {({ copied, copy }) => (
+              <Tooltip label={copied ? "Copied" : "Copy"} withArrow position="right">
+                <ActionIcon color={copied ? "teal" : "gray"} variant="subtle" onClick={copy}>
+                  {copied ? <IconCheck size={16} /> : <IconCopy size={16} />}
+                </ActionIcon>
+              </Tooltip>
+            )}
+          </CopyButton>
+        </div>
+      ),
+    },
+    {
       accessor: "status",
       title: "Status",
       render: ({ status }) => (

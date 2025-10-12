@@ -10,6 +10,7 @@ import { Ref, useImperativeHandle } from "react"
 import { getProductDepartments } from "@/services/product-department.service"
 import { createProductSchema } from "@/schema/product.schema"
 import { zod4Resolver } from "mantine-form-zod-resolver"
+import { STUDENT_LEVEL, STUDENT_LEVEL_LABEL } from "@/constants/student"
 
 export interface ProductDetailsFormRef {
   form: UseFormReturnType<Partial<ICreateProductInput>>
@@ -42,14 +43,19 @@ export const ProductDetailsForm = ({ disabled, ref, imageDefaultValue }: Props) 
   const categoryOptions: ComboboxItem[] = [
     { label: "Uniform", value: PRODUCT_CATEGORY.UNIFORM },
     { label: "Proware", value: PRODUCT_CATEGORY.PROWARE },
-    { label: "Accessory", value: PRODUCT_CATEGORY.ACCESSORY },
-    { label: "Stationery", value: PRODUCT_CATEGORY.STATIONERY },
+    { label: "Fabric", value: PRODUCT_CATEGORY.FABRIC },
   ]
 
   const typeOptions: ComboboxItem[] = [
     { label: "Upper Wear", value: PRODUCT_TYPE.UPPER_WEAR },
     { label: "Lower Wear", value: PRODUCT_TYPE.LOWER_WEAR },
     { label: "Non-Wearable", value: PRODUCT_TYPE.NON_WEARABLE },
+  ]
+
+  const studentLevelOptions: ComboboxItem[] = [
+    { label: "All", value: "all" },
+    { label: STUDENT_LEVEL_LABEL[STUDENT_LEVEL.SHS], value: STUDENT_LEVEL.SHS },
+    { label: STUDENT_LEVEL_LABEL[STUDENT_LEVEL.TERTIARY], value: STUDENT_LEVEL.TERTIARY },
   ]
 
   const productSchema = createProductSchema.omit({ variants: true })
@@ -61,6 +67,7 @@ export const ProductDetailsForm = ({ disabled, ref, imageDefaultValue }: Props) 
       departmentId: "",
       category: "",
       type: "",
+      level: undefined,
     },
     validate: zod4Resolver(productSchema),
   })
@@ -87,12 +94,12 @@ export const ProductDetailsForm = ({ disabled, ref, imageDefaultValue }: Props) 
         </Grid.Col>
 
         <Grid.Col span={6}>
-          {/* Student ID */}
+          {/* Name */}
           <TextInput label="Name" {...form.getInputProps("name")} disabled={disabled} />
         </Grid.Col>
 
         <Grid.Col span={12}>
-          {/* Student ID */}
+          {/* Description */}
           <Textarea
             label="Description"
             {...form.getInputProps("description")}
@@ -101,7 +108,7 @@ export const ProductDetailsForm = ({ disabled, ref, imageDefaultValue }: Props) 
           />
         </Grid.Col>
 
-        <Grid.Col span={4}>
+        <Grid.Col span={6}>
           {/* Program/Department */}
           <Select
             label="Department"
@@ -115,7 +122,18 @@ export const ProductDetailsForm = ({ disabled, ref, imageDefaultValue }: Props) 
           />
         </Grid.Col>
 
-        <Grid.Col span={4}>
+        <Grid.Col span={6}>
+          {/* Student Level */}
+          <Select
+            label="Student Level"
+            placeholder="Select Student Level"
+            data={studentLevelOptions}
+            disabled={disabled}
+            {...form.getInputProps("level")}
+          />
+        </Grid.Col>
+
+        <Grid.Col span={6}>
           {/* Type*/}
           <Select
             label="Type"
@@ -126,7 +144,7 @@ export const ProductDetailsForm = ({ disabled, ref, imageDefaultValue }: Props) 
           />
         </Grid.Col>
 
-        <Grid.Col span={4}>
+        <Grid.Col span={6}>
           {/* Category*/}
           <Select
             label="Category"

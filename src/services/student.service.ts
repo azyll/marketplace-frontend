@@ -12,6 +12,15 @@ export const createStudent = async (userId: string, payload: ICreateStudentInput
   return response.data
 }
 
+export const bulkCreateStudent = async (file: File) => {
+  const formData = new FormData()
+  formData.append("file", file)
+
+  const response = await axios.post(ENDPOINT.STUDENT.BULK, formData)
+
+  return response.data
+}
+
 export const updateStudent = async (studentId: string, payload: IUpdateStudentInput) => {
   const response = await axios.put<IStudent>(
     ENDPOINT.STUDENT.ID.replace(":studentId", studentId),

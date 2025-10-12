@@ -9,16 +9,14 @@ import axios from "@/utils/axios"
 import { IPaginatedResponse, IResponse } from "@/types/common.type"
 
 export const createOrder = async (
-  studentId: string,
+  userId: string,
   orderItems: { productVariantId: string; quantity: number }[],
   orderType: "cart" | "buy-now",
 ) => {
   const response = await axios.post<IResponse<IOrder>>(
-    `${ENDPOINT.ORDER.BASE}/${studentId}`,
+    `${ENDPOINT.ORDER.BASE}/${userId}`,
     {
-      studentId,
       orderItems,
-      orderType,
     },
     {
       params: {

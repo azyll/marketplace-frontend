@@ -16,6 +16,10 @@ export const ROUTES = {
     INVENTORY: {
       BASE: "/dashboard/inventory",
     },
+    SALES: {
+      BASE: "/dashboard/sales",
+      ID: "/dashboard/sales/:salesId",
+    },
   },
   AUTH: {
     BASE: "/auth",

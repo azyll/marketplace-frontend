@@ -15,8 +15,7 @@ import {
 import { getImage } from "@/services/media.service"
 import { ProductFilter } from "@/pages/dashboard/components/ProductFilter"
 import { stockConditionColor } from "@/constants/stock"
-import { EditStockModal } from "./EditStockModal"
-import { useDisclosure } from "@mantine/hooks"
+import { LogsCard } from "../../components/LogsCard"
 
 export const InventoryList = () => {
   const DEFAULT_PAGE = 1
@@ -149,66 +148,76 @@ export const InventoryList = () => {
   ]
 
   return (
-    <Card>
-      <Card.Section px={24} pt={24}>
-        <div className="flex items-center justify-between gap-4">
-          <h1 className="text-xl font-bold">Manage Inventory</h1>
-        </div>
+    <>
+      <Card style={{ flex: "1 1 calc(50% - 0.75rem)" }} withBorder>
+        <Card.Section px={24} pt={24} pb={12}>
+          <h1 className="text-xl font-bold">Inventory Activity</h1>
+        </Card.Section>
 
-        <ProductFilter filters={filters} onFilter={setFilterValues} />
-      </Card.Section>
+        <LogsCard type="inventory" />
+      </Card>
 
       <Space h={16} />
+      <Card>
+        <Card.Section px={24} pt={24}>
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="text-xl font-bold">Manage Inventory</h1>
+          </div>
 
-      <Card.Section px={24} pb={24}>
-        <DataTable
-          columns={productColumns}
-          records={products?.data ?? []}
-          // State
-          fetching={isLoading}
-          noRecordsIcon={
-            <Box p={4} mb={4}>
-              <IconMoodSad size={36} strokeWidth={1.5} />
-            </Box>
-          }
-          noRecordsText="No products found"
-          // Styling
-          verticalSpacing="md"
-          highlightOnHover
-          withTableBorder
-          striped
-          borderRadius={6}
-          minHeight={340}
-          // Pagination
-          totalRecords={products?.meta?.totalItems ?? 0}
-          recordsPerPage={filters.limit ?? DEFAULT_LIMIT}
-          page={filters.page ?? DEFAULT_PAGE}
-          onPageChange={(p) => setFilters("page", p)}
-          // Controlled row expansion
-          rowExpansion={{
-            allowMultiple: true,
-            expanded: {
-              recordIds: expandedRecordIds,
-              onRecordIdsChange: setExpandedRecordIds,
-            },
-            content: ({ record }) => (
-              <Box p="sm" className="bg-gray-50">
-                <DataTable
-                  mx={45}
-                  columns={variantColumns}
-                  records={record.productVariant ?? []}
-                  noRecordsText="No variants available"
-                  withTableBorder={false}
-                  withColumnBorders
-                  striped
-                  highlightOnHover
-                />
+          <ProductFilter filters={filters} onFilter={setFilterValues} />
+        </Card.Section>
+
+        <Space h={16} />
+
+        <Card.Section px={24} pb={24}>
+          <DataTable
+            columns={productColumns}
+            records={products?.data ?? []}
+            // State
+            fetching={isLoading}
+            noRecordsIcon={
+              <Box p={4} mb={4}>
+                <IconMoodSad size={36} strokeWidth={1.5} />
               </Box>
-            ),
-          }}
-        />
-        <EditStockModal opened={opened} onClose={close} productVariantId={selectedVariantId} />
-      </Card.Section>
-    </Card>
+            }
+            noRecordsText="No products found"
+            // Styling
+            verticalSpacing="md"
+            highlightOnHover
+            withTableBorder
+            striped
+            borderRadius={6}
+            minHeight={340}
+            // Pagination
+            totalRecords={products?.meta?.totalItems ?? 0}
+            recordsPerPage={filters.limit ?? DEFAULT_LIMIT}
+            page={filters.page ?? DEFAULT_PAGE}
+            onPageChange={(p) => setFilters("page", p)}
+            // Controlled row expansion
+            rowExpansion={{
+              allowMultiple: true,
+              expanded: {
+                recordIds: expandedRecordIds,
+                onRecordIdsChange: setExpandedRecordIds,
+              },
+              content: ({ record }) => (
+                <Box p="sm" className="bg-gray-50">
+                  <DataTable
+                    mx={45}
+                    columns={variantColumns}
+                    records={record.productVariant ?? []}
+                    noRecordsText="No variants available"
+                    withTableBorder={false}
+                    withColumnBorders
+                    striped
+                    highlightOnHover
+                  />
+                </Box>
+              ),
+            }}
+          />
+        </Card.Section>
+      </Card>
+    </>
   )
 }

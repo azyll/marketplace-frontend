@@ -21,6 +21,8 @@ import { ProductList as DashboardProductList } from "@/pages/dashboard/products/
 import { OrdersList as DashboardOrdersList } from "@/pages/dashboard/orders/list"
 import { OrdersPage as DashboardOrdersPage } from "@/pages/dashboard/orders/page"
 import { InventoryList as DashboardInventoryList } from "@/pages/dashboard/inventory/list"
+import { SalesList as DashboardSalesList } from "@/pages/dashboard/sales/list"
+import { SalesPage as DashboardSalesPage } from "@/pages/dashboard/sales/page"
 
 import { dashboardLoader } from "@/router/loader/auth"
 
@@ -120,11 +122,21 @@ export const router = createBrowserRouter([
             path: ROUTES.DASHBOARD.ORDERS.ID,
             Component: DashboardOrdersPage,
           },
-          // Inventory
 
+          // Inventory
           {
             path: ROUTES.DASHBOARD.INVENTORY.BASE,
             Component: DashboardInventoryList,
+          },
+
+          // Sales
+          {
+            path: ROUTES.DASHBOARD.SALES.BASE,
+            Component: DashboardSalesList,
+          },
+          {
+            path: ROUTES.DASHBOARD.SALES.ID,
+            Component: DashboardSalesPage,
           },
         ],
       },
