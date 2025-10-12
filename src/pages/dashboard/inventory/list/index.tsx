@@ -1,4 +1,4 @@
-import { ActionIcon, Box, Card, Image, Space, Badge, Text } from "@mantine/core"
+import { ActionIcon, Box, Card, Image, Space, Badge, Text, Flex } from "@mantine/core"
 import { IconEdit, IconMoodSad, IconChevronRight } from "@tabler/icons-react"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import dayjs from "dayjs"
@@ -7,7 +7,11 @@ import { IProductVariant, IProductListFilters, IProduct } from "@/types/product.
 import { useFilters } from "@/hooks/useFilters"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { getInventoryProducts, getInventoryValue } from "@/services/products.service"
+import {
+  getInventoryAlerts,
+  getInventoryProducts,
+  getInventoryValue,
+} from "@/services/products.service"
 import { getImage } from "@/services/media.service"
 import { ProductFilter } from "@/pages/dashboard/components/ProductFilter"
 import { stockConditionColor } from "@/constants/stock"
@@ -15,6 +19,7 @@ import { LogsCard } from "../../components/LogsCard"
 import { useDisclosure } from "@mantine/hooks"
 import { EditStockModal } from "./EditStockModal"
 import { PRODUCT_SIZE } from "@/constants/product"
+import { AlertsCard } from "./AlertsCard"
 
 export const InventoryList = () => {
   const DEFAULT_PAGE = 1
@@ -39,6 +44,11 @@ export const InventoryList = () => {
   const { data: inventoryValues } = useQuery({
     queryKey: [KEY.PRODUCTS, "inventory-values"],
     queryFn: () => getInventoryValue(),
+  })
+
+  const { data: inventoryAlertData, isLoading: isAlertsLoading } = useQuery({
+    queryKey: [KEY.PRODUCTS, "inventory-alerts"],
+    queryFn: () => getInventoryAlerts(),
   })
 
   // Create a lookup map for variant values
@@ -211,6 +221,31 @@ export const InventoryList = () => {
       {selectedVariantId && (
         <EditStockModal opened={opened} onClose={close} variantId={selectedVariantId} />
       )}
+
+      <Flex gap="lg">
+        <AlertsCard
+          title="Low Stock"
+          data={inventoryAlertData?.data?.[1]}
+          isLoading={isAlertsLoading}
+          description={"Item has less than 20 stock"}
+        />
+
+        <AlertsCard
+          title="No Stock"
+          data={inventoryAlertData?.data?.[0]}
+          isLoading={isAlertsLoading}
+          description={"Item needs to be restocked"}
+        />
+
+        <AlertsCard
+          title="In Stock"
+          data={inventoryAlertData?.data?.[2]}
+          isLoading={isAlertsLoading}
+          description={"Items has enough stock"}
+        />
+      </Flex>
+
+      <Space h={16} />
 
       <Card style={{ flex: "1 1 calc(50% - 0.75rem)" }} withBorder>
         <Card.Section px={24} pt={24} pb={12}>
