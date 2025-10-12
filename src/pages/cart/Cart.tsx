@@ -144,7 +144,11 @@ export default function Cart() {
         {/* Cart items */}
         <Grid.Col span={{ base: 12, md: 6 }}>
           <Stack gap="md">
-            <Title order={4}>My Cart - {cart?.length} item(s)</Title>
+            {cart?.length === 0 ? (
+              <Title order={4}>My Cart</Title>
+            ) : (
+              <Title order={4}>My Cart - {cart?.length} item(s)</Title>
+            )}
 
             {isLoading && !user ? (
               // Skeletons while loading
@@ -236,7 +240,7 @@ export default function Cart() {
               ))
             ) : cart && cart.length === 0 ? (
               //Empty cart
-              <Card h={230} w="100%" bg="#e9edf3" padding="sm" radius="md">
+              <Card h={300} w="100%" bg="#e9edf3" padding="sm" radius="md">
                 <div className="flex h-full flex-col items-center justify-center">
                   <IconMoodSad color="gray" size={32} stroke={1.5} />
 
