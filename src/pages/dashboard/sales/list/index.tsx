@@ -51,7 +51,6 @@ export const SalesList = () => {
     {
       accessor: "oracleInvoice",
       title: "Sales Invoice #",
-      width: 120,
       render: (sale) => (
         <div className="flex items-center gap-1">
           <p className="shrink-0">{sale.oracleInvoice}</p>
@@ -69,9 +68,12 @@ export const SalesList = () => {
       ),
     },
     {
+      accessor: "orderId",
+      title: "Order #",
+    },
+    {
       accessor: "student.user",
       title: "Student",
-      width: 250,
       render: (sale) => (
         <div className="flex flex-col text-sm">
           <div className="flex items-center gap-0.5">
@@ -90,7 +92,6 @@ export const SalesList = () => {
     {
       accessor: "order.student.program.acronym",
       title: "Program",
-      width: 100,
       render: (sale) => (
         <Badge variant="light">{sale.order.student.program.acronym.toUpperCase()}</Badge>
       ),
@@ -98,7 +99,6 @@ export const SalesList = () => {
     {
       accessor: "total",
       title: "Total",
-      width: 130,
       render: (sale) => `₱ ${sale.total.toFixed(2)}`,
     },
     {
