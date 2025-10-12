@@ -1,4 +1,4 @@
-import { ActionIcon, Box, Card, Image, Space, Badge, Text } from "@mantine/core"
+import { ActionIcon, Box, Card, Image, Space, Badge, Text, Flex } from "@mantine/core"
 import { IconEdit, IconMoodSad, IconChevronRight } from "@tabler/icons-react"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import dayjs from "dayjs"
@@ -7,13 +7,18 @@ import { IProductVariant, IProductListFilters, IProduct } from "@/types/product.
 import { useFilters } from "@/hooks/useFilters"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { getInventoryProducts, getInventoryValue } from "@/services/products.service"
+import {
+  getInventoryAlerts,
+  getInventoryProducts,
+  getInventoryValue,
+} from "@/services/products.service"
 import { getImage } from "@/services/media.service"
 import { ProductFilter } from "@/pages/dashboard/components/ProductFilter"
 import { stockConditionColor } from "@/constants/stock"
 import { LogsCard } from "../../components/LogsCard"
 import { useDisclosure } from "@mantine/hooks"
 import { EditStockModal } from "./EditStockModal"
+import { AlertsCard } from "./AlertsCard"
 
 export const InventoryList = () => {
   const DEFAULT_PAGE = 1
@@ -36,6 +41,12 @@ export const InventoryList = () => {
   const { data: inventoryValues } = useQuery({
     queryKey: [KEY.PRODUCTS, "inventory-values"],
     queryFn: () => getInventoryValue(),
+  })
+
+  const { data: alertsData, isLoading: isAlertsLoading } = useQuery({
+    queryKey: [KEY.PRODUCTS, "inventory-alerts"],
+    queryFn: () => getInventoryAlerts(),
+    select: (response) => response.data,
   })
 
   // Create a lookup map for variant values
@@ -109,16 +120,16 @@ export const InventoryList = () => {
       accessor: "name",
       title: "Name",
     },
-    {
-      accessor: "category",
-      title: "Category",
-      render: ({ category }) => <Badge variant="light">{category}</Badge>,
-    },
-    {
-      accessor: "department.name",
-      title: "Department",
-      render: ({ department }) => department?.name || "-",
-    },
+    // {
+    //   accessor: "category",
+    //   title: "Category",
+    //   render: ({ category }) => <Badge variant="light">{category}</Badge>,
+    // },
+    // {
+    //   accessor: "department.name",
+    //   title: "Department",
+    //   render: ({ department }) => department?.name || "-",
+    // },
     {
       accessor: "productVariant",
       title: "Variants",
@@ -128,7 +139,7 @@ export const InventoryList = () => {
     {
       accessor: "totalValue",
       title: "≈ Total Value",
-      textAlign: "right",
+      textAlign: "left",
       render: ({ name }) => {
         const totalValue = productValueMap.get(name)
         return totalValue
@@ -161,6 +172,7 @@ export const InventoryList = () => {
       accessor: "stockQuantity",
       title: "Total Stock",
       textAlign: "center",
+      width: 100,
     },
     {
       accessor: "stockValue",
@@ -209,7 +221,32 @@ export const InventoryList = () => {
         <EditStockModal opened={opened} onClose={close} variantId={selectedVariantId} />
       )}
 
-      <Card style={{ flex: "1 1 calc(50% - 0.75rem)" }} withBorder>
+      {/* Alerts */}
+      <Flex gap={16}>
+        <AlertsCard
+          title="Low Stock"
+          data={alertsData?.[1]}
+          isLoading={isAlertsLoading}
+          description="Items with less than 20 stock"
+        />
+
+        <AlertsCard
+          title="No Stock"
+          data={alertsData?.[0]}
+          isLoading={isAlertsLoading}
+          description="Items with no stock left"
+        />
+        <AlertsCard
+          title="In Stock"
+          data={alertsData?.[2]}
+          isLoading={isAlertsLoading}
+          description="Items with enough stock"
+        />
+      </Flex>
+      <Space h={16} />
+
+      {/* Activity Logs */}
+      <Card style={{ flex: "1 1 calc(50% - 0.75rem)" }}>
         <Card.Section px={24} pt={24} pb={12}>
           <h1 className="text-xl font-bold">Inventory Activity</h1>
         </Card.Section>
@@ -218,6 +255,8 @@ export const InventoryList = () => {
       </Card>
 
       <Space h={16} />
+
+      {/* Table */}
       <Card>
         <Card.Section px={24} pt={24}>
           <div className="flex items-center justify-between gap-4">
