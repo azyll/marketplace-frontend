@@ -1,7 +1,7 @@
 import { KEY } from "@/constants/key"
 import { ROUTES } from "@/constants/routes"
 import { useFilters } from "@/hooks/useFilters"
-import { getAnnualSales, getSales, getSalesTrend } from "@/services/sales.service"
+import { getAnnualSales, getSales } from "@/services/sales.service"
 import { ISales } from "@/types/sale.type"
 import {
   ActionIcon,
@@ -24,6 +24,7 @@ import { LogsCard } from "../../components/LogsCard"
 import { SalesTrendCard } from "./SalesTrendCard"
 import { DepartmentSalesChart } from "./DepartmentSalesChart"
 import { AnnualSalesCard } from "./AnnualSalesCard"
+import { SalesFilter } from "./SalesFilter"
 
 export const SalesList = () => {
   const DEFAULT_PAGE = 1
@@ -170,6 +171,8 @@ export const SalesList = () => {
         <Card.Section px={24} pt={24}>
           <div className="flex h-[36px] items-center justify-between gap-4">
             <h1 className="text-xl font-bold">Manage Sales</h1>
+
+            <SalesFilter filters={filters} onFilter={setFilterValues} />
           </div>
         </Card.Section>
 
