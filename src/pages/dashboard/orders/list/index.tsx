@@ -105,6 +105,10 @@ export const OrdersList = () => {
       ),
     },
     {
+      accessor: "student.program.name",
+      title: "Program",
+    },
+    {
       accessor: "total",
       title: "Total",
       width: 130,
