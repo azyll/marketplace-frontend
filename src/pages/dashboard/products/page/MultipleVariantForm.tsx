@@ -1,6 +1,6 @@
-import { Button, Card, Divider, Grid, Space, Text, Title } from "@mantine/core"
+import { Button, Card, Divider, Space, Text, Title } from "@mantine/core"
 import { useForm, UseFormReturnType } from "@mantine/form"
-import { MultipleVariantFormItem } from "@/pages/dashboard/products/page/MultipleVarianFormItem"
+import { MultipleVariantFormItem } from "@/pages/dashboard/products/page/MultipleVariantFormItem"
 import { ICreateProductVariantInput } from "@/types/product.type"
 import { IconPlus } from "@tabler/icons-react"
 import { Ref, useImperativeHandle } from "react"
