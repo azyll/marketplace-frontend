@@ -183,7 +183,14 @@ export const ProductPage = () => {
           productId: product?.id as string,
           payload: {
             ...productDetails,
-            variants: simpleProduct ? singleProductVariants : multipleProductVariants,
+            variants: simpleProduct
+              ? singleProductVariants
+              : (multipleProductVariants.map((variant, index) => {
+                  if (!variant.id) {
+                    return { ...variant, id: index }
+                  }
+                  return variant
+                }) as IUpdateProductVariantInput[]),
           },
         })
       }
