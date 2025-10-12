@@ -124,11 +124,13 @@ export const SalesList = () => {
   return (
     <>
       <Flex align="flex-start" justify="flex-start" wrap="wrap" gap="lg">
+        {/* Monthly & Annual Sales Trend */}
         <Stack style={{ flex: "1 1 calc(30% - 0.75rem)" }}>
           <SalesTrendCard />
           <AnnualSalesCard />
         </Stack>
 
+        {/* Line Chart (Sales per month)*/}
         <Card style={{ flex: "1 1 calc(50% - 0.75rem)" }}>
           <Card.Section px={24} pt={24}>
             <h1 className="text-sm font-semibold">Sales Per Month</h1>
@@ -148,6 +150,7 @@ export const SalesList = () => {
       <Space h={16} />
 
       <Flex align="flex-start" justify="flex-start" wrap="wrap" gap="lg">
+        {/* Bar Chart (Sales per department) */}
         <Card style={{ flex: "1 1 calc(50% - 0.75rem)" }}>
           <Card.Section px={24} pt={24} pb={12}>
             <h1 className="text-sm font-semibold">Sales By Department</h1>
@@ -156,6 +159,7 @@ export const SalesList = () => {
           <DepartmentSalesChart />
         </Card>
 
+        {/* Activity Logs */}
         <Card style={{ flex: "1 1 calc(40% - 0.75rem)" }}>
           <Card.Section px={24} pt={24} pb={12}>
             <h1 className="text-sm font-semibold">Sales Activity</h1>
@@ -167,6 +171,7 @@ export const SalesList = () => {
 
       <Space h={16} />
 
+      {/* Table */}
       <Card>
         <Card.Section px={24} pt={24}>
           <div className="flex h-[36px] items-center justify-between gap-4">
