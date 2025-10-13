@@ -11,17 +11,9 @@ import {
 } from "@mantine/core"
 import { OrdersFilter } from "@/pages/dashboard/orders/list/OrdersFilter"
 import { useFilters } from "@/hooks/useFilters"
-import { IProductListFilters } from "@/types/product.type"
 import { IOrder, IOrderFilters, IOrderStatusType } from "@/types/order.type"
 import { DataTable, DataTableColumn } from "mantine-datatable"
-import {
-  IconCheck,
-  IconCopy,
-  IconEdit,
-  IconMoodSad,
-  IconNotes,
-  IconTrashX,
-} from "@tabler/icons-react"
+import { IconCheck, IconCopy, IconMoodSad, IconNotes } from "@tabler/icons-react"
 import { ORDER_STATUS, orderStatusColor, orderStatusLabel } from "@/constants/order"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"

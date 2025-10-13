@@ -8,7 +8,6 @@ import { ConfirmOrderActionsModal } from "@/pages/dashboard/orders/components/Or
 import { useMemo, useState } from "react"
 import { ORDER_STATUS } from "@/constants/order"
 import { notifications } from "@mantine/notifications"
-import pluralize from "pluralize"
 import { KEY } from "@/constants/key"
 import Axios from "axios"
 
@@ -17,8 +16,7 @@ interface Props {
   onSuccess?: () => void
 }
 
-export const ConfirmedOrderActions = ({ selectedOrders = [], onSuccess }: Props) => {
-  const [orders, setOrders] = useState<IOrder[]>(selectedOrders)
+export const ConfirmedOrderActions = ({ selectedOrders: orders = [], onSuccess }: Props) => {
   const [activeOrderIndex, setActiveOrderIndex] = useState<number>(0)
 
   const remaining = useMemo(() => {
