@@ -85,9 +85,7 @@ export const OrdersList = () => {
       render: ({ student }) => (
         <div className="flex flex-col text-sm">
           <div className="flex items-center gap-0.5">
-            <p className="shrink-0">
-              {student.user.fullName} <span className="text-neutral-500">({student.id})</span>
-            </p>
+            <p className="shrink-0">{student.user.fullName}</p>
 
             <CopyButton value={student.id.toString()} timeout={500}>
               {({ copied, copy }) => (
@@ -100,7 +98,7 @@ export const OrdersList = () => {
             </CopyButton>
           </div>
 
-          <p className="shrink-0 text-neutral-500">{student.user.username}@fairview.sti.edu.ph</p>
+          <p className="shrink-0 text-neutral-500">{student.id}</p>
         </div>
       ),
     },
