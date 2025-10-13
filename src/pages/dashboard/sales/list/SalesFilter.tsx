@@ -80,7 +80,7 @@ export const SalesFilter = ({ filters, onFilter, disabled }: Props) => {
         clearable
         disabled={disabled}
         miw={220}
-        valueFormat="MMM DD YYYY"
+        valueFormat="MM/DD/YY"
       />
     </Group>
   )
