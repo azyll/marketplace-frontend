@@ -116,7 +116,7 @@ export const OrdersFilter = ({ filters, onFilter, disabled }: Props) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={handleOnSearch}
-          placeholder="Search"
+          placeholder="# / Student / Program"
           w={260}
           leftSection={<IconSearch size={14} />}
           rightSectionPointerEvents="all"

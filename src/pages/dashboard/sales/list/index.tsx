@@ -182,9 +182,9 @@ export const SalesList = () => {
         <Card.Section px={24} pt={24}>
           <div className="flex h-[36px] items-center justify-between gap-4">
             <h1 className="text-xl font-bold">Manage Sales</h1>
-
-            <SalesFilter filters={filters} onFilter={setFilterValues} />
           </div>
+
+          <SalesFilter filters={filters} onFilter={setFilterValues} />
         </Card.Section>
 
         <Space h={16} />
