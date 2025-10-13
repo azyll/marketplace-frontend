@@ -30,6 +30,7 @@ export interface IOrderItems {
 export interface IOrderFilters extends IPagination {
   from: string
   to: string
+  search: string
   status: IOrderStatusType
 }
 

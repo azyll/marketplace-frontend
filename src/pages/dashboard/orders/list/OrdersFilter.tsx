@@ -1,10 +1,10 @@
 import { IProductListFilters } from "@/types/product.type"
 import { IOrderFilters, IOrderStatusType } from "@/types/order.type"
-import { Button, ComboboxItem, Group } from "@mantine/core"
+import { Button, CloseButton, ComboboxItem, Flex, Group, Input } from "@mantine/core"
 import { ORDER_STATUS } from "@/constants/order"
-import { useMemo, useState } from "react"
+import { KeyboardEvent, useMemo, useState } from "react"
 import { DateInput, DatePicker, DatePickerInput } from "@mantine/dates"
-import { IconCalendar } from "@tabler/icons-react"
+import { IconCalendar, IconSearch } from "@tabler/icons-react"
 import { useParams, useSearchParams } from "react-router"
 
 type OrderFilterStatusType = IOrderStatusType | "all"
@@ -16,6 +16,25 @@ interface Props {
 }
 
 export const OrdersFilter = ({ filters, onFilter, disabled }: Props) => {
+  const handleOnFilter = (key: keyof IOrderFilters, value: unknown) => {
+    onFilter({
+      [key]: value,
+      page: 1,
+    })
+  }
+
+  const [search, setSearch] = useState<string>(filters?.search ?? "")
+
+  const handleOnSearch = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleOnFilter("search", search)
+    }
+  }
+
+  const handleOnClearSearch = () => {
+    setSearch("")
+    handleOnFilter("search", undefined)
+  }
   const [searchParams, setSearchParams] = useSearchParams()
 
   const statusOptions: ComboboxItem[] = [
@@ -92,7 +111,25 @@ export const OrdersFilter = ({ filters, onFilter, disabled }: Props) => {
         ))}
       </div>
 
-      <div>
+      <Flex gap={14}>
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={handleOnSearch}
+          placeholder="Search"
+          w={260}
+          leftSection={<IconSearch size={14} />}
+          rightSectionPointerEvents="all"
+          rightSection={
+            <CloseButton
+              aria-label="Clear input"
+              onClick={() => handleOnClearSearch()}
+              style={{ display: filters.search ? undefined : "none" }}
+            />
+          }
+          disabled={disabled}
+        />
+
         <DatePickerInput
           leftSection={<IconCalendar size={16} />}
           type="range"
@@ -105,7 +142,7 @@ export const OrdersFilter = ({ filters, onFilter, disabled }: Props) => {
           miw={220}
           valueFormat="MMM DD YYYY"
         />
-      </div>
+      </Flex>
     </Group>
   )
 }
