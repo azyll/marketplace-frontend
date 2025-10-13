@@ -71,7 +71,7 @@ export const DepartmentSalesChart = () => {
 
             <XAxis dataKey="department" tick={{ fontSize: 12 }} stroke="#666" />
 
-            <YAxis tick={{ fontSize: 12 }} stroke="#666" tickFormatter={formatYAxis} />
+            <YAxis width={30} tick={{ fontSize: 12 }} stroke="#666" tickFormatter={formatYAxis} />
 
             <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(0, 0, 0, 0.05)" }} />
 

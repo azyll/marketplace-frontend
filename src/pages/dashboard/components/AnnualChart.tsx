@@ -87,7 +87,7 @@ const AnnualChart = ({ queryKey, queryFn, label, dataKey }: AnnualChartProps) =>
                 tick={{ fontSize: 12 }}
                 stroke="#666"
                 tickFormatter={dataKey === "sales" ? formatYAxis : undefined}
-                width={60}
+                width={30}
               />
 
               <Tooltip content={<CustomTooltip />} />
