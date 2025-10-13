@@ -13,7 +13,7 @@ import { useDisclosure } from "@mantine/hooks"
 import { useState } from "react"
 import { notifications } from "@mantine/notifications"
 import Axios from "axios"
-import { bulkCreateStudent } from "@/services/student.service"
+import { bulkCreateStudent, deleteStudent } from "@/services/student.service"
 
 export const UserList = () => {
   const DEFAULT_PAGE = 1
@@ -127,7 +127,9 @@ export const UserList = () => {
   }
 
   const deleteMutation = useMutation({
-    mutationFn: (userId: string) => deleteUser(userId),
+    mutationFn: async (userId: string) => {
+      await deleteUser(userId)
+    },
     onSuccess: async () => {
       notifications.show({
         title: "Delete Success",
@@ -141,17 +143,15 @@ export const UserList = () => {
       setUserForDeletion(undefined)
     },
     onError: (error) => {
-      let errorMessage = "Unable to Delete User, Please contact your Admin"
-
       if (Axios.isAxiosError(error)) {
-        errorMessage = error.response?.data.error?.[0]?.message ?? errorMessage
-      }
+        error.response?.data.error?.[0]?.message
 
-      notifications.show({
-        title: "Delete Failed",
-        message: errorMessage,
-        color: "red",
-      })
+        notifications.show({
+          title: "Delete Failed",
+          message: error.response?.data.error?.[0]?.message,
+          color: "red",
+        })
+      }
     },
   })
 
@@ -205,7 +205,7 @@ export const UserList = () => {
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Users</h1>
           <div className="flex">
-            <FileButton onChange={() => handleOnBulkUploadStudent} accept=".xlsx,.xls">
+            <FileButton onChange={handleOnBulkUploadStudent} accept=".xlsx,.xls">
               {(props) => (
                 <Button variant="light" {...props} loading={bulkUploadMutation.isPending}>
                   <IconFileTypeXls size={14} /> <Space w={6} />
@@ -230,7 +230,7 @@ export const UserList = () => {
           columns={columns}
           records={users?.data ?? []}
           // State
-          fetching={isLoading}
+          fetching={isLoading || bulkUploadMutation.isPending}
           noRecordsIcon={
             <Box p={4} mb={4}>
               <IconMoodSad size={36} strokeWidth={1.5} />
