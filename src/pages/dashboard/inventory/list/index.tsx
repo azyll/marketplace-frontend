@@ -122,11 +122,11 @@ export const InventoryList = () => {
       accessor: "name",
       title: "Name",
     },
-    {
-      accessor: "category",
-      title: "Category",
-      render: ({ category }) => <Badge variant="light">{category}</Badge>,
-    },
+    // {
+    //   accessor: "category",
+    //   title: "Category",
+    //   render: ({ category }) => <Badge variant="light">{category}</Badge>,
+    // },
     {
       accessor: "department.name",
       title: "Department",
@@ -141,7 +141,7 @@ export const InventoryList = () => {
     {
       accessor: "totalValue",
       title: "≈ Total Value",
-      textAlign: "right",
+      textAlign: "left",
       render: ({ name }) => {
         const totalValue = productValueMap.get(name)
         return totalValue
@@ -222,6 +222,7 @@ export const InventoryList = () => {
         <EditStockModal opened={opened} onClose={close} variantId={selectedVariantId} />
       )}
 
+      {/* Alerts */}
       <Flex gap="lg">
         <AlertsCard
           title="Low Stock"
@@ -247,6 +248,7 @@ export const InventoryList = () => {
 
       <Space h={16} />
 
+      {/* Activity Logs */}
       <Card style={{ flex: "1 1 calc(50% - 0.75rem)" }} withBorder>
         <Card.Section px={24} pt={24} pb={12}>
           <h1 className="text-xl font-bold">Inventory Activity</h1>
@@ -256,6 +258,8 @@ export const InventoryList = () => {
       </Card>
 
       <Space h={16} />
+
+      {/* Table */}
       <Card>
         <Card.Section px={24} pt={24}>
           <div className="flex items-center justify-between gap-4">
