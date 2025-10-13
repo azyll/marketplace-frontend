@@ -117,7 +117,7 @@ export const OrdersFilter = ({ filters, onFilter, disabled }: Props) => {
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={handleOnSearch}
           placeholder="# / Student / Program"
-          w={260}
+          w={220}
           leftSection={<IconSearch size={14} />}
           rightSectionPointerEvents="all"
           rightSection={
@@ -140,7 +140,7 @@ export const OrdersFilter = ({ filters, onFilter, disabled }: Props) => {
           clearable
           disabled={disabled}
           miw={220}
-          valueFormat="MMM DD YYYY"
+          valueFormat="MM/DD/YY"
         />
       </Flex>
     </Group>

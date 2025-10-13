@@ -58,8 +58,8 @@ export const DashboardLayout = () => {
     <AppShell
       header={{ height: 60 }}
       navbar={{
-        width: 260,
-        breakpoint: "sm",
+        width: 210,
+        breakpoint: "xs",
         // collapsed: { mobile: !opened, desktop: !opened }
       }}
       padding="md"
