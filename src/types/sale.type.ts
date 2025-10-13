@@ -4,6 +4,7 @@ import { IOrder } from "./order.type"
 export interface ISalesFilter extends IPagination {
   from: string
   to: string
+  search: string
 }
 
 export interface ISales {
