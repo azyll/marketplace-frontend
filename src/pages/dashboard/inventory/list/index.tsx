@@ -1,5 +1,11 @@
-import { ActionIcon, Box, Card, Image, Space, Badge, Text, Flex } from "@mantine/core"
-import { IconEdit, IconMoodSad, IconChevronRight } from "@tabler/icons-react"
+import { ActionIcon, Box, Card, Image, Space, Badge, Text, Flex, Group } from "@mantine/core"
+import {
+  IconEdit,
+  IconMoodSad,
+  IconChevronRight,
+  IconAlertTriangle,
+  IconAlertCircle,
+} from "@tabler/icons-react"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import dayjs from "dayjs"
 import { useState, useMemo } from "react"
@@ -14,7 +20,7 @@ import {
 } from "@/services/products.service"
 import { getImage } from "@/services/media.service"
 import { ProductFilter } from "@/pages/dashboard/components/ProductFilter"
-import { stockConditionColor } from "@/constants/stock"
+import { stockConditionColor, stockConditionLabel } from "@/constants/stock"
 import { LogsCard } from "../../components/LogsCard"
 import { useDisclosure } from "@mantine/hooks"
 import { EditStockModal } from "./EditStockModal"
@@ -23,7 +29,7 @@ import { AlertsCard } from "./AlertsCard"
 
 export const InventoryList = () => {
   const DEFAULT_PAGE = 1
-  const DEFAULT_LIMIT = 10
+  const DEFAULT_LIMIT = 20
 
   const [filters, setFilters, setFilterValues] = useFilters<IProductListFilters>({
     page: DEFAULT_PAGE,
@@ -50,6 +56,22 @@ export const InventoryList = () => {
     queryKey: [KEY.PRODUCTS, "inventory-alerts"],
     queryFn: () => getInventoryAlerts(),
   })
+
+  // Helper function to get stock status for a product
+  const getProductStockStatus = (product: IProduct) => {
+    if (!product.productVariant || product.productVariant.length === 0) {
+      return { hasNoStock: false, hasLowStock: false }
+    }
+
+    const hasNoStock = product.productVariant.some(
+      (variant) => variant.stockCondition === "out-of-stock",
+    )
+    const hasLowStock = product.productVariant.some(
+      (variant) => variant.stockCondition === "low-stock",
+    )
+
+    return { hasNoStock, hasLowStock }
+  }
 
   // Create a lookup map for variant values
   const variantValueMap = useMemo(() => {
@@ -121,12 +143,26 @@ export const InventoryList = () => {
     {
       accessor: "name",
       title: "Name",
+      render: (product) => {
+        const { hasNoStock, hasLowStock } = getProductStockStatus(product)
+
+        return (
+          <Group gap="xs">
+            <Text>{product.name}</Text>
+            {hasNoStock && (
+              <Badge color="red" variant="light" size="sm">
+                <IconAlertCircle size={12} />
+              </Badge>
+            )}
+            {hasLowStock && (
+              <Badge color="orange" variant="light" size="sm">
+                <IconAlertTriangle size={12} />
+              </Badge>
+            )}
+          </Group>
+        )
+      },
     },
-    // {
-    //   accessor: "category",
-    //   title: "Category",
-    //   render: ({ category }) => <Badge variant="light">{category}</Badge>,
-    // },
     {
       accessor: "department.name",
       title: "Department",
@@ -172,8 +208,9 @@ export const InventoryList = () => {
     },
     {
       accessor: "stockQuantity",
-      title: "Total Stock",
+      title: "Stock",
       textAlign: "center",
+      width: 100,
     },
     {
       accessor: "stockValue",
@@ -200,7 +237,9 @@ export const InventoryList = () => {
       title: "Status",
       textAlign: "center",
       render: ({ stockCondition }) => (
-        <Badge color={stockConditionColor[stockCondition]}>{stockCondition}</Badge>
+        <Badge color={stockConditionColor[stockCondition]}>
+          {stockConditionLabel[stockCondition]}
+        </Badge>
       ),
     },
     {
@@ -225,13 +264,6 @@ export const InventoryList = () => {
       {/* Alerts */}
       <Flex gap="lg">
         <AlertsCard
-          title="Low Stock"
-          data={inventoryAlertData?.data?.[1]}
-          isLoading={isAlertsLoading}
-          description={"Item has less than 20 stock"}
-        />
-
-        <AlertsCard
           title="No Stock"
           data={inventoryAlertData?.data?.[0]}
           isLoading={isAlertsLoading}
@@ -239,10 +271,17 @@ export const InventoryList = () => {
         />
 
         <AlertsCard
+          title="Low Stock"
+          data={inventoryAlertData?.data?.[1]}
+          isLoading={isAlertsLoading}
+          description={"Item has less than 20 stock"}
+        />
+
+        <AlertsCard
           title="In Stock"
           data={inventoryAlertData?.data?.[2]}
           isLoading={isAlertsLoading}
-          description={"Items has enough stock"}
+          description={"Items have enough stock"}
         />
       </Flex>
 

@@ -1,5 +1,5 @@
 import { Card, Text, Skeleton, Stack, Badge, Group } from "@mantine/core"
-import { IconAlertCircle, IconPackage, IconCheck } from "@tabler/icons-react"
+import { IconAlertCircle, IconPackage, IconCheck, IconAlertTriangle } from "@tabler/icons-react"
 
 interface AlertData {
   value: number
@@ -18,7 +18,7 @@ const getAlertIcon = (label: string) => {
     case "No Stock":
       return <IconAlertCircle size={20} color="red" />
     case "Low Stock":
-      return <IconAlertCircle size={20} color="orange" />
+      return <IconAlertTriangle size={20} color="orange" />
     case "In Stock":
       return <IconCheck size={20} color="green" />
   }
