@@ -1,4 +1,15 @@
-import { AppShell, Avatar, Badge, Burger, Group, Menu, NavLink, Stack, Text } from "@mantine/core"
+import {
+  AppShell,
+  Avatar,
+  Badge,
+  Burger,
+  Group,
+  Indicator,
+  Menu,
+  NavLink,
+  Stack,
+  Text,
+} from "@mantine/core"
 import { Link, Outlet, redirect, useLocation, useNavigate } from "react-router"
 import { useContext, useEffect } from "react"
 import { AuthContext } from "@/contexts/AuthContext"
@@ -12,6 +23,10 @@ import {
   IconUser,
 } from "@tabler/icons-react"
 import { ROUTES } from "@/constants/routes"
+import { useQuery } from "@tanstack/react-query"
+import { KEY } from "@/constants/key"
+import { getInventoryAlerts } from "@/services/products.service"
+import { getOrders } from "@/services/order.service"
 
 export const DashboardLayout = () => {
   const navigate = useNavigate()
@@ -19,36 +34,65 @@ export const DashboardLayout = () => {
 
   const { user, logout } = useContext(AuthContext)
 
+  const { data: inventoryAlertData } = useQuery({
+    queryKey: [KEY.PRODUCTS, "inventory-alerts"],
+    queryFn: () => getInventoryAlerts(),
+  })
+
+  const { data: ordersData } = useQuery({
+    queryKey: [KEY.DASHBOARD.ORDERS, "ongoing-count"],
+    queryFn: () => getOrders({ status: "ongoing", limit: 1000 }),
+  })
+
   const handleOnLogout = () => {
     logout()
     navigate(ROUTES.AUTH.BASE)
   }
+
+  // Extract counts from inventory alerts
+  // Index 0 = No Stock, Index 1 = Low Stock, Index 2 = In Stock
+  const outOfStockCount = inventoryAlertData?.data?.[0]?.value || 0
+  const lowStockCount = inventoryAlertData?.data?.[1]?.value || 0
+
+  // Extract ongoing orders count
+  const ongoingOrdersCount = ordersData?.meta?.totalItems || 0
 
   const items = [
     {
       label: "Users",
       path: ROUTES.DASHBOARD.USER.BASE,
       icon: <IconUser size={14} />,
+      alertCount: 0,
+      badges: [],
     },
     {
       label: "Products",
       path: ROUTES.DASHBOARD.PRODUCTS.BASE,
       icon: <IconBuildingStore size={14} />,
+      alertCount: 0,
+      badges: [],
     },
     {
       label: "Orders",
       path: ROUTES.DASHBOARD.ORDERS.BASE,
       icon: <IconShoppingBagCheck size={14} />,
+      badges: [...(ongoingOrdersCount > 0 ? [{ count: ongoingOrdersCount, color: "yellow" }] : [])],
     },
     {
       label: "Inventory",
       path: ROUTES.DASHBOARD.INVENTORY.BASE,
       icon: <IconBuildingWarehouse size={14} />,
+      badges: [
+        ...(outOfStockCount > 0 ? [{ count: outOfStockCount, color: "red" }] : []),
+        ...(lowStockCount > 0 ? [{ count: lowStockCount, color: "yellow" }] : []),
+      ],
     },
     {
       label: "Sales",
       path: ROUTES.DASHBOARD.SALES.BASE,
       icon: <IconReportMoney size={14} />,
+      alertCount: 0,
+      badges: [],
     },
   ]
 
@@ -107,13 +151,36 @@ export const DashboardLayout = () => {
       <AppShell.Navbar p="md">
         {items.map((item, index) => (
           <NavLink
-            leftSection={item.icon}
+            leftSection={
+              <Indicator
+                disabled={item.alertCount === 0}
+                size={7}
+                color="red"
+                styles={{
+                  indicator: {
+                    fontSize: "10px",
+                  },
+                }}
+              >
+                {item.icon}
+              </Indicator>
+            }
             label={item.label}
             key={index}
             active={location.pathname === item.path || location.pathname.includes(item.path)}
-            // disabled={item.disabled}
             component={Link}
             to={item.path}
+            rightSection={
+              item.badges && item.badges.length > 0 ? (
+                <Group gap={4}>
+                  {item.badges.map((badge, badgeIndex) => (
+                    <Badge key={badgeIndex} color={badge.color} variant="light" size="xs" circle>
+                      {badge.count}
+                    </Badge>
+                  ))}
+                </Group>
+              ) : undefined
+            }
           />
         ))}
       </AppShell.Navbar>
