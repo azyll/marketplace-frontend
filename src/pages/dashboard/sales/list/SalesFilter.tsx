@@ -79,7 +79,7 @@ export const SalesFilter = ({ filters, onFilter, disabled }: Props) => {
         placeholder="Select Date Range"
         clearable
         disabled={disabled}
-        miw={220}
+        miw={200}
         valueFormat="MM/DD/YY"
       />
     </Group>
