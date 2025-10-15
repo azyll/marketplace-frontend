@@ -26,6 +26,7 @@ export const ENDPOINT = {
     STUDENT: "/order/student",
     STATUS: "/order/status/:studentNumber",
     ANNUAL: "/order/annual",
+    PROWARE: "/order/proware/create",
   },
 
   LOGIN: "/auth/login",

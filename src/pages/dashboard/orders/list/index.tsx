@@ -13,7 +13,15 @@ import { OrdersFilter } from "@/pages/dashboard/orders/list/OrdersFilter"
 import { useFilters } from "@/hooks/useFilters"
 import { IOrder, IOrderFilters, IOrderStatusType } from "@/types/order.type"
 import { DataTable, DataTableColumn } from "mantine-datatable"
-import { IconCheck, IconCopy, IconMoodSad, IconNotes } from "@tabler/icons-react"
+import {
+  IconCheck,
+  IconCopy,
+  IconEdit,
+  IconMoodSad,
+  IconNotes,
+  IconPlus,
+  IconTrashX,
+} from "@tabler/icons-react"
 import { ORDER_STATUS, orderStatusColor, orderStatusLabel } from "@/constants/order"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
@@ -50,6 +58,10 @@ export const OrdersList = () => {
   })
 
   const navigate = useNavigate()
+
+  const handleOnCreateOrder = () => {
+    navigate(ROUTES.DASHBOARD.ORDERS.ID.replace(":orderId", "create"))
+  }
 
   const columns: DataTableColumn<IOrder>[] = [
     {
@@ -200,13 +212,21 @@ export const OrdersList = () => {
           <div className="flex h-[36px] items-center justify-between gap-4">
             <h1 className="text-xl font-bold">Manage Orders</h1>
 
-            {selectedOrders.length > 0 && (
-              <OrderActions
-                status={filters?.status as IOrderStatusType}
-                selectedOrders={selectedOrders}
-                onSuccess={() => setSelectedOrders([])}
-              />
-            )}
+            <div className="flex gap-4">
+              {selectedOrders.length > 0 && (
+                <OrderActions
+                  status={filters?.status as IOrderStatusType}
+                  selectedOrders={selectedOrders}
+                  onSuccess={() => setSelectedOrders([])}
+                />
+              )}
+
+              {!selectedOrders.length && (
+                <Button onClick={() => handleOnCreateOrder}>
+                  <IconPlus size={14} /> <Space w={6} /> Create Order
+                </Button>
+              )}
+            </div>
           </div>
 
           <OrdersFilter filters={filters} onFilter={setFilterValues} />

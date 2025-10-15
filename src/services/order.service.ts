@@ -28,6 +28,24 @@ export const createOrder = async (
   return response.data
 }
 
+export const createProwareOrder = async (
+  student: {
+    studentNumber: string
+    firstName: string
+    lastName: string
+    program: string
+    sex: "male" | "female"
+  },
+  orderItems: { productVariantId: string; quantity: number }[],
+) => {
+  const response = await axios.post<IResponse<IOrder>>(ENDPOINT.ORDER.PROWARE, {
+    student,
+    orderItems,
+  })
+
+  return response.data
+}
+
 export const getOrder = async (orderId: string) => {
   const response = await axios.get<IResponse<IOrder>>(`${ENDPOINT.ORDER.BASE}/${orderId}`)
 

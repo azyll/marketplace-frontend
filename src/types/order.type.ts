@@ -39,3 +39,21 @@ export interface IUpdateOrderStatusInput {
   newStatus: IOrderStatusType
   oracleInvoice?: string
 }
+
+export interface ICreateOrderItemInput {
+  productVariantId: string
+  quantity: number
+}
+
+export interface ICreateOrderStudentInput {
+  studentNumber: string
+  firstName: string
+  lastName: string
+  program: string
+  sex: "male" | "female"
+}
+
+export interface ICreateOrderInput {
+  student: ICreateOrderStudentInput
+  orderItems: ICreateOrderItemInput[]
+}
