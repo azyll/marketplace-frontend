@@ -2,6 +2,7 @@ import { ENDPOINT } from "@/constants/endpoints"
 import { IPaginatedResponse } from "@/types/common.type"
 import {
   ICreateProductInput,
+  IInventoryFilter,
   IProduct,
   IProductListFilters,
   IProductVariant,
@@ -10,7 +11,7 @@ import {
 import axios from "@/utils/axios"
 
 //Inventory
-export const getInventoryProducts = async (filters: IProductListFilters) => {
+export const getInventoryProducts = async (filters: IInventoryFilter) => {
   const response = await axios.get<IPaginatedResponse<IProduct[]>>(
     ENDPOINT.PRODUCT.INVENTORY.BASE,
     {

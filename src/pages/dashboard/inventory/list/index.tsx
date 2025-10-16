@@ -9,7 +9,7 @@ import {
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import dayjs from "dayjs"
 import { useState, useMemo } from "react"
-import { IProductVariant, IProductListFilters, IProduct } from "@/types/product.type"
+import { IProductVariant, IInventoryFilter, IProduct } from "@/types/product.type"
 import { useFilters } from "@/hooks/useFilters"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
@@ -19,19 +19,19 @@ import {
   getInventoryValue,
 } from "@/services/products.service"
 import { getImage } from "@/services/media.service"
-import { ProductFilter } from "@/pages/dashboard/components/ProductFilter"
 import { stockConditionColor, stockConditionLabel } from "@/constants/stock"
 import { LogsCard } from "../../components/LogsCard"
 import { useDisclosure } from "@mantine/hooks"
 import { EditStockModal } from "./EditStockModal"
 import { PRODUCT_SIZE } from "@/constants/product"
 import { AlertsCard } from "./AlertsCard"
+import { InventoryFilter } from "./InventoryFilters"
 
 export const InventoryList = () => {
   const DEFAULT_PAGE = 1
   const DEFAULT_LIMIT = 20
 
-  const [filters, setFilters, setFilterValues] = useFilters<IProductListFilters>({
+  const [filters, setFilters, setFilterValues] = useFilters<IInventoryFilter>({
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
   })
@@ -150,12 +150,12 @@ export const InventoryList = () => {
           <Group gap="xs">
             <Text>{product.name}</Text>
             {hasNoStock && (
-              <Badge color="red" variant="light" size="sm">
+              <Badge color="red" variant="filled" size="sm">
                 <IconAlertCircle size={12} />
               </Badge>
             )}
             {hasLowStock && (
-              <Badge color="orange" variant="light" size="sm">
+              <Badge color="orange" variant="filled" size="sm">
                 <IconAlertTriangle size={12} />
               </Badge>
             )}
@@ -305,7 +305,7 @@ export const InventoryList = () => {
             <h1 className="text-xl font-bold">Manage Inventory</h1>
           </div>
 
-          <ProductFilter filters={filters} onFilter={setFilterValues} />
+          <InventoryFilter filters={filters} onFilter={setFilterValues} />
         </Card.Section>
 
         <Space h={16} />

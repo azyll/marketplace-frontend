@@ -82,3 +82,13 @@ export type IUpdateProductInput = Partial<Omit<ICreateProductInput, "variants">>
 }
 
 export type IProductStudentLevel = IStudentLevel | "all"
+
+//Inventory
+
+export interface IInventoryFilter extends IPagination {
+  sex?: "male" | "female"
+  department?: string
+  stock_condition?: "low-stock" | "in-stock" | "out-of-stock"
+  name?: string
+  category?: string
+}
