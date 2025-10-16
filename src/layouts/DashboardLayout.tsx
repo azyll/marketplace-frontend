@@ -10,8 +10,8 @@ import {
   Stack,
   Text,
 } from "@mantine/core"
-import { Link, Outlet, redirect, useLocation, useNavigate } from "react-router"
-import { useContext, useEffect } from "react"
+import { Link, Outlet, useLocation, useNavigate } from "react-router"
+import { useContext } from "react"
 import { AuthContext } from "@/contexts/AuthContext"
 import {
   IconArrowLeft,
@@ -25,7 +25,6 @@ import {
 import { ROUTES } from "@/constants/routes"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { getInventoryAlerts } from "@/services/products.service"
 import { getOrders } from "@/services/order.service"
 
 export const DashboardLayout = () => {
@@ -33,11 +32,6 @@ export const DashboardLayout = () => {
   const location = useLocation()
 
   const { user, logout } = useContext(AuthContext)
-
-  const { data: inventoryAlertData } = useQuery({
-    queryKey: [KEY.PRODUCTS, "inventory-alerts"],
-    queryFn: () => getInventoryAlerts(),
-  })
 
   const { data: ordersData } = useQuery({
     queryKey: [KEY.DASHBOARD.ORDERS, "ongoing-count"],
@@ -48,14 +42,6 @@ export const DashboardLayout = () => {
     logout()
     navigate(ROUTES.AUTH.BASE)
   }
-
-  // Extract counts from inventory alerts
-  // Index 0 = No Stock, Index 1 = Low Stock, Index 2 = In Stock
-  const outOfStockCount = inventoryAlertData?.data?.[0]?.value || 0
-  const lowStockCount = inventoryAlertData?.data?.[1]?.value || 0
-
-  // Extract ongoing orders count
-  const ongoingOrdersCount = ordersData?.meta?.totalItems || 0
 
   const items = [
     {
@@ -76,16 +62,11 @@ export const DashboardLayout = () => {
       label: "Orders",
       path: ROUTES.DASHBOARD.ORDERS.BASE,
       icon: <IconShoppingBagCheck size={14} />,
-      badges: [...(ongoingOrdersCount > 0 ? [{ count: ongoingOrdersCount, color: "yellow" }] : [])],
     },
     {
       label: "Inventory",
       path: ROUTES.DASHBOARD.INVENTORY.BASE,
       icon: <IconBuildingWarehouse size={14} />,
-      badges: [
-        ...(outOfStockCount > 0 ? [{ count: outOfStockCount, color: "red" }] : []),
-        ...(lowStockCount > 0 ? [{ count: lowStockCount, color: "yellow" }] : []),
-      ],
     },
     {
       label: "Sales",
@@ -170,17 +151,6 @@ export const DashboardLayout = () => {
             active={location.pathname === item.path || location.pathname.includes(item.path)}
             component={Link}
             to={item.path}
-            rightSection={
-              item.badges && item.badges.length > 0 ? (
-                <Group gap={4}>
-                  {item.badges.map((badge, badgeIndex) => (
-                    <Badge key={badgeIndex} color={badge.color} variant="light" size="xs" circle>
-                      {badge.count}
-                    </Badge>
-                  ))}
-                </Group>
-              ) : undefined
-            }
           />
         ))}
       </AppShell.Navbar>
