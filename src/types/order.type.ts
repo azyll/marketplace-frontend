@@ -45,7 +45,7 @@ export interface ICreateOrderItemInput {
   quantity: number
 }
 
-export interface ICreateOrderStudentInput {
+export interface ICreateOrderStudentCreateInput {
   studentNumber: string
   firstName: string
   lastName: string
@@ -53,7 +53,11 @@ export interface ICreateOrderStudentInput {
   sex: "male" | "female"
 }
 
+export interface ICreateOrderStudentInput {
+  studentNumber: string
+}
+
 export interface ICreateOrderInput {
-  student: ICreateOrderStudentInput
+  student: ICreateOrderStudentCreateInput | ICreateOrderStudentInput
   orderItems: ICreateOrderItemInput[]
 }
