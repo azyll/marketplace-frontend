@@ -222,7 +222,7 @@ export const OrdersList = () => {
               )}
 
               {!selectedOrders.length && (
-                <Button onClick={() => handleOnCreateOrder}>
+                <Button onClick={() => handleOnCreateOrder()}>
                   <IconPlus size={14} /> <Space w={6} /> Create Order
                 </Button>
               )}

@@ -25,6 +25,7 @@ import { SalesList as DashboardSalesList } from "@/pages/dashboard/sales/list"
 import { SalesPage as DashboardSalesPage } from "@/pages/dashboard/sales/page"
 
 import { dashboardLoader } from "@/router/loader/auth"
+import { OrderDetailsForm } from "@/pages/dashboard/orders/page/OrderDetailsForm"
 
 export const router = createBrowserRouter([
   {
@@ -117,6 +118,10 @@ export const router = createBrowserRouter([
           {
             path: ROUTES.DASHBOARD.ORDERS.BASE,
             Component: DashboardOrdersList,
+          },
+          {
+            path: "/dashboard/orders/create",
+            Component: OrderDetailsForm,
           },
           {
             path: ROUTES.DASHBOARD.ORDERS.ID,
