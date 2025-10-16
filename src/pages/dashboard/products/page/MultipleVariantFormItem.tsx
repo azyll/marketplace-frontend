@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   Grid,
+  Menu,
   NumberInput,
   Select,
   Space,
@@ -11,12 +12,25 @@ import {
   Title,
 } from "@mantine/core"
 import { useForm, UseFormReturnType } from "@mantine/form"
-import { Ref, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { ICreateProductVariantInput, IProductAttribute } from "@/types/product.type"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
 import { getProductAttributes } from "@/services/product-attribute.service"
-import { IconTrashX } from "@tabler/icons-react"
+import { IconCheck, IconSelector, IconTrashX } from "@tabler/icons-react"
+
+// your constant
+export const PRODUCT_SIZE = {
+  "Extra Small": "XS",
+  Small: "S",
+  Medium: "M",
+  Large: "L",
+  "Extra Large": "XL",
+  "2 Extra Large": "2XL",
+  "3 Extra Large": "3XL",
+  "4 Extra Large": "4XL",
+  "5 Extra Large": "5XL",
+}
 
 interface Props {
   disabled?: boolean
@@ -65,14 +79,6 @@ export const MultipleVariantFormItem = ({ title, disabled, form, index, onDelete
       <form>
         <Grid>
           <Grid.Col span={4}>
-            <TextInput
-              label="Name"
-              {...form.getInputProps(`variants.${index}.name`)}
-              disabled={disabled}
-            />
-          </Grid.Col>
-
-          <Grid.Col span={4}>
             <Select
               label="Attribute"
               {...form.getInputProps(`variants.${index}.productAttributeId`)}
@@ -83,14 +89,47 @@ export const MultipleVariantFormItem = ({ title, disabled, form, index, onDelete
 
           <Grid.Col span={4}>
             <TextInput
-              label="Size"
-              {...form.getInputProps(`variants.${index}.size`)}
+              label="Name"
+              {...form.getInputProps(`variants.${index}.name`)}
               disabled={disabled}
             />
           </Grid.Col>
 
+          <Grid.Col span={4}>
+            <Menu trapFocus={false} position="bottom-start" withinPortal width="target">
+              <Menu.Target>
+                <div className="w-full">
+                  <TextInput
+                    autoComplete="off"
+                    label="Size"
+                    disabled={disabled}
+                    {...form.getInputProps(`variants.${index}.size`)}
+                    rightSection={<IconSelector size={16} stroke={1.5} />}
+                  />
+                </div>
+              </Menu.Target>
+
+              <Menu.Dropdown className="w-[var(--menu-target-width)]">
+                {Object.keys(PRODUCT_SIZE).map((label) => {
+                  const isSelected = form.values.variants[index].size === label
+
+                  return (
+                    <Menu.Item
+                      key={label}
+                      onClick={() => form.setFieldValue(`variants.${index}.size`, label)}
+                      leftSection={
+                        isSelected ? <IconCheck size={14} stroke={4} color="gray" /> : null
+                      }
+                    >
+                      {label}
+                    </Menu.Item>
+                  )
+                })}
+              </Menu.Dropdown>
+            </Menu>
+          </Grid.Col>
+
           <Grid.Col span={6}>
-            {/* Price */}
             <NumberInput
               label="Price"
               prefix="₱"
@@ -101,7 +140,6 @@ export const MultipleVariantFormItem = ({ title, disabled, form, index, onDelete
           </Grid.Col>
 
           <Grid.Col span={6}>
-            {/* Stock */}
             <NumberInput
               label="Stock"
               disabled={disabled}
