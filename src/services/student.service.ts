@@ -1,6 +1,11 @@
 import axios from "@/utils/axios"
 import { ENDPOINT } from "@/constants/endpoints"
-import { ICreateStudentInput, IStudent, IUpdateStudentInput } from "@/types/student.type"
+import {
+  ICreateStudentInput,
+  IGetStudentsFilters,
+  IStudent,
+  IUpdateStudentInput,
+} from "@/types/student.type"
 
 export const createStudent = async (userId: string, payload: ICreateStudentInput) => {
   const response = await axios.post<IStudent>(
@@ -31,6 +36,14 @@ export const updateStudent = async (studentId: string, payload: IUpdateStudentIn
 
 export const deleteStudent = async (studentId: string) => {
   const response = await axios.delete(ENDPOINT.STUDENT.ID.replace(":studentId", studentId))
+
+  return response.data
+}
+
+export const getAllStudents = async (filters: IGetStudentsFilters): Promise<IStudent[]> => {
+  const response = await axios.get(ENDPOINT.STUDENT.BASE, {
+    params: filters,
+  })
 
   return response.data
 }

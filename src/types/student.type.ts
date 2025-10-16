@@ -25,3 +25,9 @@ export interface ICreateStudentInput {
 }
 
 export type IUpdateStudentInput = Partial<ICreateStudentInput>
+
+export interface IGetStudentsFilters {
+  q?: string
+  limit?: number
+  page?: number
+}

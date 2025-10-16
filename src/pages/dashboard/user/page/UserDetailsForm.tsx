@@ -17,18 +17,19 @@ interface Props {
   disabled?: boolean
   user?: IUser
   onRoleChange?: (roleOption: ComboboxItem) => void
+  initialValues?: Partial<IUser>
 }
 
-export const UserDetailsForm = ({ ref, disabled, user, onRoleChange }: Props) => {
+export const UserDetailsForm = ({ ref, disabled, user, onRoleChange, initialValues }: Props) => {
   const isUpdate = useMemo(() => !!user, [user])
 
   const form = useForm<Partial<ICreateUserInput>>({
     initialValues: {
-      firstName: undefined,
-      lastName: undefined,
-      username: undefined,
-      password: undefined,
-      roleId: undefined,
+      firstName: initialValues?.firstName ?? undefined,
+      lastName: initialValues?.lastName ?? undefined,
+      username: initialValues?.username ?? undefined,
+      password: initialValues?.firstName ?? undefined,
+      roleId: initialValues?.firstName ?? undefined,
     },
     validate: zod4Resolver(isUpdate ? updateUserSchema : createUserSchema),
   })
