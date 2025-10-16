@@ -12,9 +12,20 @@ export const getSales = async (filters: Partial<ISalesFilter>) => {
   return response.data
 }
 
-//Get Sales
-export const getSale = async (oracleInvoice: string | undefined) => {
-  const response = await axios.get<IResponse<ISales>>(`${ENDPOINT.SALES.BASE}/${oracleInvoice}`)
+//Get Sale
+export const getSale = async (oracleInvoice: string) => {
+  const response = await axios.get<IResponse<ISales>>(
+    ENDPOINT.SALES.ID.replace(":salesId", oracleInvoice),
+  )
+
+  return response.data
+}
+
+//Get Sale by Order ID
+export const getSaleByOrder = async (orderId: string) => {
+  const response = await axios.get<IResponse<ISales>>(
+    ENDPOINT.SALES.ORDERID.replace(":orderId", orderId),
+  )
 
   return response.data
 }

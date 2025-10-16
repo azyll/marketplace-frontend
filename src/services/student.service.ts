@@ -1,7 +1,6 @@
 import axios from "@/utils/axios"
 import { ENDPOINT } from "@/constants/endpoints"
-import { ICreateStudentInput, IUpdateStudentInput } from "@/types/student.type"
-import { IStudent } from "@/types/user.type"
+import { ICreateStudentInput, IStudent, IUpdateStudentInput } from "@/types/student.type"
 
 export const createStudent = async (userId: string, payload: ICreateStudentInput) => {
   const response = await axios.post<IStudent>(

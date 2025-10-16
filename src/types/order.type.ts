@@ -1,6 +1,6 @@
 import { IProductVariant } from "./product.type"
 import { IPagination } from "@/types/common.type"
-import { IStudent } from "@/types/user.type"
+import { IStudent } from "./student.type"
 
 export type IOrderStatusType = "ongoing" | "confirmed" | "completed" | "cancelled"
 

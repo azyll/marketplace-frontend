@@ -1,6 +1,6 @@
-import { IProgram } from "./program.type"
 import { IRole, IRoleSystemTag } from "./role.type"
 import { IPagination } from "@/types/common.type"
+import { IStudent } from "./student.type"
 
 export interface IUser {
   fullName: string
@@ -17,22 +17,7 @@ export interface IUser {
   updatedAt: Date | null
 }
 
-export interface IStudent {
-  id: number
-  userId: string
-  user: IUser
-  programId: string
-  program: IProgram
-  level: string
-  sex: "male | female"
-  createdAt: Date
-  deletedAt: Date | null
-  updatedAt: Date | null
-}
-
-export interface IGetUserFilter extends IPagination {
-  // Add other user filters here
-}
+export interface IGetUserFilter extends IPagination {}
 
 export interface ICreateUserInput {
   firstName: string
