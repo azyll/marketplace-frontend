@@ -17,6 +17,11 @@ export interface IUser {
   updatedAt: Date | null
 }
 
+export interface IUserFilters extends IPagination {
+  search?: string
+  role?: string
+}
+
 export interface IGetUserFilter extends IPagination {}
 
 export interface ICreateUserInput {

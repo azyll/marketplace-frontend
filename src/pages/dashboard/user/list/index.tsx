@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
 import { deleteUser, getUsers } from "@/services/user.service"
 import { useFilters } from "@/hooks/useFilters"
-import { IGetUserFilter, IUser } from "@/types/user.type"
+import { IGetUserFilter, IUser, IUserFilters } from "@/types/user.type"
 import { ActionIcon, Box, Button, Card, FileButton, Modal, Space, Text, Title } from "@mantine/core"
 import dayjs from "dayjs"
 import { IconEdit, IconFileTypeXls, IconMoodSad, IconPlus, IconTrashX } from "@tabler/icons-react"
@@ -13,13 +13,14 @@ import { useDisclosure } from "@mantine/hooks"
 import { useState } from "react"
 import { notifications } from "@mantine/notifications"
 import Axios from "axios"
-import { bulkCreateStudent, deleteStudent } from "@/services/student.service"
+import { bulkCreateStudent } from "@/services/student.service"
+import { UsersFilter } from "./UsersFilter"
 
 export const UserList = () => {
   const DEFAULT_PAGE = 1
   const DEFAULT_LIMIT = 10
 
-  const [filters, setFilters] = useFilters<IGetUserFilter>({
+  const [filters, setFilters, setFilterValues] = useFilters<IUserFilters>({
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
   })
@@ -205,7 +206,10 @@ export const UserList = () => {
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Users</h1>
           <div className="flex">
-            <FileButton onChange={handleOnBulkUploadStudent} accept=".xlsx,.xls">
+            <FileButton
+              onChange={(file) => file && handleOnBulkUploadStudent(file)}
+              accept=".xlsx,.xls"
+            >
               {(props) => (
                 <Button variant="light" {...props} loading={bulkUploadMutation.isPending}>
                   <IconFileTypeXls size={14} /> <Space w={6} />
@@ -221,6 +225,7 @@ export const UserList = () => {
             </Button>
           </div>
         </div>
+        <UsersFilter filters={filters} onFilter={setFilterValues} />
       </Card.Section>
 
       <Space h={16} />
