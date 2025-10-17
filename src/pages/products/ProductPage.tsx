@@ -9,6 +9,9 @@ import {
   Text,
   Title,
   Badge,
+  Tooltip,
+  Card,
+  Space,
 } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { useNavigate, useParams } from "react-router"
@@ -42,7 +45,7 @@ export default function ProductPage() {
   const { user } = useContext(AuthContext)
 
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({})
-  const [size, setSize] = useState<string | undefined>("Small")
+  const [size, setSize] = useState<string | undefined>(undefined)
   const [quantity, setQuantity] = useState(1)
   const [loading, setLoading] = useState(false)
 
@@ -59,7 +62,7 @@ export default function ProductPage() {
       variants,
       hasNoVariants,
       basePrice: baseVariant?.price,
-      baseStock: baseVariant?.stockQuantity,
+      baseStock: baseVariant?.stockAvailable,
       baseStockCondition: baseVariant?.stockCondition,
     }
   }, [product?.data?.productVariant])
@@ -88,28 +91,43 @@ export default function ProductPage() {
     return groups
   }, [productData.variants, productData.hasNoVariants])
 
-  // Auto-set user's sex when variants are loaded
+  // Auto-set default attributes when variants are loaded
   useEffect(() => {
     if (
       productData.hasNoVariants ||
-      !user?.student?.sex ||
       productData.variants.length === 0 ||
-      Object.keys(selectedAttributes).length > 0
+      Object.keys(selectedAttributes).length > 0 ||
+      Object.keys(attributeGroups).length === 0
     )
       return
 
-    const userSex = user.student.sex.toLowerCase()
-    const sexAttributeGroup = Object.entries(attributeGroups).find(
-      ([_, group]) => group.name.toLowerCase() === "sex" || group.name.toLowerCase() === "gender",
-    )
+    const defaultAttributes: Record<string, string> = {}
 
-    if (sexAttributeGroup) {
-      const [attributeName, attributeData] = sexAttributeGroup
-      const matchingValue = attributeData.values.find((value) => value.toLowerCase() === userSex)
+    Object.entries(attributeGroups).forEach(([attributeName, attributeData]) => {
+      // Skip if no values available
+      if (!attributeData.values || attributeData.values.length === 0) return
 
-      if (matchingValue) {
-        setSelectedAttributes({ [attributeName]: matchingValue })
+      const isSexAttribute =
+        attributeData.name.toLowerCase() === "sex" || attributeData.name.toLowerCase() === "gender"
+
+      if (isSexAttribute && user?.student?.sex) {
+        // Auto-select based on user's sex
+        const userSex = user.student.sex.toLowerCase()
+        const matchingValue = attributeData.values.find((value) => value.toLowerCase() === userSex)
+        if (matchingValue) {
+          defaultAttributes[attributeName] = matchingValue
+        } else {
+          // Fallback to first value if user's sex doesn't match
+          defaultAttributes[attributeName] = attributeData.values[0]
+        }
+      } else {
+        // For all other attributes, select the first value
+        defaultAttributes[attributeName] = attributeData.values[0]
       }
+    })
+
+    if (Object.keys(defaultAttributes).length > 0) {
+      setSelectedAttributes(defaultAttributes)
     }
   }, [
     user?.student?.sex,
@@ -141,6 +159,13 @@ export default function ProductPage() {
     )
   }, [selectedAttributes, productData.variants, attributeGroups, productData.hasNoVariants])
 
+  // Auto-select first size when size options change
+  useEffect(() => {
+    if (sortedSizeOptions.length > 0 && !size) {
+      setSize(sortedSizeOptions[0])
+    }
+  }, [sortedSizeOptions, size])
+
   // Consolidated variant and pricing logic
   const currentVariant = useMemo(() => {
     if (productData.hasNoVariants) {
@@ -164,7 +189,7 @@ export default function ProductPage() {
 
     return {
       price: variant?.price,
-      stock: variant?.stockQuantity ?? null,
+      stock: variant?.stockAvailable ?? null,
       stockCondition: variant?.stockCondition ?? null,
     }
   }, [selectedAttributes, size, productData, attributeGroups])
@@ -349,28 +374,29 @@ export default function ProductPage() {
 
         {/* Product details */}
         <Grid.Col span={{ base: 12, sm: 6 }}>
-          <Stack gap={10} w="100%" bg="#f2f5f9" px={{ base: 16, md: 0 }}>
+          <Group>
+            <Text size="xs" tt="uppercase">
+              {product?.data?.category} • {product?.data.department.acronym.toUpperCase()}
+            </Text>
+          </Group>
+          <Stack gap="md" w="100%" bg="#f2f5f9" px={{ base: 16, md: 0 }}>
             {/* Description */}
             <div className="gap-2">
               <Title order={3}>{product?.data?.name}</Title>
+
               <Text c="dimmed">{product?.data?.description}</Text>
-              <Group>
-                <Text size="xs" c="dimmed">
-                  category: {product?.data?.category}, program:{" "}
-                  {product?.data.department.acronym.toUpperCase()}
-                </Text>
-              </Group>
             </div>
 
             {/* Price */}
             <Text size="xl" fw={700}>
               <NumberFormatter
-                prefix="₱"
+                prefix="₱ "
                 value={
                   (currentVariant.price ??
                     productData.basePrice ??
                     productData.variants[0]?.price) * quantity
                 }
+                thousandSeparator=","
                 decimalSeparator="."
                 decimalScale={2}
                 fixedDecimalScale
@@ -383,31 +409,42 @@ export default function ProductPage() {
             {!productData.hasNoVariants &&
               Object.entries(attributeGroups).map(([attributeName, attributeData]) => (
                 <Stack gap={2} key={attributeName}>
-                  <Title key={attributeName} order={4}>
-                    {attributeData.name}
+                  <Title key={attributeName} order={4} tt="uppercase">
+                    {attributeData.name}:{" "}
+                    <span className="text-sm font-bold text-gray-500">
+                      {selectedAttributes[attributeName]}
+                    </span>
                   </Title>
+
+                  <Space h="xs" />
 
                   {/* Show selected value for auto-selected sex */}
                   {shouldHideSexSelection(attributeName, attributeData) ? (
-                    <>
-                      <Text size="sm">Selected: {selectedAttributes[attributeName]}</Text>
-                      <Text c="dimmed" size="xs" fs="italic">
-                        Note: This option is determined by your registered profile. If you wish to
-                        order uniforms for a different sex, kindly visit the Proware.
-                      </Text>
-                    </>
+                    <Text c="dimmed" size="xs" fs="italic">
+                      Note: This option is determined by your registered profile. If you wish to
+                      order uniforms for a different sex, kindly visit the Proware.
+                    </Text>
                   ) : (
-                    <Group gap={5}>
-                      {attributeData.values.map((value) => (
-                        <Button
-                          key={value}
-                          variant={selectedAttributes[attributeName] === value ? "filled" : "light"}
-                          onClick={() => handleAttributeChange(attributeName, value)}
-                        >
-                          {value}
-                        </Button>
-                      ))}
-                    </Group>
+                    <>
+                      {!selectedAttributes[attributeName] && (
+                        <Text size="sm" c="dimmed" fs="italic">
+                          Please select a {attributeData.name.toLowerCase()}
+                        </Text>
+                      )}
+                      <Group gap={5}>
+                        {attributeData.values.map((value) => (
+                          <Button
+                            key={value}
+                            variant={
+                              selectedAttributes[attributeName] === value ? "filled" : "light"
+                            }
+                            onClick={() => handleAttributeChange(attributeName, value)}
+                          >
+                            {value}
+                          </Button>
+                        ))}
+                      </Group>
+                    </>
                   )}
                 </Stack>
               ))}
@@ -415,7 +452,9 @@ export default function ProductPage() {
             {/* Size selection - only for products with variants */}
             {!productData.hasNoVariants && sortedSizeOptions.length > 0 && (
               <>
-                <Title order={4}>Size</Title>
+                <Title order={4} tt="uppercase">
+                  Size: <span className="text-sm font-bold text-gray-500">{size && size}</span>
+                </Title>
                 <Group gap={5}>
                   {sortedSizeOptions.map((option) => (
                     <Button
@@ -433,7 +472,9 @@ export default function ProductPage() {
 
             {/* Quantity Input */}
             <>
-              <Title order={4}>Quantity</Title>
+              <Title order={4} tt="uppercase">
+                Quantity:
+              </Title>
               <QuantityInput
                 quantity={quantity}
                 setQuantity={setQuantity}
@@ -468,26 +509,30 @@ export default function ProductPage() {
               grow
               justify="center"
             >
-              <Button
-                radius="xl"
-                color="yellow"
-                size="lg"
-                onClick={handleOnAddToCart}
-                loading={loading}
-                disabled={!canOrder}
-              >
-                Add to cart
-              </Button>
+              <Tooltip label="Add this item to your cart for later checkout">
+                <Button
+                  radius="xl"
+                  color="yellow"
+                  size="lg"
+                  onClick={handleOnAddToCart}
+                  loading={loading}
+                  disabled={!canOrder}
+                >
+                  Add to cart
+                </Button>
+              </Tooltip>
 
-              <Button
-                radius="xl"
-                size="lg"
-                disabled={!canOrder}
-                onClick={openConfirmation}
-                loading={buyNowMutation.isPending}
-              >
-                Buy Now
-              </Button>
+              <Tooltip label="Proceed to order this item now">
+                <Button
+                  radius="xl"
+                  size="lg"
+                  disabled={!canOrder}
+                  onClick={openConfirmation}
+                  loading={buyNowMutation.isPending}
+                >
+                  Buy Now
+                </Button>
+              </Tooltip>
             </Group>
           </Stack>
         </Grid.Col>

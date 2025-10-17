@@ -1,10 +1,20 @@
 import { Card, Image, NumberFormatter, Stack, Text } from "@mantine/core"
-import { IProduct } from "@/types/product.type"
+import { IProduct, IProductVariant } from "@/types/product.type"
 import { Link } from "react-router"
 import { getImage } from "@/services/media.service"
 
 interface ProductCardProps {
   product: IProduct
+}
+
+const displayPriceRange = (variants: IProductVariant[]) => {
+  if (!variants?.length) return "N/A"
+
+  const prices = variants.map((v) => v.price)
+  const min = Math.min(...prices)
+  const max = Math.max(...prices)
+
+  return min === max ? `₱ ${min}.00` : `₱ ${min}.00 - ₱ ${max}.00`
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
@@ -36,14 +46,9 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.description}
           </Text>
 
-          <NumberFormatter
-            prefix="₱"
-            decimalScale={2}
-            thousandSeparator
-            fixedDecimalScale
-            value={product.productVariant?.[0].price}
-            className="font-semibold"
-          />
+          <Text fw={500} size="sm">
+            {displayPriceRange(product?.productVariant ?? [])}
+          </Text>
 
           <Text size="xs" c="gray.6" mt={-2} tt="capitalize">
             {product.category}
