@@ -108,7 +108,7 @@ export const InventoryFilter = ({ filters, onFilter, disabled }: Props) => {
         ))}
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         {/* Search Name */}
         <Input
           value={search}
