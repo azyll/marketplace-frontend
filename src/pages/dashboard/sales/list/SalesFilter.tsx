@@ -2,7 +2,7 @@ import { CloseButton, Group, Input } from "@mantine/core"
 import { KeyboardEvent, useState } from "react"
 import { DatePickerInput } from "@mantine/dates"
 import { IconCalendar, IconSearch } from "@tabler/icons-react"
-import { ISalesFilter } from "@/types/sale.type"
+import { ISalesFilter } from "@/types/sales.type"
 
 interface Props {
   filters: Partial<ISalesFilter>
@@ -45,13 +45,7 @@ export const SalesFilter = ({ filters, onFilter, disabled }: Props) => {
   }
 
   return (
-    <Group
-      gap="sm"
-      wrap="nowrap"
-      className="hide-scrollbar mt-4 overflow-x-auto"
-      justify="space-between"
-      align="center"
-    >
+    <Group gap="sm" wrap="nowrap" className="hide-scrollbar mt-4 overflow-x-auto" align="center">
       <Input
         value={search}
         onChange={(e) => setSearch(e.target.value)}

@@ -1,6 +1,6 @@
 import { ENDPOINT } from "@/constants/endpoints"
 import { IPagination, IResponse } from "@/types/common.type"
-import { IPaginatedSalesResponse, ISales, ISalesFilter, ISalesTrend } from "@/types/sale.type"
+import { IPaginatedSalesResponse, ISales, ISalesFilter, ISalesTrend } from "@/types/sales.type"
 import axios from "@/utils/axios"
 
 //Get All Sales

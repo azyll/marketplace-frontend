@@ -37,6 +37,13 @@ export const ENDPOINT = {
     ORDER: "/user/orders",
   },
 
+  STUDENT: {
+    BASE: "/student",
+    ID: "/student/:studentId",
+    USER_ID: "/student/user/:userId",
+    BULK: "/student/bulk",
+  },
+
   ROLE: {
     BASE: "/role",
     ID: "/role/:roleId",
@@ -46,11 +53,8 @@ export const ENDPOINT = {
     BASE: "/program",
   },
 
-  STUDENT: {
-    BASE: "/student",
-    ID: "/student/:studentId",
-    USER_ID: "/student/user/:userId",
-    BULK: "/student/bulk",
+  DEPARTMENT: {
+    BASE: "/department",
   },
 
   NOTIFICATION: {
@@ -71,7 +75,10 @@ export const ENDPOINT = {
     TREND: "/sales/trend",
   },
 
-  DEPARTMENT: {
-    BASE: "/department",
+  REPORT: {
+    SALES: "/report/sales",
+    PRODUCT: "/report/product",
+    INVENTORY: "/report/inventory",
+    ORDER: "report/order",
   },
 }

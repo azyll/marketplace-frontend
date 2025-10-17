@@ -19,8 +19,8 @@ export interface ISales {
 }
 
 export interface IPaginatedResponseMeta {
-  currentPage: number
-  itemsPerPage: number
+  currentPage?: number
+  itemsPerPage?: number
   totalItems: number
   totalSales: number
 }

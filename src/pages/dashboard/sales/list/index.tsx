@@ -2,7 +2,7 @@ import { KEY } from "@/constants/key"
 import { ROUTES } from "@/constants/routes"
 import { useFilters } from "@/hooks/useFilters"
 import { getAnnualSales, getSales } from "@/services/sales.service"
-import { ISales } from "@/types/sale.type"
+import { ISales } from "@/types/sales.type"
 import {
   ActionIcon,
   Badge,
@@ -26,6 +26,7 @@ import { DepartmentSalesChart } from "./DepartmentSalesChart"
 import { AnnualSalesCard } from "./AnnualSalesCard"
 import { SalesFilter } from "./SalesFilter"
 import dayjs from "dayjs"
+import { SalesReportDownloader } from "./SalesReport"
 
 export const SalesList = () => {
   const DEFAULT_PAGE = 1
@@ -182,6 +183,7 @@ export const SalesList = () => {
         <Card.Section px={24} pt={24}>
           <div className="flex h-[36px] items-center justify-between gap-4">
             <h1 className="text-xl font-bold">Manage Sales</h1>
+            <SalesReportDownloader />
           </div>
 
           <SalesFilter filters={filters} onFilter={setFilterValues} />
