@@ -106,7 +106,18 @@ export default function Products() {
         />
       </section>
 
-      <Space h="sm" />
+      <Pagination
+        my="xs"
+        size="sm"
+        styles={{
+          control: {
+            border: 0,
+          },
+        }}
+        value={filter.page}
+        onChange={(page) => setFilterValue("page", page)}
+        total={totalPages}
+      />
 
       {/* Show current search term */}
       {filter.search && (
@@ -143,19 +154,6 @@ export default function Products() {
             </div>
           </Card>
         )}
-
-        <Pagination
-          my="sm"
-          radius="xl"
-          styles={{
-            control: {
-              border: 0,
-            },
-          }}
-          value={filter.page}
-          onChange={(page) => setFilterValue("page", page)}
-          total={totalPages}
-        />
       </section>
     </main>
   )
