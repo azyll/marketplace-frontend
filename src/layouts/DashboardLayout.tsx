@@ -33,7 +33,7 @@ export const DashboardLayout = () => {
 
   const { user, logout } = useContext(AuthContext)
 
-  const { data: ordersData } = useQuery({
+  const { data: ongoingOrders } = useQuery({
     queryKey: [KEY.DASHBOARD.ORDERS, "ongoing-count"],
     queryFn: () => getOrders({ status: "ongoing", limit: 1000 }),
   })
@@ -48,20 +48,21 @@ export const DashboardLayout = () => {
       label: "Users",
       path: ROUTES.DASHBOARD.USER.BASE,
       icon: <IconUser size={14} />,
-      alertCount: 0,
+      indicator: false,
       badges: [],
     },
     {
       label: "Products",
       path: ROUTES.DASHBOARD.PRODUCTS.BASE,
       icon: <IconBuildingStore size={14} />,
-      alertCount: 0,
+      indicator: false,
       badges: [],
     },
     {
       label: "Orders",
       path: ROUTES.DASHBOARD.ORDERS.BASE,
       icon: <IconShoppingBagCheck size={14} />,
+      indicator: ongoingOrders?.data.length !== 0,
     },
     {
       label: "Inventory",
@@ -72,7 +73,7 @@ export const DashboardLayout = () => {
       label: "Sales",
       path: ROUTES.DASHBOARD.SALES.BASE,
       icon: <IconReportMoney size={14} />,
-      alertCount: 0,
+      indicator: false,
       badges: [],
     },
   ]
@@ -134,7 +135,7 @@ export const DashboardLayout = () => {
           <NavLink
             leftSection={
               <Indicator
-                disabled={item.alertCount === 0}
+                disabled={!item.indicator}
                 size={7}
                 color="red"
                 styles={{
