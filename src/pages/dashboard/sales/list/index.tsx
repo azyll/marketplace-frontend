@@ -11,6 +11,7 @@ import {
   CopyButton,
   Flex,
   Group,
+  NumberFormatter,
   Space,
   Stack,
   Tooltip,
@@ -101,7 +102,16 @@ export const SalesList = () => {
     {
       accessor: "total",
       title: "Total",
-      render: (sale) => `₱ ${sale.total.toFixed(2)}`,
+      render: (sale) => (
+        <NumberFormatter
+          prefix="₱ "
+          value={sale.total}
+          thousandSeparator
+          decimalSeparator="."
+          decimalScale={2}
+          fixedDecimalScale
+        />
+      ),
     },
     {
       accessor: "createdAt",
@@ -109,8 +119,8 @@ export const SalesList = () => {
       render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM DD, YYYY") : "-"),
     },
     {
-      accessor: "actions",
-      title: "Actions",
+      accessor: "View",
+      title: "View",
       width: 120,
       textAlign: "center",
       render: (sale) => (

@@ -6,6 +6,7 @@ import {
   Card,
   CopyButton,
   Flex,
+  NumberFormatter,
   Space,
   Tooltip,
 } from "@mantine/core"
@@ -120,7 +121,16 @@ export const OrdersList = () => {
       width: 130,
       render: (sale) => (
         <div className="flex items-center gap-1">
-          <p className="shrink-0">{`₱ ${sale.total.toFixed(2)}`}</p>
+          <p className="shrink-0">
+            <NumberFormatter
+              prefix="₱ "
+              value={sale.total}
+              thousandSeparator
+              decimalSeparator="."
+              decimalScale={2}
+              fixedDecimalScale
+            />
+          </p>
 
           <CopyButton value={sale.total.toString()} timeout={500}>
             {({ copied, copy }) => (
@@ -147,8 +157,8 @@ export const OrdersList = () => {
       render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM DD, YYYY") : "-"),
     },
     {
-      accessor: "actions",
-      title: "Actions",
+      accessor: "view",
+      title: "View",
       width: 120,
       textAlign: "center",
       render: (order) => (
