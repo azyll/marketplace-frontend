@@ -26,6 +26,7 @@ import { ROUTES } from "@/constants/routes"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
 import { getOrders } from "@/services/order.service"
+import { getInventoryAlerts } from "@/services/products.service"
 
 export const DashboardLayout = () => {
   const navigate = useNavigate()
@@ -36,6 +37,27 @@ export const DashboardLayout = () => {
   const { data: ongoingOrders } = useQuery({
     queryKey: [KEY.DASHBOARD.ORDERS, "ongoing-count"],
     queryFn: () => getOrders({ status: "ongoing", limit: 1000 }),
+  })
+
+  const { data: criticalStock } = useQuery({
+    queryKey: ["inventory-alert"],
+    queryFn: () => getInventoryAlerts(),
+    select: (response) => {
+      const alerts = response.data
+      // Check if "No Stock" or "Low Stock" has items
+      const noStock =
+        alerts.find((item: { value: number; label: string }) => item.label === "No Stock")?.value ||
+        0
+      const lowStock =
+        alerts.find((item: { value: number; label: string }) => item.label === "Low Stock")
+          ?.value || 0
+      return {
+        hasAlerts: noStock > 0 || lowStock > 0,
+        noStock,
+        lowStock,
+        data: alerts,
+      }
+    },
   })
 
   const handleOnLogout = () => {
@@ -68,6 +90,7 @@ export const DashboardLayout = () => {
       label: "Inventory",
       path: ROUTES.DASHBOARD.INVENTORY.BASE,
       icon: <IconBuildingWarehouse size={14} />,
+      indicator: criticalStock?.hasAlerts,
     },
     {
       label: "Sales",
