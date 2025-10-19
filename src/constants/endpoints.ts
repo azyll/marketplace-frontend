@@ -59,6 +59,7 @@ export const ENDPOINT = {
 
   NOTIFICATION: {
     BASE: "/notification",
+    ID: "/notification/:userId",
     RECEIVER: "/notification/receiver",
   },
 
