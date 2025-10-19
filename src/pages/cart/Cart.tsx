@@ -4,6 +4,7 @@ import { getItems, removeItem, addItemQuantity, deductItemQuantity } from "@/ser
 import { createOrder } from "@/services/order.service"
 import {
   ActionIcon,
+  Badge,
   Button,
   Card,
   Checkbox,
@@ -201,22 +202,20 @@ export default function Cart() {
         {/* Cart items */}
         <Grid.Col span={{ base: 12, md: 6 }}>
           <Stack gap="md">
-            <Group justify="space-between" align="center">
-              {cart?.length === 0 ? (
-                <Title order={4}>My Cart</Title>
-              ) : (
-                <Title order={4}>My Cart - {cart?.length || 0} item(s)</Title>
-              )}
+            <Group gap={8} align="center">
+              <Title order={4}>My Cart</Title>
 
-              {cart && cart.length > 0 && (
-                <Checkbox
-                  label="Select All"
-                  checked={cart.length > 0 && selectedItems.size === cart.length}
-                  indeterminate={selectedItems.size > 0 && selectedItems.size < cart.length}
-                  onChange={handleSelectAll}
-                />
-              )}
+              <Badge>{cart?.length}</Badge>
             </Group>
+
+            {cart && cart.length > 0 && (
+              <Checkbox
+                label="Select All"
+                checked={cart.length > 0 && selectedItems.size === cart.length}
+                indeterminate={selectedItems.size > 0 && selectedItems.size < cart.length}
+                onChange={handleSelectAll}
+              />
+            )}
 
             {isLoading && !user ? (
               Array.from({ length: 2 }).map((_, i) => <CartItemSkeleton key={i} />)
@@ -278,14 +277,10 @@ export default function Cart() {
                         <Text size="xs" c="dimmed">
                           {data.productVariant.productAttribute?.name !== "N/A" && (
                             <>
-                              {data.productVariant.productAttribute?.name}:{" "}
-                              {data.productVariant.name}
-                              <br />
+                              {data.productVariant.name}, {""}
+                              {data.productVariant.size !== "N/A" && data.productVariant.size}
                             </>
                           )}
-
-                          {data.productVariant.size !== "N/A" &&
-                            `Size: ${data.productVariant.size}`}
                         </Text>
 
                         <QuantityInput
