@@ -1,5 +1,5 @@
 import { IconMinus, IconPlus } from "@tabler/icons-react"
-import { Button, NumberInput, Group, TextInput } from "@mantine/core"
+import { Button, NumberInput, Group, TextInput, ActionIcon } from "@mantine/core"
 
 interface QuantityInputProps {
   quantity: number
@@ -40,40 +40,40 @@ export default function QuantityInput({
   return (
     <Group gap="sm">
       <Button.Group>
-        <Button
-          size="compact-sm"
+        <ActionIcon
+          className="!rounded-r-none"
           variant="default"
           onClick={decrement}
           disabled={disabled || quantity <= min}
         >
           <IconMinus size={15} />
-        </Button>
+        </ActionIcon>
 
         <TextInput
-          value={quantity.toString()}
+          value={quantity}
           onChange={handleInputChange}
           disabled={disabled}
           styles={{
             input: {
               height: 26,
-              minHeight: 26,
+              minHeight: 28,
               textAlign: "center",
-              width: 35,
+              width: 44,
               borderRadius: 0,
-              borderWidth: 0,
+              borderWidth: "1px 0",
               fontSize: 14,
             },
           }}
         />
 
-        <Button
-          size="compact-sm"
+        <ActionIcon
+          className="!rounded-l-none"
           variant="default"
           onClick={increment}
           disabled={disabled || quantity >= max}
         >
           <IconPlus size={15} />
-        </Button>
+        </ActionIcon>
       </Button.Group>
     </Group>
   )

@@ -1,6 +1,5 @@
 import { Button, Modal, ModalProps } from "@mantine/core"
 import { OrderStudentCreateForm } from "@/pages/dashboard/orders/form/OrderStudentCreateForm"
-import { useDebouncedState } from "@mantine/hooks"
 import { useEffect, useState } from "react"
 import { OrderStudentExistingForm } from "@/pages/dashboard/orders/form/OrderStudentExistingForm"
 import { useOrderForm } from "@/pages/dashboard/orders/form/index"
@@ -26,15 +25,20 @@ export const OrderStudentModal = ({ disabled, onClose, onSave, ...modalProps }: 
 
   const handleOnClose = () => {
     onClose()
+
+    if (isExistingStudent) {
+      orderStudentCreateForm.reset()
+    } else {
+      orderStudentForm.reset()
+    }
   }
 
   const handleOnSave = () => {
-    setIsExistingStudent(existing)
-
     if (existing) {
       const { hasErrors } = orderStudentForm.validate()
 
       if (!hasErrors) {
+        setIsExistingStudent(existing)
         orderStudentCreateForm.reset()
         onSave?.(true)
       }
@@ -44,6 +48,7 @@ export const OrderStudentModal = ({ disabled, onClose, onSave, ...modalProps }: 
     const { hasErrors } = orderStudentCreateForm.validate()
 
     if (!hasErrors) {
+      setIsExistingStudent(existing)
       orderStudentForm.reset()
       onSave?.(false)
     }

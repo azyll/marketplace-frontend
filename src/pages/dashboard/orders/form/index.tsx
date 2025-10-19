@@ -1,4 +1,4 @@
-import { Button, Text, Title } from "@mantine/core"
+import { Text, Title } from "@mantine/core"
 
 import {
   StudentCardSelect,
@@ -9,15 +9,13 @@ import { OrderItemsFormCart } from "@/pages/dashboard/orders/form/OrderItemsForm
 import { useForm, UseFormReturnType } from "@mantine/form"
 import { ICreateOrderInput, ICreateOrderStudentInput } from "@/types/order.type"
 import { zod4Resolver } from "mantine-form-zod-resolver"
-import {
-  createOrderItemSchema,
-  createOrderStudentCreateSchema,
-  createOrderStudentSchema,
-} from "@/schema/order.schema"
+import { createOrderItemSchema, createOrderStudentCreateSchema } from "@/schema/order.schema"
 import { z } from "zod"
 import { createContext, useContext, useState } from "react"
 import { useDisclosure } from "@mantine/hooks"
 import { OrderStudentModal } from "@/pages/dashboard/orders/form/OrderStudentModal"
+import { OrderProductModal } from "@/pages/dashboard/orders/form/OrderProductModal"
+import { IProduct, IProductVariant } from "@/types/product.type"
 
 export interface OrderFormContextProps {
   orderStudentCreateForm: UseFormReturnType<Partial<ICreateOrderStudentInput>>
@@ -73,11 +71,8 @@ export const OrderFormPage = () => {
 
   const [student, setStudent] = useState<StudentCardSelectProps["student"]>()
 
-  const [opened, { open, close }] = useDisclosure()
-
-  const handleOnSubmit = () => {
-    console.log(orderItemsForm.getValues())
-  }
+  const [orderStudentModalOpened, { open: openOrderStudentModal, close: closeOrderStudentModal }] =
+    useDisclosure()
 
   const handleOnSaveStudent = (existing: boolean) => {
     if (existing) {
@@ -91,7 +86,7 @@ export const OrderFormPage = () => {
       })
     } else {
       const student = orderStudentCreateForm.getValues()
-      console.log(student)
+
       setStudent({
         firstName: student.firstName,
         lastName: student.lastName,
@@ -100,7 +95,30 @@ export const OrderFormPage = () => {
       })
     }
 
-    close()
+    closeOrderStudentModal()
+  }
+
+  const handleOnSubmit = () => {
+    console.log(orderItemsForm.getValues())
+  }
+
+  const [selectedProduct, setSelectedProduct] = useState<IProduct>()
+
+  const [productModalOpened, { open: openProductModal, close: closeProductModal }] = useDisclosure()
+
+  const handleOnSelectProduct = (product: IProduct) => {
+    openProductModal()
+    setSelectedProduct(product)
+  }
+
+  const handleOnCloseProductModal = () => {
+    closeProductModal()
+    setSelectedProduct(undefined)
+  }
+
+  const handleOnAddToCart = (variant: IProductVariant, quantity: number) => {
+    console.log(variant, quantity)
+    handleOnCloseProductModal()
   }
 
   return (
@@ -114,7 +132,18 @@ export const OrderFormPage = () => {
       }}
     >
       <div className="flex flex-col gap-4">
-        <OrderStudentModal opened={opened} onClose={() => close()} onSave={handleOnSaveStudent} />
+        <OrderStudentModal
+          opened={orderStudentModalOpened}
+          onClose={() => closeOrderStudentModal()}
+          onSave={handleOnSaveStudent}
+        />
+
+        <OrderProductModal
+          product={selectedProduct}
+          opened={productModalOpened}
+          onClose={() => handleOnCloseProductModal()}
+          onAddToCart={handleOnAddToCart}
+        />
 
         <div>
           <Title order={3}>Create Order</Title>
@@ -125,16 +154,16 @@ export const OrderFormPage = () => {
         </div>
 
         <div className="flex gap-4">
-          <div className="flex !basis-auto flex-col gap-4">
-            <OrderItemsFormTable />
+          <div className="min-w-0 basis-full">
+            <OrderItemsFormTable onProductSelect={handleOnSelectProduct} />
           </div>
 
-          <div className="flex !basis-[800px] flex-col gap-4">
+          <div className="flex !basis-[480px] flex-col gap-4">
             <StudentCardSelect
               student={student}
-              onSelect={() => open()}
               existing={isExistingStudent}
-              onEdit={() => open()}
+              onSelect={() => openOrderStudentModal()}
+              onEdit={() => openOrderStudentModal()}
             />
             <OrderItemsFormCart />
           </div>
