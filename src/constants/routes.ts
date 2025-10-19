@@ -12,6 +12,7 @@ export const ROUTES = {
     ORDERS: {
       BASE: "/dashboard/orders",
       ID: "/dashboard/orders/:orderId",
+      CREATE: "/dashboard/orders/create",
     },
     INVENTORY: {
       BASE: "/dashboard/inventory",
