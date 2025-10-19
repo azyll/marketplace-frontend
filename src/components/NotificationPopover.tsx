@@ -25,7 +25,7 @@ export default function NotificationPopover() {
     queryKey: ["notifications", user?.id],
     queryFn: () => getUserNotifications(user!.id),
     enabled: !!user?.id,
-    refetchInterval: 30000,
+    refetchInterval: 1000,
   })
 
   const unreadCount = userNotifications?.meta?.unread ?? 0
@@ -42,7 +42,7 @@ export default function NotificationPopover() {
         {
           event: "*",
           schema: "public",
-          table: "notification_receiver",
+          table: "NotificationReceivers",
           filter: `userId=eq.${user.id}`,
         },
         () => {
