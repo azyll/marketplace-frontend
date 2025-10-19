@@ -129,8 +129,9 @@ export const ConfirmOrderActionsModal = ({
         mt={16}
         placeholder="Sales Invoice"
         key={order.id}
-        value={salesInvoice}
-        onChange={(e) => setSalesInvoice(e.target.value)}
+        value={salesInvoice.replace("FAI", "")}
+        onChange={(e) => setSalesInvoice("FAI" + e.target.value)}
+        leftSection={"FAI"}
       />
 
       {/* Action Buttons */}
@@ -147,7 +148,7 @@ export const ConfirmOrderActionsModal = ({
         <Button
           color="green"
           onClick={() => onSubmit(salesInvoice ?? "")}
-          disabled={!salesInvoice}
+          disabled={!salesInvoice.replace("FAI", "")}
           loading={loading}
         >
           Yes, complete order
