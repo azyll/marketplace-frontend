@@ -20,7 +20,6 @@ import {
   IconLayoutDashboard,
 } from "@tabler/icons-react"
 import HeaderSearchBar from "./HeaderSearchBar"
-import NotificationPopover from "./NotificationPopover"
 import { useNavigate } from "react-router"
 import { useContext, useMemo } from "react"
 import { AuthContext } from "@/contexts/AuthContext"
@@ -29,6 +28,7 @@ import { ENDPOINT } from "@/constants/endpoints"
 import { ROUTES } from "@/constants/routes"
 import { useQuery } from "@tanstack/react-query"
 import { getItems } from "@/services/cart.service"
+import NotificationButton from "./NotificationButton"
 
 export default function Header() {
   const navigate = useNavigate()
@@ -76,35 +76,15 @@ export default function Header() {
           <HeaderSearchBar />
 
           {/* Cart Button */}
-          {cartCount > 0 ? (
-            <Indicator
-              inline
-              label={cartCount}
-              size={18}
-              offset={3}
-              withBorder
-              classNames={{ indicator: "!text-[12px] !p-1" }}
-            >
-              <ActionIcon
-                variant="subtle"
-                radius="xl"
-                onClick={() => {
-                  if (!user) {
-                    notifications.show({
-                      title: "Login required",
-                      message: "Please log in to view your cart",
-                      icon: <IconLock size={18} />,
-                    })
-                    navigate(ENDPOINT.LOGIN)
-                  } else {
-                    navigate(ENDPOINT.CART.BASE)
-                  }
-                }}
-              >
-                <IconShoppingBag />
-              </ActionIcon>
-            </Indicator>
-          ) : (
+          <Indicator
+            inline
+            label={cartCount}
+            size={18}
+            offset={3}
+            withBorder
+            disabled={!cartCount}
+            classNames={{ indicator: "!text-[12px] !p-1" }}
+          >
             <ActionIcon
               variant="subtle"
               radius="xl"
@@ -123,10 +103,10 @@ export default function Header() {
             >
               <IconShoppingBag />
             </ActionIcon>
-          )}
+          </Indicator>
 
           {/* Notifications Component */}
-          <NotificationPopover />
+          <NotificationButton />
 
           {/* Loading State */}
           {isLoading ? (

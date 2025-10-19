@@ -8,8 +8,10 @@ import {
   ScrollArea,
   Divider,
   Group,
+  Button,
+  Space,
 } from "@mantine/core"
-import { IconBell, IconPackage, IconSpeakerphone } from "@tabler/icons-react"
+import { IconBell, IconCheck, IconPackage, IconSpeakerphone } from "@tabler/icons-react"
 import { useContext, useEffect, useState } from "react"
 import { AuthContext } from "@/contexts/AuthContext"
 import { useQuery } from "@tanstack/react-query"
@@ -17,7 +19,7 @@ import { getUserNotifications, updateNotificationStatus } from "@/services/notif
 import { supabase } from "@/utils/supabase"
 import { formatDistanceToNow } from "date-fns"
 
-export default function NotificationPopover() {
+export default function NotificationButton() {
   const { user } = useContext(AuthContext)
   const [notificationOpen, setNotificationOpen] = useState(false)
 
@@ -67,6 +69,26 @@ export default function NotificationPopover() {
     }
   }
 
+  const handleMarkAllAsRead = async () => {
+    if (!user?.id) return
+
+    try {
+      const unreadNotifications = notificationsList.filter(
+        (notification) => !notification.notificationReceiver[0]?.isRead,
+      )
+
+      await Promise.all(
+        unreadNotifications.map((notification) =>
+          updateNotificationStatus(user.id, notification.id),
+        ),
+      )
+
+      refetchNotifications()
+    } catch (error) {
+      console.error("Failed to mark all notifications as read:", error)
+    }
+  }
+
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "order":
@@ -89,47 +111,51 @@ export default function NotificationPopover() {
       onChange={setNotificationOpen}
     >
       <Popover.Target>
-        <div>
-          {unreadCount > 0 ? (
-            <Indicator
-              inline
-              label={unreadCount}
-              size={18}
-              offset={3}
-              withBorder
-              classNames={{ indicator: "!text-[12px] !p-1" }}
-            >
-              <ActionIcon
-                variant="subtle"
-                radius="xl"
-                onClick={() => setNotificationOpen(!notificationOpen)}
-              >
-                <IconBell />
-              </ActionIcon>
-            </Indicator>
-          ) : (
-            <ActionIcon
-              variant="subtle"
-              radius="xl"
-              onClick={() => setNotificationOpen(!notificationOpen)}
-            >
-              <IconBell />
-            </ActionIcon>
-          )}
-        </div>
+        <Indicator
+          inline
+          label={unreadCount}
+          size={18}
+          offset={3}
+          withBorder
+          disabled={!unreadCount}
+          classNames={{ indicator: "!text-[12px] !p-1" }}
+        >
+          <ActionIcon
+            variant="subtle"
+            radius="xl"
+            onClick={() => setNotificationOpen(!notificationOpen)}
+          >
+            <IconBell />
+          </ActionIcon>
+        </Indicator>
       </Popover.Target>
 
       <Popover.Dropdown p={0}>
         <Stack gap={0}>
           <Group justify="space-between" p="md" pb="sm">
-            <Text fw={600} size="sm">
-              Notifications
-            </Text>
-            {unreadCount > 0 && (
-              <Badge size="sm" variant="filled" color="blue">
-                {unreadCount} new
-              </Badge>
-            )}
+            <Group gap="xs">
+              <Text fw={600} size="sm">
+                Notifications
+              </Text>
+              {unreadCount > 0 && (
+                <Badge size="sm" variant="filled" color="blue">
+                  {unreadCount} new
+                </Badge>
+              )}
+            </Group>
+            <Group gap="xs">
+              <Button
+                size="xs"
+                variant="subtle"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleMarkAllAsRead()
+                }}
+              >
+                <IconCheck size={16} /> <Space w={4} />
+                Mark all read
+              </Button>
+            </Group>
           </Group>
 
           <Divider />
@@ -156,7 +182,7 @@ export default function NotificationPopover() {
                       }`}
                       onClick={() => {
                         if (isUnread && receiver) {
-                          handleMarkAsRead(receiver.id)
+                          handleMarkAsRead(notification.id)
                         }
                       }}
                     >
