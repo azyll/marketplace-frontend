@@ -1,18 +1,27 @@
-import { Card, Group, Image, Stack, Text, Title } from "@mantine/core";
-import { KEY } from "../../../constants/key";
-import { getProductList } from "../../../services/products.service";
+import { Title } from "@mantine/core";
+import { KEY } from "@/constants/key";
+import { getProductList } from "@/services/products.service";
 import { useQuery } from "@tanstack/react-query";
 import { Carousel } from "@mantine/carousel";
-import { getImage } from "../../../services/media.service";
-import { Link } from "react-router";
-import ProductCard from "../../products/components/ProductCard";
-import ProductCardSkeleton from "../../../components/ProductCardSkeleton";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
+import ProductCard from "@/components/ProductCard";
+import { useContext } from "react";
+import { AuthContext } from "@/contexts/AuthContext";
 
 export default function UserProducts() {
+  const user = useContext(AuthContext);
+
   const { data: products, isLoading } = useQuery({
     queryKey: [KEY.PRODUCTS],
-    queryFn: () => getProductList({ department: "Proware", latest: true }),
+    queryFn: () =>
+      getProductList({
+        department: user.user?.student.program.department.name,
+        latest: true,
+      }),
+    enabled: !!user.user?.student,
   });
+
+  if (!user.user?.student?.program.department.name) return null;
 
   return (
     <section className="max-w-[1200px] mx-auto">
@@ -22,7 +31,7 @@ export default function UserProducts() {
         pb={10}
         order={2}
       >
-        Program
+        {user.user?.student?.program?.department?.name}
       </Title>
 
       <Carousel
@@ -30,6 +39,7 @@ export default function UserProducts() {
         slideSize={{ base: "80%", sm: "50%", md: "33.33%", lg: "25%" }}
         slideGap="md"
         withIndicators={false}
+        classNames={{ control: "control" }}
       >
         {isLoading
           ? [...Array(4)].map((_, index) => (

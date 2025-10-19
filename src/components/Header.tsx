@@ -1,106 +1,246 @@
-import { Group, Button, ActionIcon, Title, Avatar, Menu } from "@mantine/core";
+import {
+  Group,
+  Button,
+  ActionIcon,
+  Title,
+  Avatar,
+  Menu,
+  Stack,
+  Text,
+  Badge,
+  Skeleton,
+  Indicator,
+  Popover,
+} from "@mantine/core"
 import {
   IconShoppingBag,
   IconBell,
   IconUser,
   IconLogout,
-} from "@tabler/icons-react";
-import HeaderSearchBar from "./HeaderSearchBar";
-import { useNavigate } from "react-router";
-import { useContext } from "react";
-import { AuthContext } from "../contexts/AuthContext";
+  IconLock,
+  IconClipboardList,
+  IconLayoutDashboard,
+} from "@tabler/icons-react"
+import HeaderSearchBar from "./HeaderSearchBar"
+import { useNavigate } from "react-router"
+import { useContext, useEffect, useMemo } from "react"
+import { AuthContext } from "@/contexts/AuthContext"
+import { notifications } from "@mantine/notifications"
+import { ENDPOINT } from "@/constants/endpoints"
+import { ROUTES } from "@/constants/routes"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { getItems } from "@/services/cart.service"
+import { supabase } from "@/utils/supabase"
+import { getUserNotifications } from "@/services/notification.service"
 
 export default function Header() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, isLoading } = useContext(AuthContext)
+
+  const { data: cart } = useQuery({
+    queryKey: ["cart", user?.id],
+    queryFn: () => getItems(user!.id),
+    enabled: !!user?.id,
+  })
+
+  const cartCount = cart?.length ?? 0
+
+  const isAdmin = useMemo(
+    () => user?.role.systemTag === "admin" || user?.role.systemTag === "employee",
+    [user],
+  )
 
   return (
     <nav className="h-14">
       <Group
-        className="max-w-[1200px] mx-auto"
+        className="mx-auto h-full max-w-[1200px]"
         px={{ base: 16, xl: 0 }}
         justify="space-between"
         wrap="nowrap"
+        align="center"
       >
-        <img
-          className="z-0 cursor-pointer  grayscale-50"
-          src="logo.png"
-          alt=""
-          width={56}
-          onClick={() => navigate("/")}
-        />
+        <div className="flex items-center gap-2">
+          <img
+            className="z-0 cursor-pointer"
+            src="/logo.png"
+            alt=""
+            width={45}
+            onClick={() => {
+              navigate("/")
+              window.location.reload()
+            }}
+          />
+          <Title order={4} className="z-0 cursor-pointer" onClick={() => navigate("/")}>
+            STI Marketplace
+          </Title>
+        </div>
 
-        <Title
-          order={4}
-          className="z-0 cursor-pointer"
-          onClick={() => navigate("/")}
-        >
-          STI Marketplace
-        </Title>
-
-        <Group
-          className="relative z-10"
-          gap="sm"
-          wrap="nowrap"
-        >
+        <Group className="relative z-10 !gap-4 md:!gap-6" wrap="nowrap">
           <HeaderSearchBar />
 
-          <ActionIcon variant="subtle">
-            <IconShoppingBag />
-          </ActionIcon>
+          {/* Cart Button */}
 
-          <ActionIcon variant="subtle">
-            <IconBell />
-          </ActionIcon>
-
-          {/* visible on pc */}
-          {!user ? (
-            <Button
-              variant="light"
-              visibleFrom="md"
-              radius={"xl"}
-              onClick={() => navigate("/auth/login")}
+          {cartCount > 0 ? (
+            <Indicator
+              inline
+              label={cartCount}
+              size={18}
+              offset={3}
+              withBorder
+              classNames={{ indicator: "!text-[12px] !p-1" }}
             >
-              Sign in
-            </Button>
+              <ActionIcon
+                variant="subtle"
+                radius="xl"
+                onClick={() => {
+                  if (!user) {
+                    notifications.show({
+                      title: "Login required",
+                      message: "Please log in to view your cart",
+                      icon: <IconLock size={18} />,
+                    })
+                    navigate(ENDPOINT.LOGIN)
+                  } else {
+                    navigate(ENDPOINT.CART.BASE)
+                  }
+                }}
+              >
+                <IconShoppingBag />
+              </ActionIcon>
+            </Indicator>
+          ) : (
+            <ActionIcon
+              variant="subtle"
+              radius="xl"
+              onClick={() => {
+                if (!user) {
+                  notifications.show({
+                    title: "Login required",
+                    message: "Please log in to view your cart",
+                    icon: <IconLock size={18} />,
+                  })
+                  navigate(ENDPOINT.LOGIN)
+                } else {
+                  navigate(ENDPOINT.CART.BASE)
+                }
+              }}
+            >
+              <IconShoppingBag />
+            </ActionIcon>
+          )}
+
+          {/* Notifications Button */}
+          <Popover>
+            <Popover.Target>
+              <div>
+                <ActionIcon variant="subtle" radius="xl">
+                  <IconBell />
+                </ActionIcon>
+              </div>
+            </Popover.Target>
+            {user && <Popover.Dropdown>{}</Popover.Dropdown>}
+          </Popover>
+
+          {/* Loading State */}
+          {isLoading ? (
+            <Group gap="sm" wrap="nowrap">
+              <Skeleton circle height={34} width={34} />
+              <Stack gap={2} visibleFrom="md">
+                <Skeleton height={14} width={80} radius="sm" />
+                <Skeleton height={12} width={30} radius="sm" />
+              </Stack>
+            </Group>
+          ) : !user ? (
+            <>
+              {/* Desktop login button */}
+              <Button
+                variant="light"
+                radius="xl"
+                visibleFrom="md"
+                onClick={() => navigate(ENDPOINT.LOGIN)}
+              >
+                Sign in
+              </Button>
+
+              {/* Mobile login icon */}
+              <ActionIcon variant="subtle" hiddenFrom="md" onClick={() => navigate(ENDPOINT.LOGIN)}>
+                <IconUser />
+              </ActionIcon>
+            </>
           ) : (
             <Menu width={200}>
               <Menu.Target>
-                <Avatar
-                  className="cursor-pointer"
-                  key={user.id}
-                  name={user.firstName + " " + user.lastName}
-                  color="initials"
-                />
+                <Group gap="sm" className="cursor-pointer transition-colors hover:text-blue-600">
+                  <Avatar key={user.id} name={user.fullName} color="initials" radius="xl" />
+
+                  <Stack gap={0} className="leading-tight" visibleFrom="md">
+                    <Text fw={600} size="sm">
+                      {user.fullName}
+                    </Text>
+
+                    <Badge variant="light" size="xs" radius="sm" color="blue">
+                      {user.student ? user.student?.program?.acronym : user.role.systemTag}
+                    </Badge>
+                  </Stack>
+                </Group>
               </Menu.Target>
 
               <Menu.Dropdown>
-                <Menu.Item leftSection={<IconUser size={14} />}>
+                {/* User info visible on mobile only */}
+                <div className="md:hidden">
+                  <Menu.Label>
+                    <Group justify="space-between" gap={4}>
+                      <Text fw={600} size="sm">
+                        {user.fullName}
+                      </Text>
+
+                      <Badge variant="light" size="xs" radius="sm" color="blue">
+                        {user.student ? user.student?.program?.acronym : user.role.systemTag}
+                      </Badge>
+                    </Group>
+                  </Menu.Label>
+                  <Menu.Divider />
+                </div>
+
+                <Menu.Item
+                  leftSection={<IconUser size={14} />}
+                  onClick={() => navigate(ENDPOINT.USER.BASE)}
+                >
                   Profile
                 </Menu.Item>
+
+                {user.student ? (
+                  <Menu.Item
+                    leftSection={<IconClipboardList size={14} />}
+                    onClick={() => navigate(ENDPOINT.USER.ORDER)}
+                  >
+                    Order History
+                  </Menu.Item>
+                ) : null}
+
                 <Menu.Divider />
-                <Menu.Item
-                  color="red"
-                  leftSection={<IconLogout size={14} />}
-                  onClick={() => logout()}
-                >
+
+                {isAdmin && (
+                  <>
+                    <Menu.Item
+                      leftSection={<IconLayoutDashboard size={14} />}
+                      onClick={() => navigate(ROUTES.DASHBOARD.BASE)}
+                    >
+                      Dashboard
+                    </Menu.Item>
+                    <Menu.Divider />
+                  </>
+                )}
+
+                <Menu.Item color="red" leftSection={<IconLogout size={14} />} onClick={logout}>
                   Logout
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
           )}
-
-          {/* only visible on mobile */}
-          <ActionIcon
-            variant="subtle"
-            hiddenFrom="md"
-            onClick={() => navigate("/auth/login")}
-          >
-            <IconUser />
-          </ActionIcon>
         </Group>
       </Group>
     </nav>
-  );
+  )
 }

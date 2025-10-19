@@ -1,5 +1,5 @@
 import { Grid } from "@mantine/core";
-import CardSkeleton from "../../../components/ProductCardSkeleton";
+import CardSkeleton from "@/components/ProductCardSkeleton";
 
 export default function ProductsSkeleton() {
   return (

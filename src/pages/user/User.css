@@ -1,0 +1,12 @@
+.mantine-Tabs-list::before {
+  border: 0 !important;
+}
+
+.mantine-Tabs-tab:hover {
+  background-color: #015d8f;
+  border-color: rgba(213, 213, 213, 0.5);
+}
+
+.mantine-Tabs-tab:where([data-active]) {
+  border-width: 0px 0px 3px 0px !important;
+}

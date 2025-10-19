@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -6,12 +7,17 @@
   --breakpoint-md: 48rem;
   --breakpoint-lg: 64rem;
   --breakpoint-xl: 80rem;
+
+  --container-page-width: 1200px;
+
+  --font-inter: "Inter", sans-serif;
 }
 
 @layer base {
   body,
   html {
     background: #f2f5f9 !important;
+    color: rgb(33, 33, 33) !important;
   }
 
   .mantine-Skeleton-root::after {
@@ -19,10 +25,20 @@
   }
 }
 
+@layer mantine, mantine-datatable;
+
 .hide-scrollbar {
   -ms-overflow-style: none; /* Internet Explorer 10+ */
   scrollbar-width: none; /* Firefox, Safari 18.2+, Chromium 121+ */
 }
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* Older Safari and Chromium */
+}
+
+.page-x-padding {
+  @apply px-4;
+}
+
+input[type="password"] {
+  caret-color: #111 !important;
 }

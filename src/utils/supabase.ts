@@ -1,5 +1,6 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js"
 
-const supabaseUrl = process.env.SUPABASE_URL || "https://supabase.com";
-const supabaseKey = process.env.SUBABASE_KEY ?? "";
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://supabase.com"
+const supabaseKey = import.meta.env.VITE_SUPABASE_KEY ?? ""
+console.log(supabaseUrl, supabaseKey)
+export const supabase = createClient(supabaseUrl, supabaseKey, { db: { schema: "public" } })
