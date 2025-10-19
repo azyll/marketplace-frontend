@@ -1,13 +1,13 @@
 import { ENDPOINT } from "@/constants/endpoints"
 import { ICart } from "@/types/cart.type"
+import { IResponse } from "@/types/common.type"
 import axios from "@/utils/axios"
 
 // Get all items in the cart
 export const getItems = async (userId: string | undefined) => {
-  const response = await axios.get<{ message: string; data: ICart[] }>(
-    `${ENDPOINT.CART.BASE}/${userId}`,
-  )
-  return response.data.data
+  const response = await axios.get<IResponse<ICart[]>>(`${ENDPOINT.CART.BASE}/${userId}`)
+
+  return response.data
 }
 
 // Add a product to the cart
