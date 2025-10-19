@@ -116,7 +116,7 @@ export const SalesList = () => {
     {
       accessor: "createdAt",
       title: "Created At",
-      render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM DD, YYYY") : "-"),
+      render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM D, YYYY h:mm A") : "-"),
     },
     {
       accessor: "View",

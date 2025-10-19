@@ -95,7 +95,7 @@ export const EditStockModal = ({
   }
 
   return (
-    <Modal opened={opened} onClose={handleClose} title="Edit Stock Quantity" centered>
+    <Modal opened={opened} onClose={handleClose} title="Update Stock Quantity" centered>
       <Group mb="md" gap="sm">
         <Button
           variant={action === "add" ? "filled" : "subtle"}

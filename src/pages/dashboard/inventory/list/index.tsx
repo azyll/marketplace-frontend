@@ -188,7 +188,7 @@ export const InventoryList = () => {
     {
       accessor: "updatedAt",
       title: "Updated At",
-      render: ({ updatedAt }) => (updatedAt ? dayjs(updatedAt).format("MMM DD, YYYY") : "-"),
+      render: ({ updatedAt }) => (updatedAt ? dayjs(updatedAt).format("MMM D, YYYY h:mm A") : "-"),
     },
   ]
 

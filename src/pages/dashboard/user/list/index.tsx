@@ -3,9 +3,20 @@ import { KEY } from "@/constants/key"
 import { deleteUser, getUsers } from "@/services/user.service"
 import { useFilters } from "@/hooks/useFilters"
 import { IGetUserFilter, IUser, IUserFilters } from "@/types/user.type"
-import { ActionIcon, Box, Button, Card, FileButton, Modal, Space, Text, Title } from "@mantine/core"
+import {
+  ActionIcon,
+  Box,
+  Button,
+  Card,
+  FileButton,
+  Modal,
+  Space,
+  Text,
+  Title,
+  Tooltip,
+} from "@mantine/core"
 import dayjs from "dayjs"
-import { IconEdit, IconFileTypeXls, IconMoodSad, IconPlus, IconTrashX } from "@tabler/icons-react"
+import { IconArchive, IconEdit, IconFileTypeXls, IconMoodSad, IconPlus } from "@tabler/icons-react"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import { useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
@@ -87,13 +98,13 @@ export const UserList = () => {
     {
       accessor: "updatedAt",
       title: "Updated At",
-      render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM DD, YYYY") : "-"),
+      render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM D, YYYY h:mm A") : "-"),
     },
     {
       accessor: "createdAt",
       title: "Created At",
 
-      render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM DD, YYYY") : "-"),
+      render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM D, YYYY h:mm A") : "-"),
     },
     {
       accessor: "actions",
@@ -106,9 +117,16 @@ export const UserList = () => {
             <IconEdit size={14} />
           </ActionIcon>
 
-          <ActionIcon size="lg" color="red" variant="light" onClick={() => handleOnDeleteUser(id)}>
-            <IconTrashX size={14} />
-          </ActionIcon>
+          <Tooltip label="Archive User">
+            <ActionIcon
+              size="lg"
+              color="red"
+              variant="light"
+              onClick={() => handleOnDeleteUser(id)}
+            >
+              <IconArchive size={14} />
+            </ActionIcon>
+          </Tooltip>
         </div>
       ),
     },

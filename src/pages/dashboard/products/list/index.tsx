@@ -101,12 +101,12 @@ export const ProductList = () => {
     {
       accessor: "updatedAt",
       title: "Updated At",
-      render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM DD, YYYY") : "-"),
+      render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM D, YYYY h:mm A") : "-"),
     },
     {
       accessor: "createdAt",
       title: "Created At",
-      render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM DD, YYYY") : "-"),
+      render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM D, YYYY h:mm A") : "-"),
     },
     {
       // Required yung 'accessor' kaya nilagyan ko nalang ng value kahit wala sa IProduct na type

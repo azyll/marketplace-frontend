@@ -39,6 +39,13 @@ export const DashboardLayout = () => {
     queryFn: () => getOrders({ status: "ongoing", limit: 1000 }),
   })
 
+  const { data: confirmedOrders } = useQuery({
+    queryKey: [KEY.DASHBOARD.ORDERS, "confirmed-count"],
+    queryFn: () => getOrders({ status: "confirmed", limit: 1000 }),
+  })
+
+  const totalOrdersCount = (ongoingOrders?.data.length || 0) + (confirmedOrders?.data.length || 0)
+
   const { data: criticalStock } = useQuery({
     queryKey: ["inventory-alert"],
     queryFn: () => getInventoryAlerts(),
@@ -65,39 +72,43 @@ export const DashboardLayout = () => {
     navigate(ROUTES.AUTH.BASE)
   }
 
+  const inventoryCount = (criticalStock?.noStock || 0) + (criticalStock?.lowStock || 0)
+
   const items = [
     {
       label: "Users",
       path: ROUTES.DASHBOARD.USER.BASE,
       icon: <IconUser size={14} />,
       indicator: false,
-      badges: [],
+      count: 0,
     },
     {
       label: "Products",
       path: ROUTES.DASHBOARD.PRODUCTS.BASE,
       icon: <IconBuildingStore size={14} />,
       indicator: false,
-      badges: [],
+      count: 0,
     },
     {
       label: "Orders",
       path: ROUTES.DASHBOARD.ORDERS.BASE,
       icon: <IconShoppingBagCheck size={14} />,
-      indicator: ongoingOrders?.data.length !== 0,
+      indicator: totalOrdersCount > 0,
+      count: totalOrdersCount,
     },
     {
       label: "Inventory",
       path: ROUTES.DASHBOARD.INVENTORY.BASE,
       icon: <IconBuildingWarehouse size={14} />,
       indicator: criticalStock?.hasAlerts,
+      count: inventoryCount,
     },
     {
       label: "Sales",
       path: ROUTES.DASHBOARD.SALES.BASE,
       icon: <IconReportMoney size={14} />,
       indicator: false,
-      badges: [],
+      count: 0,
     },
   ]
 
@@ -159,7 +170,8 @@ export const DashboardLayout = () => {
             leftSection={
               <Indicator
                 disabled={!item.indicator}
-                size={7}
+                label={item.count > 0 ? item.count : undefined}
+                size={16}
                 color="red"
                 styles={{
                   indicator: {

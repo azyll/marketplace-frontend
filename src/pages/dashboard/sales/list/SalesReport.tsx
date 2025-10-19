@@ -1,4 +1,4 @@
-import { Button, Menu } from "@mantine/core"
+import { Button, Group, Menu } from "@mantine/core"
 import { IconDownload, IconFileTypePdf, IconFileTypeXls } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { notifications } from "@mantine/notifications"
@@ -148,30 +148,23 @@ export const SalesReportDownloader = () => {
   }
 
   return (
-    <Menu shadow="md" width={200}>
-      <Menu.Target>
-        <Button leftSection={<IconDownload size={16} />} loading={isLoading} disabled={isError}>
-          Download Report
-        </Button>
-      </Menu.Target>
+    <Group gap="xs">
+      <Button
+        leftSection={<IconDownload size={16} />}
+        onClick={() => downloadReport("excel")}
+        disabled={!data}
+        variant="light"
+      >
+        Download Sales (Excel)
+      </Button>
 
-      <Menu.Dropdown>
-        <Menu.Label>Export Format</Menu.Label>
-        <Menu.Item
-          leftSection={<IconFileTypeXls size={16} />}
-          onClick={() => downloadReport("excel")}
-          disabled={!data}
-        >
-          Excel (.xlsx)
-        </Menu.Item>
-        <Menu.Item
-          leftSection={<IconFileTypePdf size={16} />}
-          onClick={() => downloadReport("pdf")}
-          disabled={!data}
-        >
-          PDF (.pdf)
-        </Menu.Item>
-      </Menu.Dropdown>
-    </Menu>
+      <Button
+        leftSection={<IconDownload size={16} />}
+        onClick={() => downloadReport("pdf")}
+        disabled={!data}
+      >
+        Download Report
+      </Button>
+    </Group>
   )
 }
