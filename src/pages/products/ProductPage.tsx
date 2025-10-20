@@ -23,7 +23,7 @@ import { getImage } from "@/services/media.service"
 import { useContext, useEffect, useMemo, useState } from "react"
 import { PRODUCT_SIZE } from "@/constants/product"
 import { AuthContext } from "@/contexts/AuthContext"
-import { IconCheck, IconX } from "@tabler/icons-react"
+import { IconCheck, IconInfoCircle, IconQuestionMark, IconX } from "@tabler/icons-react"
 import QuantityInput from "./components/QuantityInput"
 import { addItem } from "@/services/cart.service"
 import OrderConfirmationModal from "../cart/components/OrderConfirmationModal"
@@ -210,17 +210,16 @@ export default function ProductPage() {
   }
 
   // Simplified canOrder logic - let backend handle stock validation
-  const canOrder = useMemo(() => {
-    if (!user) return false
-    if (productData.hasNoVariants) return true
+  // const canOrder = useMemo(() => {
+  //   if (productData.hasNoVariants) return true
 
-    const attributesOk =
-      Object.keys(attributeGroups).length === 0 || Object.keys(selectedAttributes).length > 0
-    const hasSizeRequirement = productData.variants.some((v) => v.size !== "N/A")
-    const sizeOk = !hasSizeRequirement || size || productData.variants.some((v) => v.size === "N/A")
+  //   const attributesOk =
+  //     Object.keys(attributeGroups).length === 0 || Object.keys(selectedAttributes).length > 0
+  //   const hasSizeRequirement = productData.variants.some((v) => v.size !== "N/A")
+  //   const sizeOk = !hasSizeRequirement || size || productData.variants.some((v) => v.size === "N/A")
 
-    return attributesOk && sizeOk
-  }, [user, attributeGroups, selectedAttributes, size, productData])
+  //   return attributesOk && sizeOk
+  // }, [user, attributeGroups, selectedAttributes, size, productData])
 
   // Auto-limit quantity for low stock items
   useEffect(() => {
@@ -266,8 +265,9 @@ export default function ProductPage() {
 
   // Simplified handleOnAddToCart - remove redundant checks
   const handleOnAddToCart = async () => {
-    if (!user?.id) {
-      showNotification("Error", "Please log in to add items to cart.", "error")
+    if (!user) {
+      navigate("/auth")
+      showNotification("Login required", "Please log in to add items to cart.", "warning")
       return
     }
 
@@ -282,10 +282,11 @@ export default function ProductPage() {
       }
 
       const response = await addItem(user.id, selectedItem.id, quantity)
+
       queryClient.invalidateQueries({ queryKey: ["cart", user.id] })
+
       showNotification("Success", response.message, "success")
     } catch (error: any) {
-      // Let backend error messages come through directly
       showNotification(
         "Error",
         error.response?.data?.error || "Failed to add item to cart",
@@ -299,9 +300,10 @@ export default function ProductPage() {
   // Simplified buyNowMutation - remove redundant validations
   const buyNowMutation = useMutation({
     mutationFn: async () => {
-      if (!user?.id) throw new Error("Please log in to place an order")
+      if (!user) throw new Error("Please log in to place an order")
 
       const selectedItem = getSelectedItem()
+
       if (!selectedItem.id) throw new Error("Please select all required options")
 
       const orderItems = [{ productVariantId: selectedItem.id, quantity }]
@@ -374,10 +376,9 @@ export default function ProductPage() {
 
         {/* Product details */}
         <Grid.Col span={{ base: 12, sm: 6 }}>
-          <Group>
-            <Text size="xs" tt="uppercase">
-              {product?.data?.category} • {product?.data.department.acronym.toUpperCase()}
-            </Text>
+          <Group gap={6} mb="xs">
+            <Badge color="gray">{product?.data?.category}</Badge>
+            <Badge color="gray">{product?.data.department.acronym}</Badge>
           </Group>
           <Stack gap="md" w="100%" bg="#f2f5f9" px={{ base: 16, md: 0 }}>
             {/* Description */}
@@ -409,21 +410,33 @@ export default function ProductPage() {
             {!productData.hasNoVariants &&
               Object.entries(attributeGroups).map(([attributeName, attributeData]) => (
                 <Stack gap={2} key={attributeName}>
-                  <Title key={attributeName} order={4} tt="uppercase">
-                    {attributeData.name}:{" "}
-                    <span className="text-sm font-bold text-gray-500">
-                      {selectedAttributes[attributeName]}
-                    </span>
-                  </Title>
+                  <Group gap={4} align="center">
+                    <Text fw="bold" tt="uppercase">
+                      {" "}
+                      {attributeData.name}:{" "}
+                    </Text>
+
+                    <Text key={attributeName} tt="uppercase">
+                      <span className="text-sm font-bold text-gray-500">
+                        {selectedAttributes[attributeName]}
+                      </span>
+                    </Text>
+
+                    <Tooltip
+                      multiline={true}
+                      w={250}
+                      label="  Note: This option is determined by your registered profile. If you wish to
+                      order uniforms for a different sex, kindly visit the Proware."
+                    >
+                      <IconInfoCircle size={16} color="#228BE6" />
+                    </Tooltip>
+                  </Group>
 
                   <Space h="xs" />
 
                   {/* Show selected value for auto-selected sex */}
                   {shouldHideSexSelection(attributeName, attributeData) ? (
-                    <Text c="dimmed" size="xs" fs="italic">
-                      Note: This option is determined by your registered profile. If you wish to
-                      order uniforms for a different sex, kindly visit the Proware.
-                    </Text>
+                    <Text c="dimmed" size="xs" fs="italic"></Text>
                   ) : (
                     <>
                       {!selectedAttributes[attributeName] && (
@@ -452,9 +465,9 @@ export default function ProductPage() {
             {/* Size selection - only for products with variants */}
             {!productData.hasNoVariants && sortedSizeOptions.length > 0 && (
               <>
-                <Title order={4} tt="uppercase">
+                <Text fw="bold" tt="uppercase">
                   Size: <span className="text-sm font-bold text-gray-500">{size && size}</span>
-                </Title>
+                </Text>
                 <Group gap={5}>
                   {sortedSizeOptions.map((option) => (
                     <Button
@@ -470,11 +483,23 @@ export default function ProductPage() {
               </>
             )}
 
+            {/* Stock display */}
+            {currentVariant.stock !== null && currentVariant.stockCondition && (
+              <Text
+                fw={stockStatus.isOutOfStock || stockStatus.isLowStock ? 600 : 400}
+                c={stockStatus.isOutOfStock ? "red" : stockStatus.isLowStock ? "orange" : "dark"}
+              >
+                {currentVariant.stock} stock available
+                {stockStatus.isOutOfStock && " (Out of Stock)"}
+                {stockStatus.isLowStock && " (Low Stock)"}
+              </Text>
+            )}
+
             {/* Quantity Input */}
             <>
-              <Title order={4} tt="uppercase">
+              <Text fw="bold" tt="uppercase">
                 Quantity:
-              </Title>
+              </Text>
               <QuantityInput
                 quantity={quantity}
                 setQuantity={setQuantity}
@@ -486,21 +511,6 @@ export default function ProductPage() {
                 </Text>
               )}
             </>
-
-            {/* Stock display */}
-            {currentVariant.stock !== null && currentVariant.stockCondition && (
-              <Stack gap={2}>
-                <Title order={4}>Stock</Title>
-                <Text
-                  fw={stockStatus.isOutOfStock || stockStatus.isLowStock ? 600 : 400}
-                  c={stockStatus.isOutOfStock ? "red" : stockStatus.isLowStock ? "orange" : "dark"}
-                >
-                  {currentVariant.stock}pc(s) available
-                  {stockStatus.isOutOfStock && " (Out of Stock)"}
-                  {stockStatus.isLowStock && " (Low Stock)"}
-                </Text>
-              </Stack>
-            )}
 
             {/* Action Buttons */}
             <Group
@@ -516,7 +526,7 @@ export default function ProductPage() {
                   size="lg"
                   onClick={handleOnAddToCart}
                   loading={loading}
-                  disabled={!canOrder}
+                  // disabled={!canOrder}
                 >
                   Add to cart
                 </Button>
@@ -526,8 +536,21 @@ export default function ProductPage() {
                 <Button
                   radius="xl"
                   size="lg"
-                  disabled={!canOrder}
-                  onClick={openConfirmation}
+                  // disabled={!canOrder || stockStatus.isOutOfStock}
+                  disabled={stockStatus.isOutOfStock}
+                  onClick={
+                    !user
+                      ? () => {
+                          navigate("/auth")
+
+                          showNotification(
+                            "Login required",
+                            "Please log in to buy items.",
+                            "warning",
+                          )
+                        }
+                      : openConfirmation
+                  }
                   loading={buyNowMutation.isPending}
                 >
                   Buy Now
