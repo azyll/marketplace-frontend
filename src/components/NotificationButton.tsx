@@ -27,7 +27,6 @@ export default function NotificationButton() {
     queryKey: ["notifications", user?.id],
     queryFn: () => getUserNotifications(user!.id),
     enabled: !!user?.id,
-    refetchInterval: 1000,
   })
 
   const unreadCount = userNotifications?.meta?.unread ?? 0
