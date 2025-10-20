@@ -389,9 +389,23 @@ export default function Cart() {
                     </Grid>
                   ))
                 ) : (
-                  <Text size="sm" c="dimmed" ta="center" py="md">
-                    No items selected
-                  </Text>
+                  <Grid align="center">
+                    <Grid.Col span={3}>
+                      <Text size="sm" c="dimmed">
+                        -
+                      </Text>
+                    </Grid.Col>
+                    <Grid.Col span={5}>
+                      <Text size="sm" c="dimmed">
+                        -
+                      </Text>
+                    </Grid.Col>
+                    <Grid.Col span={4} ta="right">
+                      <Text size="sm" c="dimmed">
+                        -
+                      </Text>
+                    </Grid.Col>
+                  </Grid>
                 )}
 
                 <Divider />
