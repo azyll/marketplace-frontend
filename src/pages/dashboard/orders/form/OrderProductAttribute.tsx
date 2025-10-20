@@ -19,22 +19,20 @@ export const OrderProductAttribute = ({
 }: Props) => {
   const hasNoAttribute = name === "N/A"
   const hasNoSize =
-    hasNoAttribute &&
-    attributeValues[0].variants.length <= 1 &&
-    attributeValues[0].variants?.[0].size === "N/A"
-  const defaultAttributeVariant = hasNoSize ? attributeValues[0].variants?.[0] : undefined
+    attributeValues[0].variants.length <= 1 && attributeValues[0].variants?.[0].size === "N/A"
+  const defaultAttributeVariant = attributeValues[0].variants?.[0]
 
   useEffect(() => {
-    if (hasNoSize) {
+    if (hasNoSize && hasNoAttribute) {
       onVariantSelect(defaultAttributeVariant)
     }
-  }, [hasNoSize])
+  }, [hasNoSize, hasNoAttribute])
 
   const [selectedAttributeValue, setSelectedAttributeValue] = useState<string | undefined>(
     hasNoAttribute ? name : undefined,
   )
   const [selectedVariant, setSelectedVariant] = useState<string | undefined>(
-    defaultAttributeVariant?.id,
+    hasNoAttribute && hasNoSize ? defaultAttributeVariant?.id : undefined,
   )
 
   const variants = useMemo(() => {
@@ -52,6 +50,11 @@ export const OrderProductAttribute = ({
 
     setSelectedVariant(undefined)
     onVariantSelect(undefined)
+
+    if (hasNoSize) {
+      setSelectedVariant(defaultAttributeVariant?.id)
+      onVariantSelect(defaultAttributeVariant)
+    }
   }
 
   const handleOnVariantSelect = (variant: IProductVariant) => {
@@ -61,6 +64,7 @@ export const OrderProductAttribute = ({
 
   useEffect(() => {
     if (initialVariant) {
+      console.log("initialVariant", initialVariant)
       setSelectedAttributeValue(initialVariant.name)
       setSelectedVariant(initialVariant.id)
     }
@@ -81,10 +85,10 @@ export const OrderProductAttribute = ({
             </Text>
 
             <div className="grid grid-cols-2 gap-2">
-              {attributeValues?.map((attribute) => (
+              {attributeValues?.map((attribute, index) => (
                 <ProductVariantSelectItem
                   selected={selectedAttributeValue === attribute.name}
-                  key={attribute.name}
+                  key={index}
                   name={attribute.name}
                   onSelect={() => handleOnSelectAttributeValue(attribute.name)}
                 />
@@ -102,8 +106,9 @@ export const OrderProductAttribute = ({
           </Text>
 
           <div className="grid grid-cols-2 gap-2">
-            {variants.map((variant) => (
+            {variants.map((variant, index) => (
               <ProductVariantSelectItem
+                key={index}
                 selected={selectedVariant === variant.id}
                 name={variant.size}
                 onSelect={() => handleOnVariantSelect(variant)}

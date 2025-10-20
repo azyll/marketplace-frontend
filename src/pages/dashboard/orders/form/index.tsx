@@ -5,9 +5,9 @@ import {
   StudentCardSelectProps,
 } from "@/pages/dashboard/components/StudentCardSelect"
 import { OrderItemsFormTable } from "@/pages/dashboard/orders/form/OrderItemsFormTable"
-import { OrderItemsFormCart } from "@/pages/dashboard/orders/form/OrderItemsFormCart"
+import { OrderCartItem, OrderItemsFormCart } from "@/pages/dashboard/orders/form/OrderItemsFormCart"
 import { useForm, UseFormReturnType } from "@mantine/form"
-import { ICreateOrderInput, ICreateOrderStudentInput } from "@/types/order.type"
+import { ICreateOrderInput, ICreateOrderStudentInput, IOrderItems } from "@/types/order.type"
 import { zod4Resolver } from "mantine-form-zod-resolver"
 import { createOrderItemSchema, createOrderStudentCreateSchema } from "@/schema/order.schema"
 import { z } from "zod"
@@ -16,6 +16,7 @@ import { useDisclosure } from "@mantine/hooks"
 import { OrderStudentModal } from "@/pages/dashboard/orders/form/OrderStudentModal"
 import { OrderProductModal } from "@/pages/dashboard/orders/form/OrderProductModal"
 import { IProduct, IProductVariant } from "@/types/product.type"
+import { ICart } from "@/types/cart.type"
 
 export interface OrderFormContextProps {
   orderStudentCreateForm: UseFormReturnType<Partial<ICreateOrderStudentInput>>
@@ -103,6 +104,7 @@ export const OrderFormPage = () => {
   }
 
   const [selectedProduct, setSelectedProduct] = useState<IProduct>()
+  const [selectedOrderItem, setSelectedOrderItem] = useState<OrderCartItem>()
 
   const [productModalOpened, { open: openProductModal, close: closeProductModal }] = useDisclosure()
 
@@ -114,11 +116,31 @@ export const OrderFormPage = () => {
   const handleOnCloseProductModal = () => {
     closeProductModal()
     setSelectedProduct(undefined)
+    setSelectedOrderItem(undefined)
   }
 
+  const [cartItems, setCartItems] = useState<OrderCartItem[]>([])
+
   const handleOnAddToCart = (variant: IProductVariant, quantity: number) => {
-    console.log(variant, quantity)
+    if (!selectedProduct) return
+
+    setCartItems((prev) => [
+      ...prev,
+      {
+        product: selectedProduct,
+        variant,
+        quantity,
+      },
+    ])
+
     handleOnCloseProductModal()
+  }
+
+  const handleOnEditOrderItem = (item: OrderCartItem) => {
+    console.log(item)
+    setSelectedOrderItem(item)
+    setSelectedProduct(item.product)
+    openProductModal()
   }
 
   return (
@@ -143,6 +165,8 @@ export const OrderFormPage = () => {
           opened={productModalOpened}
           onClose={() => handleOnCloseProductModal()}
           onAddToCart={handleOnAddToCart}
+          initialQuantity={selectedOrderItem?.quantity}
+          initialVariant={selectedOrderItem?.variant}
         />
 
         <div>
@@ -158,14 +182,14 @@ export const OrderFormPage = () => {
             <OrderItemsFormTable onProductSelect={handleOnSelectProduct} />
           </div>
 
-          <div className="flex !basis-[480px] flex-col gap-4">
+          <div className="flex !basis-[600px] flex-col gap-4">
             <StudentCardSelect
               student={student}
               existing={isExistingStudent}
               onSelect={() => openOrderStudentModal()}
               onEdit={() => openOrderStudentModal()}
             />
-            <OrderItemsFormCart />
+            <OrderItemsFormCart items={cartItems} onEdit={handleOnEditOrderItem} />
           </div>
         </div>
       </div>

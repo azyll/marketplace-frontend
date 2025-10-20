@@ -35,8 +35,8 @@ export const OrderProductModal = ({
   }
 
   useEffect(() => {
-    setVariant(undefined)
-    setQuantity(1)
+    setVariant(initialVariant ?? undefined)
+    setQuantity(initialQuantity ?? 1)
   }, [product])
 
   const handleOnAddToCart = () => {
@@ -89,6 +89,7 @@ export const OrderProductModal = ({
                     name={attribute.name}
                     attributeValues={attribute.attributeValues}
                     onVariantSelect={handleOnVariantSelect}
+                    initialVariant={initialVariant}
                   />
                 ))}
               </div>
