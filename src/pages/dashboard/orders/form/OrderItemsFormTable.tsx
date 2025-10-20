@@ -1,17 +1,19 @@
-import { Component } from "react"
-import { ActionIcon, Box, Button, Card, Image, Pagination, Space } from "@mantine/core"
+import { ActionIcon, Box, Button, Card, Image, Pagination, Space, Title } from "@mantine/core"
 import { DataTable, DataTableColumn } from "mantine-datatable"
-import { IconEdit, IconMoodSad, IconPlus, IconTrashX } from "@tabler/icons-react"
+import { IconEdit, IconMoodSad, IconPlus } from "@tabler/icons-react"
 import { IProduct, IProductListFilters, IProductVariant } from "@/types/product.type"
 import { getImage } from "@/services/media.service"
-import dayjs from "dayjs"
 import { ProductFilter } from "@/pages/dashboard/components/ProductFilter"
 import { useFilters } from "@/hooks/useFilters"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
 import { getProductList } from "@/services/products.service"
 
-export const OrderItemsFormTable = () => {
+interface Props {
+  onProductSelect: (product: IProduct) => void
+}
+
+export const OrderItemsFormTable = ({ onProductSelect }: Props) => {
   const DEFAULT_PAGE = 1
   const DEFAULT_LIMIT = 10
 
@@ -26,7 +28,7 @@ export const OrderItemsFormTable = () => {
   })
 
   const handleOnAddToCard = (product: IProduct) => {
-    console.log("onAddToCard", product)
+    onProductSelect(product)
   }
 
   const displayPriceRange = (variants: IProductVariant[]) => {
@@ -71,8 +73,8 @@ export const OrderItemsFormTable = () => {
   ]
 
   return (
-    <Card>
-      <Card.Section px={24} pt={4}>
+    <Card radius="md">
+      <Card.Section px={24} pt={10}>
         <ProductFilter filters={filters} onFilter={setFilterValues} />
       </Card.Section>
 

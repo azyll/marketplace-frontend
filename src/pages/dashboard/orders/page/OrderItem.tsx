@@ -66,7 +66,7 @@ export const OrderItem = ({ item, size = "lg", bordered = true, padding = 18 }: 
           radius="md"
           w={sizes.w}
           h={sizes.h}
-          src={getImage(product?.image)}
+          src={getImage(product?.image ?? "")}
           className="!aspect-square"
         />
 

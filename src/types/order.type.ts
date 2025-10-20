@@ -45,19 +45,15 @@ export interface ICreateOrderItemInput {
   quantity: number
 }
 
-export interface ICreateOrderStudentCreateInput {
+export interface ICreateOrderStudentInput {
   studentNumber: string
   firstName: string
   lastName: string
   program: string
-  sex: "male" | "female"
-}
-
-export interface ICreateOrderStudentInput {
-  studentNumber: string
+  sex: IStudent["sex"]
 }
 
 export interface ICreateOrderInput {
-  student: ICreateOrderStudentCreateInput | ICreateOrderStudentInput
+  student: ICreateOrderStudentInput
   orderItems: ICreateOrderItemInput[]
 }
