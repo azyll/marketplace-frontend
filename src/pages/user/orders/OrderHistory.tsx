@@ -10,6 +10,7 @@ import {
   Divider,
   Flex,
   Skeleton,
+  NumberFormatter,
 } from "@mantine/core"
 import { IconMoodSad } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
@@ -124,14 +125,24 @@ export default function OrderHistory() {
                         <Text size="sm" c="dimmed">
                           Item(s)
                         </Text>
-                        <Text size="sm" fw={500} style={{ whiteSpace: "pre-line" }}>
-                          {order.orderItems
-                            ?.map(
-                              (item) =>
-                                `${item.productVariant.product.name} (${item.productVariant.size}) × ${item.quantity}`,
-                            )
-                            .join("\n")}
-                        </Text>
+                        <Stack gap={2}>
+                          {order.orderItems?.length ? (
+                            order.orderItems.map((item, i) => (
+                              <Text key={i} size="sm" fw={500}>
+                                {item.productVariant.product.name}
+                                <span className="text-gray-500">
+                                  {" "}
+                                  • {item.productVariant.size}, {item.productVariant.name} ×{" "}
+                                  {item.quantity}
+                                </span>
+                              </Text>
+                            ))
+                          ) : (
+                            <Text size="sm" c="dimmed">
+                              —
+                            </Text>
+                          )}
+                        </Stack>
                       </div>
                     </Group>
 
@@ -156,8 +167,16 @@ export default function OrderHistory() {
                       <Text size="sm" c="dimmed">
                         Total:
                       </Text>
+
                       <Text size="lg" fw={700}>
-                        ₱{order.total.toFixed(2)}
+                        <NumberFormatter
+                          prefix="₱ "
+                          value={order.total}
+                          thousandSeparator=","
+                          decimalSeparator="."
+                          decimalScale={2}
+                          fixedDecimalScale
+                        />
                       </Text>
                     </Group>
                     <Button

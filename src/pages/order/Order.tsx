@@ -229,7 +229,7 @@ export default function Order() {
                             {item.productVariant.product.name} × {item.quantity} pc(s)
                           </Text>
                           <NumberFormatter
-                            prefix="₱"
+                            prefix="₱ "
                             value={item.quantity * item.productVariant.price}
                             thousandSeparator=","
                             decimalSeparator="."
@@ -248,7 +248,7 @@ export default function Order() {
 
                       <Text size="xl" fw={700} c="blue">
                         <NumberFormatter
-                          prefix="₱"
+                          prefix="₱ "
                           value={order.total}
                           thousandSeparator=","
                           decimalSeparator="."
@@ -277,7 +277,7 @@ export default function Order() {
           <Grid.Col span={{ base: 12, sm: 6, md: 6 }}>
             {/* Sales Card */}
             {sale && (
-              <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Card shadow="sm" padding="lg" radius="md" withBorder mb="md">
                 <Stack gap="sm" justify="space-between">
                   <div>
                     <Group justify="space-between" align="center" mb="sm">
@@ -326,7 +326,7 @@ export default function Order() {
                     </Group>
                   </div>
 
-                  <Button
+                  {/* <Button
                     variant="light"
                     color="blue"
                     size="sm"
@@ -335,12 +335,10 @@ export default function Order() {
                     onClick={handleDownloadIssuance}
                   >
                     Download Issuance Slip
-                  </Button>
+                  </Button> */}
                 </Stack>
               </Card>
             )}
-
-            <Space h="md" />
 
             {/* Student Details */}
             <Card shadow="sm" padding="lg" radius="md" withBorder>
