@@ -99,8 +99,6 @@ export default function NotificationButton() {
     }
   }
 
-  if (!user) return null
-
   return (
     <Popover
       width={380}
@@ -131,7 +129,7 @@ export default function NotificationButton() {
 
       <Popover.Dropdown p={0}>
         <Stack gap={0}>
-          <Group justify="space-between" p="md" pb="sm">
+          <Group justify="space-between" px="md" py="xs">
             <Group gap="xs">
               <Text fw={600} size="sm">
                 Notifications
@@ -142,7 +140,8 @@ export default function NotificationButton() {
                 </Badge>
               )}
             </Group>
-            <Group gap="xs">
+
+            <Group gap="xs" align="center">
               <Button
                 size="xs"
                 variant="subtle"
@@ -164,7 +163,7 @@ export default function NotificationButton() {
               <Stack align="center" justify="center" py="xl" gap="xs">
                 <IconBell size={32} stroke={1.5} opacity={0.3} />
                 <Text size="sm" c="dimmed">
-                  No notifications yet
+                  {!user ? "Login to view notifications" : " No notifications yet"}
                 </Text>
               </Stack>
             ) : (
