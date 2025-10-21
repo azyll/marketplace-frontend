@@ -1,13 +1,18 @@
 import { ActionIcon, Box, Button, Card, Image, Pagination, Space, Title } from "@mantine/core"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import { IconEdit, IconMoodSad, IconPlus } from "@tabler/icons-react"
-import { IProduct, IProductListFilters, IProductVariant } from "@/types/product.type"
+import {
+  IInventoryFilter,
+  IProduct,
+  IProductListFilters,
+  IProductVariant,
+} from "@/types/product.type"
 import { getImage } from "@/services/media.service"
 import { ProductFilter } from "@/pages/dashboard/components/ProductFilter"
 import { useFilters } from "@/hooks/useFilters"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { getProductList } from "@/services/products.service"
+import { getInventoryProducts } from "@/services/products.service"
 
 interface Props {
   onProductSelect: (product: IProduct) => void
@@ -18,14 +23,14 @@ export const OrderItemsFormTable = ({ onProductSelect, disabled }: Props) => {
   const DEFAULT_PAGE = 1
   const DEFAULT_LIMIT = 10
 
-  const [filters, setFilters, setFilterValues] = useFilters<IProductListFilters>({
+  const [filters, setFilters, setFilterValues] = useFilters<IInventoryFilter>({
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
   })
 
   const { data: products, isLoading } = useQuery({
     queryKey: [KEY.PRODUCTS, filters],
-    queryFn: () => getProductList(filters),
+    queryFn: () => getInventoryProducts(filters),
   })
 
   const handleOnAddToCard = (product: IProduct) => {
