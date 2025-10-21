@@ -111,7 +111,7 @@ export const RoleList = () => {
             <IconEdit size={14} />
           </ActionIcon>
 
-          <Tooltip label="Archive User">
+          <Tooltip label="Archive Role">
             <ActionIcon
               size="lg"
               color="red"

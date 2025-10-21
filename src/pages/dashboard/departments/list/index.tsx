@@ -13,6 +13,7 @@ import {
   IconEdit,
   IconLibraryPlus,
   IconMoodSad,
+  IconRestore,
   IconShieldPlus,
 } from "@tabler/icons-react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -116,30 +117,42 @@ export const DepartmentList = () => {
     {
       accessor: "deletedAt",
       title: "Status",
-      render: ({ deletedAt }) =>
-        deletedAt ? dayjs(deletedAt).format("MMM D, YYYY h:mm A") : "Active",
+      render: ({ deletedAt }) => (deletedAt ? "Archived" : "Active"),
     },
     {
       accessor: "actions",
       title: "Actions",
       width: 120,
       textAlign: "center",
-      render: ({ id }) => (
+      render: ({ id, deletedAt }) => (
         <div className="flex justify-center gap-4">
           <ActionIcon size="lg" variant="light" onClick={() => handleOnEditDepartment(id)}>
             <IconEdit size={14} />
           </ActionIcon>
 
-          <Tooltip label="Archive Department">
-            <ActionIcon
-              size="lg"
-              color="red"
-              variant="light"
-              onClick={() => handleOnDeleteDepartment(id)}
-            >
-              <IconArchive size={14} />
-            </ActionIcon>
-          </Tooltip>
+          {deletedAt ? (
+            <Tooltip label="Archive Department (wala pa function)">
+              <ActionIcon
+                size="lg"
+                color="green"
+                variant="light"
+                onClick={() => handleOnDeleteDepartment(id)}
+              >
+                <IconRestore size={14} />
+              </ActionIcon>
+            </Tooltip>
+          ) : (
+            <Tooltip label="Restore Department ">
+              <ActionIcon
+                size="lg"
+                color="red"
+                variant="light"
+                onClick={() => handleOnDeleteDepartment(id)}
+              >
+                <IconArchive size={14} />
+              </ActionIcon>
+            </Tooltip>
+          )}
         </div>
       ),
     },

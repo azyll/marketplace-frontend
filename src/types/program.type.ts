@@ -17,3 +17,10 @@ export interface IProgramsFilter extends IPagination {
   search?: string
   department?: string
 }
+export interface ICreateProgramInput {
+  name: string
+  acronym: string
+  departmentId: string
+}
+
+export type IUpdateDepartmentInput = Partial<ICreateProgramInput>

@@ -1,7 +1,7 @@
 export const RolePage = () => {
   return (
     <>
-      <p>Test</p>
+      <p>To follow nalang</p>
     </>
   )
 }

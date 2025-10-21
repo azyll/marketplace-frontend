@@ -17,3 +17,9 @@ export interface IGetDepartmentFilters extends IPagination {
 export interface IDepartmentsFilter extends IPagination {
   search?: string
 }
+export interface ICreateDepartmentInput {
+  name: string
+  acronym: string
+}
+
+export type IUpdateDepartmentInput = Partial<ICreateDepartmentInput>
