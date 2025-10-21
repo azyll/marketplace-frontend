@@ -3,14 +3,16 @@ import { getImage } from "@/services/media.service"
 import { OrderCartItem } from "@/pages/dashboard/orders/form/OrderItemsFormCart"
 import { useMemo } from "react"
 import { IconEdit, IconTrashX } from "@tabler/icons-react"
+import classnames from "classnames"
 
 interface Props {
   item: OrderCartItem
   onEdit?: () => void
   onDelete?: () => void
+  disabled?: boolean
 }
 
-export const OrderItemsFormCardItem = ({ item, onDelete, onEdit }: Props) => {
+export const OrderItemsFormCardItem = ({ item, onDelete, onEdit, disabled }: Props) => {
   const attrs = useMemo(() => {
     const variantName = item.variant.name
     const size = item.variant.size
@@ -48,11 +50,23 @@ export const OrderItemsFormCardItem = ({ item, onDelete, onEdit }: Props) => {
         </div>
       </div>
 
-      <div className="absolute top-0 right-0 bottom-0 flex h-full translate-x-[45px] transform flex-col items-center justify-center gap-6 border-l border-gray-200 bg-white p-2 transition-all group-hover:translate-x-0">
-        <ActionIcon variant="transparent" onClick={() => onEdit?.()}>
+      <div
+        className={classnames(
+          "absolute top-0 right-0 bottom-0 flex h-full translate-x-[45px] transform flex-col items-center justify-center gap-6 border-l border-gray-200 bg-white p-2 transition-all",
+          {
+            "group-hover:translate-x-0": !disabled,
+          },
+        )}
+      >
+        <ActionIcon variant="transparent" onClick={() => onEdit?.()} disabled={disabled}>
           <IconEdit size={16} />
         </ActionIcon>
-        <ActionIcon variant="transparent" color="red" onClick={() => onDelete?.()}>
+        <ActionIcon
+          variant="transparent"
+          color="red"
+          onClick={() => onDelete?.()}
+          disabled={disabled}
+        >
           <IconTrashX size={16} />
         </ActionIcon>
       </div>

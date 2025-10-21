@@ -1,4 +1,4 @@
-import { Text, Title } from "@mantine/core"
+import { Button, Text, Title } from "@mantine/core"
 
 import {
   StudentCardSelect,
@@ -7,16 +7,33 @@ import {
 import { OrderItemsFormTable } from "@/pages/dashboard/orders/form/OrderItemsFormTable"
 import { OrderCartItem, OrderItemsFormCart } from "@/pages/dashboard/orders/form/OrderItemsFormCart"
 import { useForm, UseFormReturnType } from "@mantine/form"
-import { ICreateOrderInput, ICreateOrderStudentInput, IOrderItems } from "@/types/order.type"
+import {
+  ICreateOrderInput,
+  ICreateOrderItemInput,
+  ICreateOrderStudentInput,
+  IOrderItems,
+} from "@/types/order.type"
 import { zod4Resolver } from "mantine-form-zod-resolver"
-import { createOrderItemSchema, createOrderStudentCreateSchema } from "@/schema/order.schema"
+import {
+  createOrderItemSchema,
+  createOrderStudentCreateSchema,
+  createOrderStudentSchema,
+} from "@/schema/order.schema"
 import { z } from "zod"
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 import { useDisclosure } from "@mantine/hooks"
 import { OrderStudentModal } from "@/pages/dashboard/orders/form/OrderStudentModal"
 import { OrderProductModal } from "@/pages/dashboard/orders/form/OrderProductModal"
 import { IProduct, IProductVariant } from "@/types/product.type"
 import { ICart } from "@/types/cart.type"
+import { Link, useNavigate } from "react-router"
+import { ROUTES } from "@/constants/routes"
+import { notifications } from "@mantine/notifications"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { createProwareOrder } from "@/services/order.service"
+import { notifyResponseError } from "@/helper/errorNotification"
+import { AxiosError } from "axios"
+import { KEY } from "@/constants/key"
 
 export interface OrderFormContextProps {
   orderStudentCreateForm: UseFormReturnType<Partial<ICreateOrderStudentInput>>
@@ -54,7 +71,7 @@ export const OrderFormPage = () => {
       program: undefined,
       studentNumber: undefined,
     },
-    validate: zod4Resolver(createOrderStudentCreateSchema),
+    validate: zod4Resolver(createOrderStudentSchema),
   })
 
   const orderItemsForm = useForm<{ orderItems: ICreateOrderInput["orderItems"] }>({
@@ -67,6 +84,15 @@ export const OrderFormPage = () => {
       }),
     ),
   })
+
+  const [cartItems, setCartItems] = useState<OrderCartItem[]>([])
+
+  useEffect(() => {
+    orderItemsForm.setFieldValue(
+      "orderItems",
+      cartItems.map(({ variant, quantity }) => ({ productVariantId: variant.id, quantity })),
+    )
+  }, [cartItems])
 
   const [isExistingStudent, setIsExistingStudent] = useState<boolean>(true)
 
@@ -84,6 +110,7 @@ export const OrderFormPage = () => {
         lastName: student.lastName,
         program: student.program,
         id: student.studentNumber,
+        sex: student.sex,
       })
     } else {
       const student = orderStudentCreateForm.getValues()
@@ -93,14 +120,88 @@ export const OrderFormPage = () => {
         lastName: student.lastName,
         program: student.program,
         id: student.studentNumber,
+        sex: student.sex,
       })
     }
 
     closeOrderStudentModal()
   }
 
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+
+  const createMutation = useMutation({
+    mutationFn: ({
+      student,
+      orderItems,
+    }: {
+      student: ICreateOrderStudentInput
+      orderItems: ICreateOrderItemInput[]
+    }) => createProwareOrder(student, orderItems),
+    onSuccess: async ({ data }) => {
+      notifications.show({
+        color: "green",
+        title: "Create Order Success",
+        message: `Successfully created Order #${data.id}`,
+      })
+
+      await queryClient.invalidateQueries({ queryKey: [KEY.ORDERS] })
+      navigate(ROUTES.DASHBOARD.ORDERS.BASE)
+    },
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Order", "create")
+    },
+  })
+
   const handleOnSubmit = () => {
-    console.log(orderItemsForm.getValues())
+    let hasStudentError = !student?.firstName
+
+    if (isExistingStudent) {
+      const { hasErrors } = orderStudentForm.validate()
+      if (hasErrors) hasStudentError = true
+    } else {
+      const { hasErrors } = orderStudentCreateForm.validate()
+      if (hasErrors) hasStudentError = true
+    }
+
+    if (hasStudentError) {
+      notifications.show({
+        color: "red",
+        title: "Create Order Error",
+        message: "Please select a student before creating an order.",
+      })
+      return
+    }
+
+    const { hasErrors } = orderItemsForm.validate()
+
+    if (hasErrors) {
+      notifications.show({
+        color: "red",
+        title: "Create Order Error",
+        message: "Please select at least 1 product before creating an order.",
+      })
+      return
+    }
+
+    const order = orderItemsForm.getValues()
+
+    if (student && student?.id) {
+      const isStudentNumber10Digits = student.id.toString().length <= 10
+
+      createMutation.mutate({
+        student: (isExistingStudent
+          ? { studentNumber: isStudentNumber10Digits ? `0${student.id}` : student.id }
+          : {
+              firstName: student.firstName,
+              lastName: student.lastName,
+              studentNumber: student.id,
+              program: student.program,
+              sex: student.sex,
+            }) as ICreateOrderStudentInput,
+        orderItems: order.orderItems as ICreateOrderItemInput[],
+      })
+    }
   }
 
   const [selectedProduct, setSelectedProduct] = useState<IProduct>()
@@ -118,8 +219,6 @@ export const OrderFormPage = () => {
     setSelectedProduct(undefined)
     setSelectedOrderItem(undefined)
   }
-
-  const [cartItems, setCartItems] = useState<OrderCartItem[]>([])
 
   const handleOnAddToCart = (variant: IProductVariant, quantity: number) => {
     if (!selectedProduct) return
@@ -227,17 +326,36 @@ export const OrderFormPage = () => {
           initialVariant={selectedOrderItem?.variant}
         />
 
-        <div>
-          <Title order={3}>Create Order</Title>
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <Title order={3}>Create Order</Title>
 
-          <Text c="dimmed">
-            Create a new order by selecting products and providing student details.
-          </Text>
+            <Text c="dimmed">
+              Create a new order by selecting products and providing student details.
+            </Text>
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              variant="subtle"
+              component={Link}
+              to={ROUTES.DASHBOARD.ORDERS.BASE}
+              disabled={createMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button onClick={() => handleOnSubmit()} loading={createMutation.isPending}>
+              Create Order
+            </Button>
+          </div>
         </div>
 
         <div className="flex gap-4">
           <div className="min-w-0 basis-full">
-            <OrderItemsFormTable onProductSelect={handleOnSelectProduct} />
+            <OrderItemsFormTable
+              onProductSelect={handleOnSelectProduct}
+              disabled={createMutation.isPending}
+            />
           </div>
 
           <div className="flex !basis-[600px] flex-col gap-4">
@@ -246,11 +364,13 @@ export const OrderFormPage = () => {
               existing={isExistingStudent}
               onSelect={() => openOrderStudentModal()}
               onEdit={() => openOrderStudentModal()}
+              disabled={createMutation.isPending}
             />
             <OrderItemsFormCart
               items={cartItems}
               onEdit={handleOnEditOrderItem}
               onDelete={handleOnDeleteOrderItem}
+              disabled={createMutation.isPending}
             />
           </div>
         </div>

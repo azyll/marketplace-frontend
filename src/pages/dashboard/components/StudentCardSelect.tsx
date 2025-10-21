@@ -7,11 +7,13 @@ export interface StudentCardSelectProps {
     lastName?: string
     program?: string
     id?: string
+    sex?: string
   }
   isLoading?: boolean
   onSelect?: () => void
   existing?: boolean
   onEdit?: () => void
+  disabled?: boolean
 }
 
 export const StudentCardSelect = ({
@@ -19,6 +21,7 @@ export const StudentCardSelect = ({
   onSelect,
   existing,
   onEdit,
+  disabled,
 }: StudentCardSelectProps) => {
   if (!student) {
     return (
@@ -35,6 +38,7 @@ export const StudentCardSelect = ({
               radius="xl"
               size="lg"
               onClick={() => onEdit?.()}
+              disabled={disabled}
             >
               <IconPlus size={16} />
             </ActionIcon>

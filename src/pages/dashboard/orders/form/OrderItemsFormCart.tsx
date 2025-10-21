@@ -15,9 +15,10 @@ interface Props {
   items?: OrderCartItem[]
   onEdit?: (item: OrderCartItem) => void
   onDelete?: (item: OrderCartItem) => void
+  disabled?: boolean
 }
 
-export const OrderItemsFormCart = ({ items = [], onDelete, onEdit }: Props) => {
+export const OrderItemsFormCart = ({ items = [], onDelete, onEdit, disabled }: Props) => {
   return (
     <div className="sticky top-18">
       <Card radius="md" p={0}>
@@ -48,6 +49,7 @@ export const OrderItemsFormCart = ({ items = [], onDelete, onEdit }: Props) => {
                   key={index}
                   onEdit={() => onEdit?.(item)}
                   onDelete={() => onDelete?.(item)}
+                  disabled={disabled}
                 />
               ))}
             </div>

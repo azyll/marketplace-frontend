@@ -22,6 +22,7 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <MantineProvider theme={theme}>
         <Notifications position="top-right" />
+
         <AuthProvider>
           <RouterProvider router={router} />
         </AuthProvider>
