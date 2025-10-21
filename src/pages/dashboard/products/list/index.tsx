@@ -22,14 +22,14 @@ export const ProductList = () => {
   const DEFAULT_PAGE = 1
   const DEFAULT_LIMIT = 10
 
-  const [filters, setFilters, setFilterValues] = useFilters<IProductListFilters>({
+  const [filters, setFilters, setFilterValues] = useFilters<IInventoryFilter>({
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
   })
 
   const { data: products, isLoading } = useQuery({
     queryKey: [KEY.PRODUCTS, filters],
-    queryFn: () => getProductList(filters),
+    queryFn: () => getInventoryProducts(filters),
   })
 
   const navigate = useNavigate()

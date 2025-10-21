@@ -47,10 +47,10 @@ export interface ICreateOrderItemInput {
 
 export interface ICreateOrderStudentInput {
   studentNumber: string
-  firstName: string
-  lastName: string
-  program: string
-  sex: IStudent["sex"]
+  firstName?: string
+  lastName?: string
+  program?: string
+  sex?: IStudent["sex"]
 }
 
 export interface ICreateOrderInput {

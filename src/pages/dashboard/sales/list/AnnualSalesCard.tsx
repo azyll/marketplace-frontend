@@ -30,7 +30,7 @@ export const AnnualSalesCard = () => {
   }
 
   return (
-    <Card p="lg" className="h-[146px] w-full max-w-lg transition-all hover:shadow-md">
+    <Card p="lg" className="h-[47%] w-full transition-all hover:shadow-md">
       <Text fw={600} mb="md">
         Total Sales (This Year)
       </Text>

@@ -12,6 +12,7 @@ import {
   Tooltip,
   Card,
   Space,
+  SimpleGrid,
 } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { useNavigate, useParams } from "react-router"
@@ -468,18 +469,17 @@ export default function ProductPage() {
                 <Text fw="bold" tt="uppercase">
                   Size: <span className="text-sm font-bold text-gray-500">{size && size}</span>
                 </Text>
-                <Group gap={5}>
+                <SimpleGrid cols={{ base: 4, sm: 5 }} spacing={5} maw={350}>
                   {sortedSizeOptions.map((option) => (
                     <Button
                       key={option}
                       variant={size === option ? "filled" : "light"}
                       onClick={() => setSize(option)}
-                      miw={{ base: 60 }}
                     >
                       {PRODUCT_SIZE[option as keyof typeof PRODUCT_SIZE] || option}
                     </Button>
                   ))}
-                </Group>
+                </SimpleGrid>
               </>
             )}
 

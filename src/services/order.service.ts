@@ -1,5 +1,7 @@
 import { ENDPOINT } from "@/constants/endpoints"
 import {
+  ICreateOrderItemInput,
+  ICreateOrderStudentInput,
   IOrder,
   IOrderFilters,
   IOrderStatusType,
@@ -29,14 +31,8 @@ export const createOrder = async (
 }
 
 export const createProwareOrder = async (
-  student: {
-    studentNumber: string
-    firstName: string
-    lastName: string
-    program: string
-    sex: "male" | "female"
-  },
-  orderItems: { productVariantId: string; quantity: number }[],
+  student: ICreateOrderStudentInput,
+  orderItems: ICreateOrderItemInput[],
 ) => {
   const response = await axios.post<IResponse<IOrder>>(ENDPOINT.ORDER.PROWARE, {
     student,

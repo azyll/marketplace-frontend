@@ -1,9 +1,11 @@
-import { Card, Image, ScrollArea, Text } from "@mantine/core"
+import { Badge, Card, Image, ScrollArea, Text } from "@mantine/core"
 import { IconShoppingBag } from "@tabler/icons-react"
 import { IProduct, IProductVariant } from "@/types/product.type"
 import { getImage } from "@/services/media.service"
 import { OrderItemsFormCardItem } from "@/pages/dashboard/orders/form/OrderItemsFormCardItem"
 import classnames from "classnames"
+import { useOrderForm } from "@/pages/dashboard/orders/form/index"
+import { useMemo } from "react"
 
 export interface OrderCartItem {
   product: IProduct
@@ -15,9 +17,16 @@ interface Props {
   items?: OrderCartItem[]
   onEdit?: (item: OrderCartItem) => void
   onDelete?: (item: OrderCartItem) => void
+  disabled?: boolean
 }
 
-export const OrderItemsFormCart = ({ items = [], onDelete, onEdit }: Props) => {
+export const OrderItemsFormCart = ({ items = [], onDelete, onEdit, disabled }: Props) => {
+  const total = useMemo(() => {
+    return items.reduce((acc, { variant: { price }, quantity }) => {
+      return acc + price * quantity
+    }, 0)
+  }, [items])
+
   return (
     <div className="sticky top-18">
       <Card radius="md" p={0}>
@@ -27,14 +36,27 @@ export const OrderItemsFormCart = ({ items = [], onDelete, onEdit }: Props) => {
           })}
         >
           <div className="flex items-center justify-between gap-2">
-            <div className="aspect-square rounded-full bg-[#f2f5f9]/75 p-2">
-              <IconShoppingBag size={20} />
+            <div className="flex items-center gap-2">
+              <div className="aspect-square rounded-full bg-[#f2f5f9]/75 p-2">
+                <IconShoppingBag size={20} />
+              </div>
+
+              {items?.length > 0 && (
+                <Text c="dimmed" fz={12}>
+                  {items?.length} ITEMS
+                </Text>
+              )}
             </div>
 
             {items?.length > 0 && (
-              <Text c={"dimmed"} fz={14} mr={4}>
-                {items?.length} Items
-              </Text>
+              <div className="flex flex-col items-end justify-end">
+                <Text className="!leading-none" c={"dimmed"} fz={10} fw={600}>
+                  TOTAL
+                </Text>
+                <Text fz={18} fw={600}>
+                  ₱ {total.toLocaleString()}
+                </Text>
+              </div>
             )}
           </div>
         </div>
@@ -48,6 +70,7 @@ export const OrderItemsFormCart = ({ items = [], onDelete, onEdit }: Props) => {
                   key={index}
                   onEdit={() => onEdit?.(item)}
                   onDelete={() => onDelete?.(item)}
+                  disabled={disabled}
                 />
               ))}
             </div>

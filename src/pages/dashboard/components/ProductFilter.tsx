@@ -1,4 +1,4 @@
-import { IProductListFilters } from "@/types/product.type"
+import { IInventoryFilter, IProductListFilters } from "@/types/product.type"
 import { CloseButton, ComboboxItem, Group, Input, OptionsFilter, Select } from "@mantine/core"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
@@ -9,12 +9,12 @@ import { IconSearch } from "@tabler/icons-react"
 import { getProductDepartments } from "@/services/product-department.service"
 
 interface Props {
-  filters: IProductListFilters
-  onFilter: (obj: Partial<IProductListFilters>) => void
+  filters: IInventoryFilter
+  onFilter: (obj: Partial<IInventoryFilter>) => void
   disabled?: boolean
 }
 export const ProductFilter = ({ filters, onFilter, disabled }: Props) => {
-  const handleOnFilter = (key: keyof IProductListFilters, value: unknown) => {
+  const handleOnFilter = (key: keyof IInventoryFilter, value: unknown) => {
     onFilter({
       [key]: value,
       page: 1,

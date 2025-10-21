@@ -10,6 +10,7 @@ import {
   Card,
   CopyButton,
   Flex,
+  Grid,
   Group,
   NumberFormatter,
   Space,
@@ -140,53 +141,54 @@ export const SalesList = () => {
   ]
   return (
     <>
-      <Flex align="flex-start" justify="flex-start" wrap="wrap" gap="lg">
+      <Grid grow gutter="lg" align="stretch">
         {/* Monthly & Annual Sales Trend */}
-        <Stack style={{ flex: "1 1 calc(30% - 0.75rem)" }}>
+        <Grid.Col span={5}>
           <SalesTrendCard />
+          <Space h="lg" />
           <AnnualSalesCard />
-        </Stack>
+        </Grid.Col>
 
         {/* Line Chart (Sales per month)*/}
-        <Card style={{ flex: "1 1 calc(50% - 0.75rem)" }}>
-          <Card.Section px={24} pt={24}>
-            <h1 className="text-sm font-semibold">Sales Per Month</h1>
-          </Card.Section>
+        <Grid.Col span={7}>
+          <Card>
+            <Card.Section px={24} pt={24}>
+              <h1 className="text-sm font-semibold">Sales Per Month</h1>
+            </Card.Section>
 
-          <Space h={16} />
+            <AnnualChart
+              queryKey="annual-sales"
+              queryFn={getAnnualSales}
+              label="Sales"
+              dataKey="sales"
+            />
+          </Card>
+        </Grid.Col>
 
-          <AnnualChart
-            queryKey="annual-sales"
-            queryFn={getAnnualSales}
-            label="Sales"
-            dataKey="sales"
-          />
-        </Card>
-      </Flex>
-
-      <Space h={16} />
-
-      <Flex align="flex-start" justify="flex-start" wrap="wrap" gap="lg">
         {/* Bar Chart (Sales per department) */}
-        <Card style={{ flex: "1 1 calc(50% - 0.75rem)" }}>
-          <Card.Section px={24} pt={24} pb={12}>
-            <h1 className="text-sm font-semibold">Sales By Department</h1>
-          </Card.Section>
+        <Grid.Col span={7}>
+          <Card>
+            <Card.Section px={24} pt={24} pb={12}>
+              <h1 className="text-sm font-semibold">Sales By Department</h1>
+            </Card.Section>
 
-          <DepartmentSalesChart />
-        </Card>
+            <DepartmentSalesChart />
+          </Card>
+        </Grid.Col>
 
         {/* Activity Logs */}
-        <Card style={{ flex: "1 1 calc(40% - 0.75rem)" }}>
-          <Card.Section px={24} pt={24} pb={12}>
-            <h1 className="text-sm font-semibold">Sales Activity</h1>
-          </Card.Section>
+        <Grid.Col span={5}>
+          <Card>
+            <Card.Section px={24} pt={24} pb={12}>
+              <h1 className="text-sm font-semibold">Sales Activity</h1>
+            </Card.Section>
 
-          <LogsCard type="sales" />
-        </Card>
-      </Flex>
+            <LogsCard type="sales" />
+          </Card>
+        </Grid.Col>
+      </Grid>
 
-      <Space h={16} />
+      <Space h="lg" />
 
       {/* Table */}
       <Card>
