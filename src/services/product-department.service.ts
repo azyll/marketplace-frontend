@@ -1,9 +1,13 @@
 import { ENDPOINT } from "@/constants/endpoints"
 import axios from "@/utils/axios"
-import { IDepartment } from "@/types/department.type"
+import { IDepartment, IGetDepartmentFilters } from "@/types/department.type"
 
-export const getProductDepartments = async (): Promise<IDepartment[]> => {
-  const response = await axios.get(ENDPOINT.PRODUCT.DEPARTMENT.BASE)
+export const getProductDepartments = async (
+  filters: IGetDepartmentFilters,
+): Promise<IDepartment[]> => {
+  const response = await axios.get(ENDPOINT.PRODUCT.DEPARTMENT.BASE, {
+    params: filters,
+  })
 
-  return response?.data?.data?.departments ?? []
+  return response.data.departments.data ?? []
 }

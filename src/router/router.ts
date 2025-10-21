@@ -26,6 +26,12 @@ import { SalesPage as DashboardSalesPage } from "@/pages/dashboard/sales/page"
 
 import { dashboardLoader } from "@/router/loader/auth"
 import { OrderFormPage } from "@/pages/dashboard/orders/form"
+import { RoleList as DashboardRoleList } from "@/pages/dashboard/roles/list"
+import { DepartmentList as DashboardDepartmentList } from "@/pages/dashboard/departments/list"
+import { ProgramList as DashboardProgramList } from "@/pages/dashboard/programs/list"
+import { ProgramPage } from "@/pages/dashboard/programs/page"
+import { DepartmentPage } from "@/pages/dashboard/departments/page"
+import { RolePage } from "@/pages/dashboard/roles/page"
 
 export const router = createBrowserRouter([
   {
@@ -142,6 +148,33 @@ export const router = createBrowserRouter([
           {
             path: ROUTES.DASHBOARD.SALES.ID,
             Component: DashboardSalesPage,
+          },
+          // Roles
+          {
+            path: ROUTES.DASHBOARD.ROLES.BASE,
+            Component: DashboardRoleList,
+          },
+          {
+            path: ROUTES.DASHBOARD.ROLES.ID,
+            Component: RolePage,
+          },
+          // Department
+          {
+            path: ROUTES.DASHBOARD.DEPARTMENTS.BASE,
+            Component: DashboardDepartmentList,
+          },
+          {
+            path: ROUTES.DASHBOARD.DEPARTMENTS.ID,
+            Component: DepartmentPage,
+          },
+          // Program
+          {
+            path: ROUTES.DASHBOARD.PROGRAMS.BASE,
+            Component: DashboardProgramList,
+          },
+          {
+            path: ROUTES.DASHBOARD.PROGRAMS.ID,
+            Component: ProgramPage,
           },
         ],
       },

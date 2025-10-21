@@ -14,3 +14,8 @@ export const getRoles = async (filters: IGetRolesFilters) => {
     console.log(error)
   }
 }
+export const deleteRole = async (roleId: string) => {
+  const response = await axios.delete(ENDPOINT.ROLE.ID.replace(":roleId", roleId))
+
+  return response.data
+}

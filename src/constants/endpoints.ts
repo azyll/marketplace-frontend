@@ -51,10 +51,12 @@ export const ENDPOINT = {
 
   PROGRAM: {
     BASE: "/program",
+    ID: "/program/:programId",
   },
 
   DEPARTMENT: {
     BASE: "/department",
+    ID: "/department/:departmentId",
   },
 
   NOTIFICATION: {

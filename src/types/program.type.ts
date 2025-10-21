@@ -13,3 +13,7 @@ export interface IProgram {
 }
 
 export interface IGetProgramsFilters extends IPagination {}
+export interface IProgramsFilter extends IPagination {
+  search?: string
+  department?: string
+}

@@ -14,3 +14,9 @@ export const getPrograms = async (filters: IGetProgramsFilters) => {
     console.log(error)
   }
 }
+
+export const deleteProgram = async (programId: string) => {
+  const response = await axios.delete(ENDPOINT.PROGRAM.ID.replace(":programId", programId))
+
+  return response.data
+}
