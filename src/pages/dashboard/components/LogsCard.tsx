@@ -45,7 +45,7 @@ export const LogsCard = ({ type, limit = 5, height = 250 }: LogsProps) => {
       {isLoading ? (
         <Skeleton height={height} radius="md" />
       ) : logData.length === 0 ? (
-        <div className="flex h-[120px] flex-col items-center justify-center">
+        <div className="flex h-[300px] flex-col items-center justify-center">
           <IconMoodSad size={32} stroke={1.5} className="text-neutral-400" />
           <Text size="xs" c="dimmed" mt="xs">
             No logs found

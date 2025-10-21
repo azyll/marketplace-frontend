@@ -1,4 +1,16 @@
-import { ActionIcon, Box, Card, Image, Space, Badge, Text, Flex, Group } from "@mantine/core"
+import {
+  ActionIcon,
+  Box,
+  Card,
+  Image,
+  Space,
+  Badge,
+  Text,
+  Flex,
+  Group,
+  Grid,
+  Stack,
+} from "@mantine/core"
 import {
   IconEdit,
   IconMoodSad,
@@ -261,42 +273,46 @@ export const InventoryList = () => {
         <EditStockModal opened={opened} onClose={close} variantId={selectedVariantId} />
       )}
 
-      {/* Alerts */}
-      <Flex gap="lg">
-        <AlertsCard
-          title="No Stock"
-          data={inventoryAlertData?.data?.[0]}
-          isLoading={isAlertsLoading}
-          description={"Item needs to be restocked"}
-        />
+      <Grid grow gutter="lg" align="stretch">
+        <Grid.Col span={5}>
+          {/* Alerts */}
+          <Stack gap="lg" style={{ height: "100%" }}>
+            <AlertsCard
+              title="No Stock"
+              data={inventoryAlertData?.data?.[0]}
+              isLoading={isAlertsLoading}
+              description="Item needs to be restocked"
+            />
 
-        <AlertsCard
-          title="Low Stock"
-          data={inventoryAlertData?.data?.[1]}
-          isLoading={isAlertsLoading}
-          description={"Item has less than 20 stock"}
-        />
+            <AlertsCard
+              title="Low Stock"
+              data={inventoryAlertData?.data?.[1]}
+              isLoading={isAlertsLoading}
+              description="Item has less than 20 stock"
+            />
 
-        <AlertsCard
-          title="In Stock"
-          data={inventoryAlertData?.data?.[2]}
-          isLoading={isAlertsLoading}
-          description={"Items have enough stock"}
-        />
-      </Flex>
+            <AlertsCard
+              title="In Stock"
+              data={inventoryAlertData?.data?.[2]}
+              isLoading={isAlertsLoading}
+              description="Items have enough stock"
+            />
+          </Stack>
+        </Grid.Col>
 
-      <Space h={16} />
+        <Grid.Col span={7}>
+          {/* Activity Logs */}
+          <Card withBorder>
+            <Card.Section px={24} pt={24} pb={12}>
+              <h1 className="text-xl font-bold">Inventory Activity</h1>
+            </Card.Section>
 
-      {/* Activity Logs */}
-      <Card style={{ flex: "1 1 calc(50% - 0.75rem)" }} withBorder>
-        <Card.Section px={24} pt={24} pb={12}>
-          <h1 className="text-xl font-bold">Inventory Activity</h1>
-        </Card.Section>
+            <LogsCard type="inventory" />
+          </Card>
+        </Grid.Col>
+      </Grid>
 
-        <LogsCard type="inventory" />
-      </Card>
-
-      <Space h={16} />
+      <Space h="lg" />
 
       {/* Table */}
       <Card>

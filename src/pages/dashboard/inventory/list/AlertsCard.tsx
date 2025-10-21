@@ -1,5 +1,5 @@
-import { Card, Text, Skeleton, Stack, Badge, Group } from "@mantine/core"
-import { IconAlertCircle, IconPackage, IconCheck, IconAlertTriangle } from "@tabler/icons-react"
+import { Card, Text, Skeleton, Stack, Group } from "@mantine/core"
+import { IconAlertCircle, IconCheck, IconAlertTriangle } from "@tabler/icons-react"
 
 interface AlertData {
   value: number
@@ -51,7 +51,7 @@ export const AlertsCard = ({ title, data, isLoading, description }: AlertsCardPr
   const iconColor = data?.label ? getAlertColor(data.label) : "gray"
 
   return (
-    <Card p="lg" className="h-[146px] w-full max-w-lg transition-all hover:shadow-md">
+    <Card p="lg" className="w-fulltransition-all h-[146px] hover:shadow-md">
       <Stack gap="xs">
         <Group gap="xs" align="center">
           <div style={{ color: `var(--mantine-color-${iconColor}-6)` }}>
