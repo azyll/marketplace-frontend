@@ -4,11 +4,11 @@ import { useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import dayjs from "dayjs"
-import { IProduct, IProductListFilters } from "@/types/product.type"
+import { IInventoryFilter, IProduct, IProductListFilters } from "@/types/product.type"
 import { useFilters } from "@/hooks/useFilters"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { deleteProduct, getProductList } from "@/services/products.service"
+import { deleteProduct, getInventoryProducts } from "@/services/products.service"
 import { getImage } from "@/services/media.service"
 import FilterBar from "@/components/FilterBar"
 import { ProductFilter } from "@/pages/dashboard/components/ProductFilter"
@@ -22,14 +22,14 @@ export const ProductList = () => {
   const DEFAULT_PAGE = 1
   const DEFAULT_LIMIT = 10
 
-  const [filters, setFilters, setFilterValues] = useFilters<IProductListFilters>({
+  const [filters, setFilters, setFilterValues] = useFilters<IInventoryFilter>({
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
   })
 
   const { data: products, isLoading } = useQuery({
     queryKey: [KEY.PRODUCTS, filters],
-    queryFn: () => getProductList(filters),
+    queryFn: () => getInventoryProducts(filters),
   })
 
   const navigate = useNavigate()

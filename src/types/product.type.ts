@@ -91,4 +91,5 @@ export interface IInventoryFilter extends IPagination {
   stock_condition?: "low-stock" | "in-stock" | "out-of-stock"
   name?: string
   category?: string
+  search?: string
 }
