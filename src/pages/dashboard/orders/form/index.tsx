@@ -124,14 +124,62 @@ export const OrderFormPage = () => {
   const handleOnAddToCart = (variant: IProductVariant, quantity: number) => {
     if (!selectedProduct) return
 
-    setCartItems((prev) => [
-      ...prev,
-      {
-        product: selectedProduct,
-        variant,
-        quantity,
-      },
-    ])
+    let isAdd = true
+
+    setCartItems((prev) => {
+      return prev.map((item) => {
+        const exists = item.product.id === selectedProduct.id && variant.id === item.variant.id
+
+        if (exists) {
+          isAdd = false
+
+          return {
+            ...item,
+            quantity: item.quantity + quantity,
+          }
+        }
+
+        return item
+      })
+    })
+
+    if (isAdd) {
+      setCartItems((prev) => [
+        ...prev,
+        {
+          product: selectedProduct,
+          variant,
+          quantity,
+        },
+      ])
+    }
+
+    handleOnCloseProductModal()
+  }
+
+  const handleOnUpdateCart = (
+    oldVariant: IProductVariant,
+    variant: IProductVariant,
+    quantity: number,
+  ) => {
+    if (!selectedProduct) return
+
+    setCartItems((prev) => {
+      return prev.map((item) => {
+        const exists = item.product.id === selectedProduct.id && oldVariant.id === item.variant.id
+
+        // Update the product variant and quantity
+        if (exists) {
+          return {
+            ...item,
+            variant,
+            quantity,
+          }
+        }
+
+        return item
+      })
+    })
 
     handleOnCloseProductModal()
   }
@@ -165,6 +213,7 @@ export const OrderFormPage = () => {
           opened={productModalOpened}
           onClose={() => handleOnCloseProductModal()}
           onAddToCart={handleOnAddToCart}
+          onUpdateCart={handleOnUpdateCart}
           initialQuantity={selectedOrderItem?.quantity}
           initialVariant={selectedOrderItem?.variant}
         />
