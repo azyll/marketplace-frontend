@@ -41,11 +41,12 @@ export const OrderStudentExistingForm = ({ disabled }: Props) => {
       form.setValues({
         studentNumber: student.id.toString(),
         sex: student.sex as IStudent["sex"],
-        program: student.program.id,
+        program: student.programId,
         firstName: student.user.firstName,
         lastName: student.user.lastName,
       })
       setStudentSearch(`${student.user.fullName} (${student.id})`)
+
       return
     }
 

@@ -1,7 +1,7 @@
 import { Button, Image, Modal, ModalProps, ScrollArea, Text, Title } from "@mantine/core"
 import { IProduct, IProductVariant } from "@/types/product.type"
 import { getImage } from "@/services/media.service"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import QuantityInput from "@/pages/products/components/QuantityInput"
 import { groupProductVariantsByAttribute } from "@/helper/groupProductVariants"
 import { OrderProductAttribute } from "@/pages/dashboard/orders/form/OrderProductAttribute"
@@ -11,16 +11,20 @@ interface Props extends ModalProps {
   initialVariant?: IProductVariant
   initialQuantity?: number
   onAddToCart: (variant: IProductVariant, quantity: number) => void
+  onUpdateCart: (oldVariant: IProductVariant, variant: IProductVariant, quantity: number) => void
 }
 
 export const OrderProductModal = ({
   product,
   onClose,
   onAddToCart,
+  onUpdateCart,
   initialVariant,
   initialQuantity,
   ...modalProps
 }: Props) => {
+  const isUpdate = useMemo(() => !!initialVariant, [initialVariant])
+
   const handleOnClose = () => {
     onClose()
   }
@@ -41,6 +45,11 @@ export const OrderProductModal = ({
 
   const handleOnAddToCart = () => {
     if (!variant) return
+
+    if (isUpdate && !!initialVariant) {
+      onUpdateCart(initialVariant, variant, quantity)
+      return
+    }
 
     onAddToCart(variant, quantity)
   }
@@ -117,8 +126,9 @@ export const OrderProductModal = ({
                   <Button variant="transparent" onClick={() => handleOnClose()}>
                     Cancel
                   </Button>
+
                   <Button onClick={() => handleOnAddToCart()} disabled={!variant || quantity <= 0}>
-                    Add to Card
+                    {isUpdate ? "Update Cart" : "Add to Cart"}
                   </Button>
                 </div>
               </div>

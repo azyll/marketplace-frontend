@@ -11,9 +11,10 @@ import { getProductList } from "@/services/products.service"
 
 interface Props {
   onProductSelect: (product: IProduct) => void
+  disabled?: boolean
 }
 
-export const OrderItemsFormTable = ({ onProductSelect }: Props) => {
+export const OrderItemsFormTable = ({ onProductSelect, disabled }: Props) => {
   const DEFAULT_PAGE = 1
   const DEFAULT_LIMIT = 10
 
@@ -64,7 +65,12 @@ export const OrderItemsFormTable = ({ onProductSelect }: Props) => {
       textAlign: "center",
       render: (product) => (
         <div className="flex justify-center gap-4">
-          <ActionIcon size="lg" variant="light" onClick={() => handleOnAddToCard(product)}>
+          <ActionIcon
+            size="lg"
+            variant="light"
+            onClick={() => handleOnAddToCard(product)}
+            disabled={disabled}
+          >
             <IconPlus size={14} />
           </ActionIcon>
         </div>
@@ -75,7 +81,7 @@ export const OrderItemsFormTable = ({ onProductSelect }: Props) => {
   return (
     <Card radius="md">
       <Card.Section px={24} pt={10}>
-        <ProductFilter filters={filters} onFilter={setFilterValues} />
+        <ProductFilter filters={filters} onFilter={setFilterValues} disabled={disabled} />
       </Card.Section>
 
       <Space h={16} />
@@ -91,6 +97,7 @@ export const OrderItemsFormTable = ({ onProductSelect }: Props) => {
             value={filters.page ?? DEFAULT_PAGE}
             onChange={(p) => setFilters("page", p)}
             size="sm"
+            disabled={disabled}
           />
         </div>
         <div>
@@ -125,6 +132,7 @@ export const OrderItemsFormTable = ({ onProductSelect }: Props) => {
             value={filters.page ?? DEFAULT_PAGE}
             onChange={(p) => setFilters("page", p)}
             size="sm"
+            disabled={disabled}
           />
         </div>
       </Card.Section>
