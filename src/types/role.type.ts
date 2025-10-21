@@ -11,4 +11,7 @@ export interface IRole {
   deletedAt: Date
 }
 
+export interface IRoleFilters extends IPagination {
+  search?: string
+}
 export interface IGetRolesFilters extends IPagination {}

@@ -21,6 +21,18 @@ export const ROUTES = {
       BASE: "/dashboard/sales",
       ID: "/dashboard/sales/:salesId",
     },
+    ROLES: {
+      BASE: "/dashboard/roles",
+      ID: "/dashboard/roles/:roleId",
+    },
+    DEPARTMENTS: {
+      BASE: "/dashboard/departments",
+      ID: "/dashboard/departments/:departmentId",
+    },
+    PROGRAMS: {
+      BASE: "/dashboard/programs",
+      ID: "/dashboard/programs/:programId",
+    },
   },
   AUTH: {
     BASE: "/auth",

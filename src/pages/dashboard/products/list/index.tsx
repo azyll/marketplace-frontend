@@ -8,7 +8,7 @@ import { IInventoryFilter, IProduct, IProductListFilters } from "@/types/product
 import { useFilters } from "@/hooks/useFilters"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { deleteProduct, getInventoryProducts } from "@/services/products.service"
+import { deleteProduct, getInventoryProducts, getProductList } from "@/services/products.service"
 import { getImage } from "@/services/media.service"
 import FilterBar from "@/components/FilterBar"
 import { ProductFilter } from "@/pages/dashboard/components/ProductFilter"

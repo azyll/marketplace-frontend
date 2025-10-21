@@ -21,6 +21,9 @@ import {
   IconReportMoney,
   IconShoppingBagCheck,
   IconUser,
+  IconShield,
+  IconBook,
+  IconLibrary
 } from "@tabler/icons-react"
 import { ROUTES } from "@/constants/routes"
 import { useQuery } from "@tanstack/react-query"
@@ -79,6 +82,27 @@ export const DashboardLayout = () => {
       label: "Users",
       path: ROUTES.DASHBOARD.USER.BASE,
       icon: <IconUser size={14} />,
+      indicator: false,
+      count: 0,
+    },
+      {
+      label: "Roles",
+      path: ROUTES.DASHBOARD.ROLES.BASE,
+      icon: <IconShield size={14} />,
+      indicator: false,
+      count: 0,
+    },
+      {
+      label: "Department",
+      path: ROUTES.DASHBOARD.DEPARTMENTS.BASE,
+      icon: <IconLibrary size={14} />,
+      indicator: false,
+      count: 0,
+    },
+      {
+      label: "Program",
+      path: ROUTES.DASHBOARD.PROGRAMS.BASE,
+      icon: <IconBook size={14} />,
       indicator: false,
       count: 0,
     },
