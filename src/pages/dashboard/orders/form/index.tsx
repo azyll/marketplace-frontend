@@ -185,10 +185,19 @@ export const OrderFormPage = () => {
   }
 
   const handleOnEditOrderItem = (item: OrderCartItem) => {
-    console.log(item)
     setSelectedOrderItem(item)
     setSelectedProduct(item.product)
     openProductModal()
+  }
+
+  const handleOnDeleteOrderItem = (orderCartItem: OrderCartItem) => {
+    setCartItems((prev) => {
+      return prev.filter(
+        (item) =>
+          item.product.id !== orderCartItem.product.id &&
+          item.variant.id !== orderCartItem.variant.id,
+      )
+    })
   }
 
   return (
@@ -238,7 +247,11 @@ export const OrderFormPage = () => {
               onSelect={() => openOrderStudentModal()}
               onEdit={() => openOrderStudentModal()}
             />
-            <OrderItemsFormCart items={cartItems} onEdit={handleOnEditOrderItem} />
+            <OrderItemsFormCart
+              items={cartItems}
+              onEdit={handleOnEditOrderItem}
+              onDelete={handleOnDeleteOrderItem}
+            />
           </div>
         </div>
       </div>
