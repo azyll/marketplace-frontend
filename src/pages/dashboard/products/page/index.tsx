@@ -179,18 +179,18 @@ export const ProductPage = () => {
         const multipleProductVariants = multipleVariantForm.values
           .variants as IUpdateProductVariantInput[]
 
+        const payloadVariants = simpleProduct ? singleProductVariants : multipleProductVariants
+
         updateMutation.mutate({
           productId: product?.id as string,
           payload: {
             ...productDetails,
-            variants: simpleProduct
-              ? singleProductVariants
-              : (multipleProductVariants.map((variant, index) => {
-                  if (!variant.id) {
-                    return { ...variant, id: index }
-                  }
-                  return variant
-                }) as IUpdateProductVariantInput[]),
+            variants: payloadVariants.map((variant, index) => {
+              if (!variant.id) {
+                return { ...variant, id: index }
+              }
+              return variant
+            }) as IUpdateProductVariantInput[],
           },
         })
       }
