@@ -81,6 +81,7 @@ export const DashboardLayout = () => {
   const inventoryCount = (criticalStock?.noStock || 0) + (criticalStock?.lowStock || 0)
 
   const items = [
+    //Admin Only
     {
       label: "Users",
       path: ROUTES.DASHBOARD.USER.BASE,
@@ -113,6 +114,24 @@ export const DashboardLayout = () => {
       count: 0,
       roles: ["admin"],
     },
+    {
+      label: "Activity Logs",
+      path: ROUTES.DASHBOARD.ACTIVITY_LOG.BASE,
+      icon: <IconActivity size={14} />,
+      indicator: false,
+      count: 0,
+      roles: ["admin"],
+    },
+    {
+      label: "Announcement Carousel",
+      path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
+      icon: <IconCarouselHorizontal size={14} />,
+      indicator: false,
+      count: 0,
+      roles: ["admin"],
+    },
+
+    //Employee & Admin
     {
       label: "Products",
       path: ROUTES.DASHBOARD.PRODUCTS.BASE,
@@ -151,20 +170,7 @@ export const DashboardLayout = () => {
       icon: <IconTruckReturn size={14} />,
       indicator: false,
       count: 0,
-    },
-    {
-      label: "Activity Logs",
-      path: ROUTES.DASHBOARD.ACTIVITY_LOG.BASE,
-      icon: <IconActivity size={14} />,
-      indicator: false,
-      count: 0,
-    },
-    {
-      label: "Announcement Carousel",
-      path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
-      icon: <IconCarouselHorizontal size={14} />,
-      indicator: false,
-      count: 0,
+      roles: ["admin", "employee"],
     },
   ]
   console.log(user)

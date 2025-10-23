@@ -104,6 +104,7 @@ export const router = createBrowserRouter([
             loader: () => redirect(ROUTES.DASHBOARD.USER.BASE),
           },
 
+          //Admin Only
           {
             Component: createProtectedRoute(["admin"]),
             children: [
@@ -146,9 +147,22 @@ export const router = createBrowserRouter([
                 path: ROUTES.DASHBOARD.PROGRAMS.ID,
                 Component: ProgramPage,
               },
+
+              // Announcement Carousel List
+              {
+                path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
+                Component: AnnouncementCarouselList,
+              },
+
+              // Activity Log
+              {
+                path: ROUTES.DASHBOARD.ACTIVITY_LOG.BASE,
+                Component: ActivityLogList,
+              },
             ],
           },
 
+          //Admin & Employee
           {
             Component: createProtectedRoute(["admin", "employee"]),
             children: [
@@ -196,18 +210,6 @@ export const router = createBrowserRouter([
               {
                 path: ROUTES.DASHBOARD.RETURN_ITEMS.BASE,
                 Component: ReturnItemList,
-              },
-
-              // Announcement Carousel List
-              {
-                path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
-                Component: AnnouncementCarouselList,
-              },
-
-              // Activity Log
-              {
-                path: ROUTES.DASHBOARD.ACTIVITY_LOG.BASE,
-                Component: ActivityLogList,
               },
             ],
           },
