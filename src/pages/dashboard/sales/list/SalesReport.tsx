@@ -58,33 +58,131 @@ const transformSalesData = (data: SalesResponse): SalesReportRow[] =>
     }))
   })
 
-const useSalesReport = () =>
+const useSalesReport = (fromDate?: string, toDate?: string) =>
   useQuery({
-    queryKey: ["sales-report"],
-    queryFn: getSalesReport,
+    queryKey: ["sales-report", fromDate, toDate],
+    queryFn: () => getSalesReport(fromDate, toDate),
     staleTime: 5 * 60 * 1000,
     retry: 2,
   })
 
-const createExcelFile = (rows: SalesReportRow[]) => {
-  const ws = XLSX.utils.json_to_sheet(rows)
-  XLSX.utils.sheet_add_aoa(ws, [HEADERS], { origin: "A1" })
-  ws["!cols"] = HEADERS.map(() => ({ wch: 15 }))
+const createExcelFile = (
+  rows: SalesReportRow[],
+  meta: any,
+  dateRange?: { from: string; to: string },
+) => {
   const wb = XLSX.utils.book_new()
+  const ws = XLSX.utils.aoa_to_sheet([])
+
+  // Add header information
+  XLSX.utils.sheet_add_aoa(ws, [["STI"]], { origin: "A1" })
+  XLSX.utils.sheet_add_aoa(ws, [["Summary of Sales Issuance"]], { origin: "A2" })
+
+  // Add date range if provided
+  const dateRangeText = dateRange
+    ? `${dateRange.from} to ${dateRange.to}`
+    : new Date().toLocaleDateString()
+  XLSX.utils.sheet_add_aoa(ws, [["For the month", dateRangeText]], { origin: "A3" })
+
+  // Add empty row
+  XLSX.utils.sheet_add_aoa(ws, [[]], { origin: "A4" })
+
+  // Add total sales in the top right
+  XLSX.utils.sheet_add_aoa(ws, [["SALES PER OR REGISTER", "", meta?.totalSales || 0]], {
+    origin: "F5",
+  })
+  XLSX.utils.sheet_add_aoa(ws, [["SALES"]], { origin: "F6" })
+
+  // Define merged cells
+  ws["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }, // A1:C1 - "STI"
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } }, // A2:E2 - "Summary of Sales Issuance"
+    { s: { r: 2, c: 1 }, e: { r: 2, c: 4 } }, // B3:E3 - Date range
+    { s: { r: 4, c: 5 }, e: { r: 4, c: 6 } }, // F5:G5 - "SALES PER OR REGISTER"
+    { s: { r: 5, c: 5 }, e: { r: 5, c: 7 } }, // F6:H6 - "SALES"
+  ]
+
+  // Add column headers starting at row 7
+  XLSX.utils.sheet_add_aoa(ws, [HEADERS], { origin: "A7" })
+
+  // Add data rows starting at row 8
+  const dataRows = rows.map((r) => [
+    r.issuanceCode,
+    r.orderDate,
+    r.studentNumber,
+    r.studentName,
+    r.product,
+    r.quantity,
+    r.srp,
+    r.total,
+    r.status,
+    r.invoiceNumber,
+    r.issuanceDate,
+  ])
+  XLSX.utils.sheet_add_aoa(ws, dataRows, { origin: "A8" })
+
+  // Apply number formatting to SRP (column G) and Total (column H) columns
+  const range = XLSX.utils.decode_range(ws["!ref"] || "A1")
+  for (let row = 7; row <= range.e.r; row++) {
+    // Start from row 8 (index 7)
+    const srpCell = XLSX.utils.encode_cell({ r: row, c: 6 }) // Column G (index 6)
+    const totalCell = XLSX.utils.encode_cell({ r: row, c: 7 }) // Column H (index 7)
+
+    if (ws[srpCell]) {
+      ws[srpCell].z = "#,##0.00"
+    }
+    if (ws[totalCell]) {
+      ws[totalCell].z = "#,##0.00"
+    }
+  }
+
+  // Apply number formatting to total sales cell (H5)
+  if (ws["H5"]) {
+    ws["H5"].z = "#,##0.00"
+  }
+
+  // Set column widths
+  ws["!cols"] = [
+    { wch: 18 }, // Issuance Code
+    { wch: 12 }, // Order Date
+    { wch: 15 }, // Student Number
+    { wch: 20 }, // Student Name
+    { wch: 25 }, // Product
+    { wch: 8 }, // Quantity
+    { wch: 10 }, // SRP
+    { wch: 12 }, // Total
+    { wch: 10 }, // Status
+    { wch: 15 }, // Invoice No
+    { wch: 12 }, // Issuance Date
+  ]
+
   XLSX.utils.book_append_sheet(wb, ws, "Sales Report")
   XLSX.writeFile(wb, `sales-report-${new Date().toISOString().split("T")[0]}.xlsx`)
 }
 
-const createPDFFile = (rows: SalesReportRow[], meta: any) => {
+const createPDFFile = (
+  rows: SalesReportRow[],
+  meta: any,
+  dateRange?: { from: string; to: string },
+) => {
   const doc = new jsPDF("landscape")
 
-  doc.setFont("helvetica", "normal")
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(18).text("STI Fairview", 14, 15)
+  doc.setFontSize(14).text("Summary of Sales Issuance", 14, 23)
 
-  doc.setFontSize(16).text("Sales Report", 14, 15)
-  doc.setFontSize(10).text(`Generated: ${new Date().toLocaleString()}`, 14, 22)
+  doc.setFont("helvetica", "normal")
+  const dateRangeText = dateRange
+    ? `${dateRange.from} to ${dateRange.to}`
+    : new Date().toLocaleDateString()
+  doc.setFontSize(10).text(`For the month: ${dateRangeText}`, 14, 30)
+
+  // Add total sales in top right
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(12).text(`Total Sales: PHP ${meta?.totalSales?.toFixed(2) ?? 0}`, 200, 15)
 
   autoTable(doc, {
-    startY: 28,
+    startY: 38,
     head: [HEADERS],
     body: rows.map((r) => [
       r.issuanceCode,
@@ -104,14 +202,21 @@ const createPDFFile = (rows: SalesReportRow[], meta: any) => {
   })
 
   const y = (doc as any).lastAutoTable.finalY + 10
-  doc.text(`Total Sales: PHP ${meta?.totalSales?.toFixed(2) ?? 0}`, 14, y)
-  doc.text(`Total Items: ${meta?.totalItems ?? 0}`, 14, y + 6)
+  doc.setFont("helvetica", "normal")
+  doc.setFontSize(10)
+  doc.text(`Total Items: ${meta?.totalItems ?? 0}`, 14, y)
 
   doc.save(`sales-report-${new Date().toISOString().split("T")[0]}.pdf`)
 }
 
-export const SalesReportDownloader = () => {
-  const { data, isLoading, isError, refetch } = useSalesReport()
+export const SalesReportDownloader = ({
+  fromDate,
+  toDate,
+}: {
+  fromDate?: string
+  toDate?: string
+}) => {
+  const { data, isLoading, isError, refetch } = useSalesReport(fromDate, toDate)
 
   const downloadReport = async (type: "excel" | "pdf") => {
     if (isError) {
@@ -131,7 +236,12 @@ export const SalesReportDownloader = () => {
 
     try {
       const rows = transformSalesData(data)
-      type === "excel" ? createExcelFile(rows) : createPDFFile(rows, data.meta)
+      const dateRange = fromDate && toDate ? { from: fromDate, to: toDate } : undefined
+
+      type === "excel"
+        ? createExcelFile(rows, data.meta, dateRange)
+        : createPDFFile(rows, data.meta, dateRange)
+
       notifications.show({
         title: "Success",
         message: `${type.toUpperCase()} file downloaded successfully`,
@@ -163,7 +273,7 @@ export const SalesReportDownloader = () => {
         onClick={() => downloadReport("pdf")}
         disabled={!data}
       >
-        Download Report
+        Download Report (PDF)
       </Button>
     </Group>
   )

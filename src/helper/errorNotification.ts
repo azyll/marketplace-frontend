@@ -11,9 +11,10 @@ function capitalizeFirstLetter(str: string) {
 export const notifyResponseError = (
   error: AxiosError<{ message: string; error: string | any[] }>,
   label: string,
-  type: "create" | "update",
+  type: "create" | "update" | "remove" | "delete",
 ) => {
-  const _type = type === "create" ? "Create" : "Update"
+  const TYPES = { create: "Create", update: "Update", remove: "Remove", delete: "Delete" }
+  const _type = TYPES[type]
   const _label = capitalizeFirstLetter(label)
 
   if (Array.isArray(error?.response?.data?.error)) {

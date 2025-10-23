@@ -29,6 +29,8 @@ import QuantityInput from "./components/QuantityInput"
 import { addItem } from "@/services/cart.service"
 import OrderConfirmationModal from "../cart/components/OrderConfirmationModal"
 import { useDisclosure } from "@mantine/hooks"
+import { notifyResponseError } from "@/helper/errorNotification"
+import { AxiosError } from "axios"
 
 const FALLBACK_IMAGE =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbrHWzlFK_PWuIk1Jglo7Avt97howljIWwAA&s"
@@ -315,8 +317,8 @@ export default function ProductPage() {
       showNotification("Success!", order.message)
       navigate(`/order/${order?.data.id}?orderType=buy-now`)
     },
-    onError: (error: any) => {
-      showNotification("Error", error.response?.data?.error)
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Order", "create")
     },
   })
 

@@ -27,6 +27,8 @@ import { useNavigate } from "react-router"
 import QuantityInput from "../products/components/QuantityInput"
 import OrderConfirmationModal from "./components/OrderConfirmationModal"
 import { ICart } from "@/types/cart.type"
+import { notifyResponseError } from "@/helper/errorNotification"
+import { AxiosError } from "axios"
 
 export default function Cart() {
   const { user } = useContext(AuthContext)
@@ -50,12 +52,8 @@ export default function Cart() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart", user?.id] })
     },
-    onError: (error: any) => {
-      notifications.show({
-        title: "Error",
-        message: error.response?.data?.message || error.message,
-        color: "red",
-      })
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Cart", "remove")
     },
   })
 
@@ -65,12 +63,8 @@ export default function Cart() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart", user?.id] })
     },
-    onError: (error: any) => {
-      notifications.show({
-        title: "Error",
-        message: error.response?.data?.message || error.message,
-        color: "red",
-      })
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Cart", "create")
     },
   })
 
@@ -80,12 +74,8 @@ export default function Cart() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart", user?.id] })
     },
-    onError: (error: any) => {
-      notifications.show({
-        title: "Error",
-        message: error.response?.data?.message || error.message,
-        color: "red",
-      })
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Cart", "remove")
     },
   })
 
@@ -120,12 +110,8 @@ export default function Cart() {
 
       navigate(`/order/${order.data.id}?orderType=cart`)
     },
-    onError: (error: any) => {
-      notifications.show({
-        title: error.response.data.message,
-        message: error.response?.data?.error || error.message,
-        color: "red",
-      })
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Order", "create")
     },
   })
 

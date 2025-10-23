@@ -28,6 +28,7 @@ import { getProductAttributes } from "@/services/product-attribute.service"
 import { getImage } from "@/services/media.service"
 import { notifications } from "@mantine/notifications"
 import { AxiosError } from "axios"
+import { notifyResponseError } from "@/helper/errorNotification"
 
 export const ProductPage = () => {
   const { productId } = useParams<{ productId: string }>()
@@ -62,40 +63,6 @@ export const ProductPage = () => {
   const singleVariantFormRef = useRef<SingleVariantFormRef>(null)
   const multipleVariantFormRef = useRef<MultipleVariantFormRef>(null)
 
-  const notifyResponseError = (
-    error: AxiosError<{ message: string; error: string | any[] }>,
-    type: "create" | "update",
-  ) => {
-    const label = type === "create" ? "Create" : "Update"
-
-    if (Array.isArray(error?.response?.data?.error)) {
-      notifications.show({
-        title: `${label} Failed`,
-        message:
-          error?.response?.data?.error?.[0]?.message ??
-          error?.response?.data?.error ??
-          `Can't ${label} Product`,
-        color: "red",
-      })
-      return
-    }
-
-    if (typeof error?.response?.data?.error === "string") {
-      notifications.show({
-        title: `${label} Failed`,
-        message: error?.response?.data?.error ?? `Can't ${label} Product`,
-        color: "red",
-      })
-      return
-    }
-
-    notifications.show({
-      title: `${label} Failed`,
-      message: `Can't ${label} Product`,
-      color: "red",
-    })
-  }
-
   const createMutation = useMutation({
     mutationFn: (payload: ICreateProductInput) => createProduct(payload),
     onSuccess: () => {
@@ -108,7 +75,7 @@ export const ProductPage = () => {
       navigate(ROUTES.DASHBOARD.PRODUCTS.BASE)
     },
     onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
-      notifyResponseError(error, "create")
+      notifyResponseError(error, "Product", "create")
     },
   })
 
@@ -126,7 +93,7 @@ export const ProductPage = () => {
       navigate(ROUTES.DASHBOARD.PRODUCTS.BASE)
     },
     onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
-      notifyResponseError(error, "update")
+      notifyResponseError(error, "Product", "update")
     },
   })
 

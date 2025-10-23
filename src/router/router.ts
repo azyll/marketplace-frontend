@@ -24,7 +24,7 @@ import { InventoryList as DashboardInventoryList } from "@/pages/dashboard/inven
 import { SalesList as DashboardSalesList } from "@/pages/dashboard/sales/list"
 import { SalesPage as DashboardSalesPage } from "@/pages/dashboard/sales/page"
 
-import { dashboardLoader } from "@/router/loader/auth"
+import { dashboardLoader, roleLoader } from "@/router/loader/auth"
 import { OrderFormPage } from "@/pages/dashboard/orders/form"
 import { RoleList as DashboardRoleList } from "@/pages/dashboard/roles/list"
 import { DepartmentList as DashboardDepartmentList } from "@/pages/dashboard/departments/list"
@@ -35,6 +35,7 @@ import { RolePage } from "@/pages/dashboard/roles/page"
 import { ReturnItemList } from "@/pages/dashboard/return-item/list"
 import { ActivityLogList } from "@/pages/dashboard/activity-logs/list"
 import { AnnouncementCarouselList } from "@/pages/dashboard/announcement-carousel/list"
+import { createProtectedRoute } from "./components/ProtectedRoute"
 
 export const router = createBrowserRouter([
   {
@@ -103,96 +104,114 @@ export const router = createBrowserRouter([
             loader: () => redirect(ROUTES.DASHBOARD.USER.BASE),
           },
 
-          // Users
+          //Admin Only
           {
-            path: ROUTES.DASHBOARD.USER.BASE,
-            Component: UserList,
-          },
-          {
-            path: ROUTES.DASHBOARD.USER.ID,
-            Component: UserPage,
+            Component: createProtectedRoute(["admin"]),
+            children: [
+              // Users
+              {
+                path: ROUTES.DASHBOARD.USER.BASE,
+                Component: UserList,
+              },
+              {
+                path: ROUTES.DASHBOARD.USER.ID,
+                Component: UserPage,
+              },
+
+              // Roles
+              {
+                path: ROUTES.DASHBOARD.ROLES.BASE,
+                Component: DashboardRoleList,
+              },
+              {
+                path: ROUTES.DASHBOARD.ROLES.ID,
+                Component: RolePage,
+              },
+
+              // Department
+              {
+                path: ROUTES.DASHBOARD.DEPARTMENTS.BASE,
+                Component: DashboardDepartmentList,
+              },
+              {
+                path: ROUTES.DASHBOARD.DEPARTMENTS.ID,
+                Component: DepartmentPage,
+              },
+
+              // Program
+              {
+                path: ROUTES.DASHBOARD.PROGRAMS.BASE,
+                Component: DashboardProgramList,
+              },
+              {
+                path: ROUTES.DASHBOARD.PROGRAMS.ID,
+                Component: ProgramPage,
+              },
+
+              // Announcement Carousel List
+              {
+                path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
+                Component: AnnouncementCarouselList,
+              },
+
+              // Activity Log
+              {
+                path: ROUTES.DASHBOARD.ACTIVITY_LOG.BASE,
+                Component: ActivityLogList,
+              },
+            ],
           },
 
-          // Products
+          //Admin & Employee
           {
-            path: ROUTES.DASHBOARD.PRODUCTS.BASE,
-            Component: DashboardProductList,
-          },
-          {
-            path: ROUTES.DASHBOARD.PRODUCTS.ID,
-            Component: DashboardProductPage,
-          },
+            Component: createProtectedRoute(["admin", "employee"]),
+            children: [
+              // Products
+              {
+                path: ROUTES.DASHBOARD.PRODUCTS.BASE,
+                Component: DashboardProductList,
+              },
+              {
+                path: ROUTES.DASHBOARD.PRODUCTS.ID,
+                Component: DashboardProductPage,
+              },
 
-          // Orders
-          {
-            path: ROUTES.DASHBOARD.ORDERS.BASE,
-            Component: DashboardOrdersList,
-          },
-          {
-            path: ROUTES.DASHBOARD.ORDERS.CREATE,
-            Component: OrderFormPage,
-          },
-          {
-            path: ROUTES.DASHBOARD.ORDERS.ID,
-            Component: DashboardOrdersPage,
-          },
+              // Orders
+              {
+                path: ROUTES.DASHBOARD.ORDERS.BASE,
+                Component: DashboardOrdersList,
+              },
+              {
+                path: ROUTES.DASHBOARD.ORDERS.CREATE,
+                Component: OrderFormPage,
+              },
+              {
+                path: ROUTES.DASHBOARD.ORDERS.ID,
+                Component: DashboardOrdersPage,
+              },
 
-          // Inventory
-          {
-            path: ROUTES.DASHBOARD.INVENTORY.BASE,
-            Component: DashboardInventoryList,
-          },
+              // Inventory
+              {
+                path: ROUTES.DASHBOARD.INVENTORY.BASE,
+                Component: DashboardInventoryList,
+              },
 
-          // Sales
-          {
-            path: ROUTES.DASHBOARD.SALES.BASE,
-            Component: DashboardSalesList,
-          },
-          {
-            path: ROUTES.DASHBOARD.SALES.ID,
-            Component: DashboardSalesPage,
-          },
-          // Roles
-          {
-            path: ROUTES.DASHBOARD.ROLES.BASE,
-            Component: DashboardRoleList,
-          },
-          {
-            path: ROUTES.DASHBOARD.ROLES.ID,
-            Component: RolePage,
-          },
-          // Department
-          {
-            path: ROUTES.DASHBOARD.DEPARTMENTS.BASE,
-            Component: DashboardDepartmentList,
-          },
-          {
-            path: ROUTES.DASHBOARD.DEPARTMENTS.ID,
-            Component: DepartmentPage,
-          },
-          // Program
-          {
-            path: ROUTES.DASHBOARD.PROGRAMS.BASE,
-            Component: DashboardProgramList,
-          },
-          {
-            path: ROUTES.DASHBOARD.PROGRAMS.ID,
-            Component: ProgramPage,
-          },
-          // Return Item
-          {
-            path: ROUTES.DASHBOARD.RETURN_ITEMS.BASE,
-            Component: ReturnItemList,
-          },
-          // Activity Log
-          {
-            path: ROUTES.DASHBOARD.ACTIVITY_LOG.BASE,
-            Component: ActivityLogList,
-          },
-          // Announcement Carousel List
-          {
-            path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
-            Component: AnnouncementCarouselList,
+              // Sales
+              {
+                path: ROUTES.DASHBOARD.SALES.BASE,
+                Component: DashboardSalesList,
+              },
+              {
+                path: ROUTES.DASHBOARD.SALES.ID,
+                Component: DashboardSalesPage,
+              },
+
+              // Return Item
+              {
+                path: ROUTES.DASHBOARD.RETURN_ITEMS.BASE,
+                Component: ReturnItemList,
+              },
+            ],
           },
         ],
       },

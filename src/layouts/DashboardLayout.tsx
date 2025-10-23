@@ -81,12 +81,14 @@ export const DashboardLayout = () => {
   const inventoryCount = (criticalStock?.noStock || 0) + (criticalStock?.lowStock || 0)
 
   const items = [
+    //Admin Only
     {
       label: "Users",
       path: ROUTES.DASHBOARD.USER.BASE,
       icon: <IconUser size={14} />,
       indicator: false,
       count: 0,
+      roles: ["admin"],
     },
     {
       label: "Roles",
@@ -94,6 +96,7 @@ export const DashboardLayout = () => {
       icon: <IconShield size={14} />,
       indicator: false,
       count: 0,
+      roles: ["admin"],
     },
     {
       label: "Department",
@@ -101,6 +104,7 @@ export const DashboardLayout = () => {
       icon: <IconLibrary size={14} />,
       indicator: false,
       count: 0,
+      roles: ["admin"],
     },
     {
       label: "Program",
@@ -108,41 +112,7 @@ export const DashboardLayout = () => {
       icon: <IconBook size={14} />,
       indicator: false,
       count: 0,
-    },
-    {
-      label: "Products",
-      path: ROUTES.DASHBOARD.PRODUCTS.BASE,
-      icon: <IconBuildingStore size={14} />,
-      indicator: false,
-      count: 0,
-    },
-    {
-      label: "Orders",
-      path: ROUTES.DASHBOARD.ORDERS.BASE,
-      icon: <IconShoppingBagCheck size={14} />,
-      indicator: totalOrdersCount > 0,
-      count: totalOrdersCount,
-    },
-    {
-      label: "Inventory",
-      path: ROUTES.DASHBOARD.INVENTORY.BASE,
-      icon: <IconBuildingWarehouse size={14} />,
-      indicator: criticalStock?.hasAlerts,
-      count: inventoryCount,
-    },
-    {
-      label: "Sales",
-      path: ROUTES.DASHBOARD.SALES.BASE,
-      icon: <IconReportMoney size={14} />,
-      indicator: false,
-      count: 0,
-    },
-    {
-      label: "Return Items",
-      path: ROUTES.DASHBOARD.RETURN_ITEMS.BASE,
-      icon: <IconTruckReturn size={14} />,
-      indicator: false,
-      count: 0,
+      roles: ["admin"],
     },
     {
       label: "Activity Logs",
@@ -150,6 +120,7 @@ export const DashboardLayout = () => {
       icon: <IconActivity size={14} />,
       indicator: false,
       count: 0,
+      roles: ["admin"],
     },
     {
       label: "Announcement Carousel",
@@ -157,6 +128,49 @@ export const DashboardLayout = () => {
       icon: <IconCarouselHorizontal size={14} />,
       indicator: false,
       count: 0,
+      roles: ["admin"],
+    },
+
+    //Employee & Admin
+    {
+      label: "Products",
+      path: ROUTES.DASHBOARD.PRODUCTS.BASE,
+      icon: <IconBuildingStore size={14} />,
+      indicator: false,
+      count: 0,
+      roles: ["admin", "employee"],
+    },
+    {
+      label: "Orders",
+      path: ROUTES.DASHBOARD.ORDERS.BASE,
+      icon: <IconShoppingBagCheck size={14} />,
+      indicator: totalOrdersCount > 0,
+      count: totalOrdersCount,
+      roles: ["admin", "employee"],
+    },
+    {
+      label: "Inventory",
+      path: ROUTES.DASHBOARD.INVENTORY.BASE,
+      icon: <IconBuildingWarehouse size={14} />,
+      indicator: criticalStock?.hasAlerts,
+      count: inventoryCount,
+      roles: ["admin", "employee"],
+    },
+    {
+      label: "Sales",
+      path: ROUTES.DASHBOARD.SALES.BASE,
+      icon: <IconReportMoney size={14} />,
+      indicator: false,
+      count: 0,
+      roles: ["admin", "employee"],
+    },
+    {
+      label: "Return Items",
+      path: ROUTES.DASHBOARD.RETURN_ITEMS.BASE,
+      icon: <IconTruckReturn size={14} />,
+      indicator: false,
+      count: 0,
+      roles: ["admin", "employee"],
     },
   ]
   console.log(user)
@@ -178,6 +192,16 @@ export const DashboardLayout = () => {
         return false
       }),
     [],
+  )
+
+  const filteredItems = useMemo(
+    () =>
+      items.filter((item) => {
+        if (!item?.roles || !user) return false
+
+        return item.roles.includes(user.role.systemTag)
+      }),
+    [user, items],
   )
 
   if (!user) return null
@@ -233,7 +257,7 @@ export const DashboardLayout = () => {
       </AppShell.Header>
 
       <AppShell.Navbar p="md">
-        {itemsFiltered.map((item, index) => (
+        {filteredItems.map((item, index) => (
           <NavLink
             leftSection={
               <Indicator

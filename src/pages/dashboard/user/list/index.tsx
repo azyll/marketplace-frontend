@@ -23,9 +23,10 @@ import { ROUTES } from "@/constants/routes"
 import { useDisclosure } from "@mantine/hooks"
 import { useState } from "react"
 import { notifications } from "@mantine/notifications"
-import Axios from "axios"
+import Axios, { AxiosError } from "axios"
 import { bulkCreateStudent } from "@/services/student.service"
 import { UsersFilter } from "./UsersFilter"
+import { notifyResponseError } from "@/helper/errorNotification"
 
 export const UserList = () => {
   const DEFAULT_PAGE = 1
@@ -66,19 +67,8 @@ export const UserList = () => {
       await queryClient.invalidateQueries({ queryKey: [KEY.USERS], exact: false })
     },
 
-    onError: (error) => {
-      let errorMessage = "Upload failed. Please try again."
-
-      if (Axios.isAxiosError(error)) {
-        errorMessage =
-          error.response?.data?.error ?? error.response?.data?.error?.[0]?.message ?? errorMessage
-      }
-
-      notifications.show({
-        title: "Upload Failed",
-        message: errorMessage,
-        color: "red",
-      })
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Students", "create")
     },
   })
 

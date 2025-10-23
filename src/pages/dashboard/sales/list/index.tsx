@@ -2,7 +2,7 @@ import { KEY } from "@/constants/key"
 import { ROUTES } from "@/constants/routes"
 import { useFilters } from "@/hooks/useFilters"
 import { getAnnualSales, getSales } from "@/services/sales.service"
-import { ISales } from "@/types/sales.type"
+import { ISales, ISalesFilter } from "@/types/sales.type"
 import {
   ActionIcon,
   Badge,
@@ -30,13 +30,22 @@ import { SalesFilter } from "./SalesFilter"
 import dayjs from "dayjs"
 import { SalesReportDownloader } from "./SalesReport"
 
+const dateFormat = "YYYY-MM-DD"
+
+const DEFAULT_DATE_RANGE = {
+  from: dayjs().subtract(1, "month").format(dateFormat),
+  to: dayjs().format(dateFormat),
+}
+
 export const SalesList = () => {
   const DEFAULT_PAGE = 1
   const DEFAULT_LIMIT = 10
 
-  const [filters, setFilters, setFilterValues] = useFilters({
+  const [filters, setFilters, setFilterValues] = useFilters<Partial<ISalesFilter>>({
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
+    from: DEFAULT_DATE_RANGE.from,
+    to: DEFAULT_DATE_RANGE.to,
   })
 
   const { data: sales, isLoading } = useQuery({
@@ -195,7 +204,8 @@ export const SalesList = () => {
         <Card.Section px={24} pt={24}>
           <div className="flex h-[36px] items-center justify-between gap-4">
             <h1 className="text-xl font-bold">Manage Sales</h1>
-            <SalesReportDownloader />
+
+            <SalesReportDownloader fromDate={filters.from} toDate={filters.to} />
           </div>
 
           <SalesFilter filters={filters} onFilter={setFilterValues} />

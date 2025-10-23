@@ -17,6 +17,7 @@ export const KEY = {
   STUDENTS: {
     ALL: "all-students",
   },
+  ME: "me",
   RETURN_ITEMS: "return-items",
   ACTIVITY_LOGS: "activity-logs",
 }
