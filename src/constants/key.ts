@@ -17,4 +17,5 @@ export const KEY = {
   STUDENTS: {
     ALL: "all-students",
   },
+  ME: "me",
 }
