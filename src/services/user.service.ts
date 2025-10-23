@@ -39,6 +39,18 @@ export const deleteUser = async (userId: string) => {
   return response.data
 }
 
+export const updatePassword = async (
+  userId: string,
+  data: { oldPassword: string; newPassword: string },
+) => {
+  const response = await axios.post(
+    `${ENDPOINT.USER.ID.replace(":userId", userId)}/update-password`,
+    data,
+  )
+
+  return response.data
+}
+
 // export const postUsers = async () => {
 //   try {
 //     const response = await axios.post("/api/user")

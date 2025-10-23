@@ -1,18 +1,13 @@
 import { EditableWrapper } from "@/components/EditableWrapper"
 import { AuthContext } from "@/contexts/AuthContext"
-import {
-  Button,
-  Group,
-  Modal,
-  PasswordInput,
-  Space,
-  Stack,
-  Text,
-  TextInput,
-  Title,
-} from "@mantine/core"
-import { useForm } from "@mantine/form"
+import { Button, Group, Modal, PasswordInput, Space, Stack, Text, Title } from "@mantine/core"
+import { notifications } from "@mantine/notifications"
 import { useContext, useEffect, useState } from "react"
+import { useForm } from "@mantine/form"
+import { useMutation } from "@tanstack/react-query"
+import { updatePassword } from "@/services/user.service"
+import { AxiosError } from "axios"
+import { notifyResponseError } from "@/helper/errorNotification"
 
 export default function Profile() {
   const user = useContext(AuthContext)
@@ -36,19 +31,79 @@ export default function Profile() {
     form.reset()
   }, [user])
 
-  const handlePasswordChange = () => {
-    // Add your password change logic here
-    console.log("Password change submitted")
+  // 🔹 Mutation for updating password
+  const passwordMutation = useMutation({
+    mutationFn: (data: { oldPassword: string; newPassword: string }) => {
+      if (!user.user?.id) {
+        throw new Error("User ID is not available")
+      }
 
-    // Reset form and close modal
-    setCurrentPassword("")
-    setNewPassword("")
-    setConfirmPassword("")
-    setModalOpened(false)
+      return updatePassword(user.user.id, data)
+    },
+    onSuccess: () => {
+      notifications.show({
+        title: "Password Updated",
+        message: "Your password has been successfully changed.",
+        color: "green",
+      })
+
+      // Reset form and close modal
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+      setModalOpened(false)
+    },
+    onError: (error: AxiosError<{ message: string; error: string | any[] }> | Error) => {
+      if (error instanceof AxiosError) {
+        notifyResponseError(error, "User Password", "update")
+      }
+    },
+  })
+
+  const handlePasswordChange = () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      notifications.show({
+        title: "Missing Fields",
+        message: "Please fill in all password fields.",
+        color: "red",
+      })
+      return
+    }
+
+    if (newPassword !== confirmPassword) {
+      notifications.show({
+        title: "Password Mismatch",
+        message: "New password and confirmation do not match.",
+        color: "red",
+      })
+      return
+    }
+
+    if (newPassword === currentPassword) {
+      notifications.show({
+        title: "Invalid Password",
+        message: "New password cannot be the same as your current password.",
+        color: "red",
+      })
+      return
+    }
+
+    if (newPassword.length < 8) {
+      notifications.show({
+        title: "Password Too Short",
+        message: "New password must be at least 8 characters long.",
+        color: "red",
+      })
+      return
+    }
+
+    passwordMutation.mutate({
+      oldPassword: currentPassword,
+      newPassword: newPassword,
+    })
   }
 
   const handleModalClose = () => {
-    // Reset form when modal closes
     setCurrentPassword("")
     setNewPassword("")
     setConfirmPassword("")
@@ -92,6 +147,7 @@ export default function Profile() {
         >
           <Stack gap="md">
             <PasswordInput
+              disabled={passwordMutation.isPending}
               label="Current Password"
               placeholder="Enter your current password"
               radius="xl"
@@ -101,6 +157,7 @@ export default function Profile() {
             />
 
             <PasswordInput
+              disabled={passwordMutation.isPending}
               label="New Password"
               placeholder="Enter your new password"
               radius="xl"
@@ -110,6 +167,7 @@ export default function Profile() {
             />
 
             <PasswordInput
+              disabled={passwordMutation.isPending}
               label="Confirm New Password"
               placeholder="Confirm your new password"
               radius="xl"
@@ -122,7 +180,9 @@ export default function Profile() {
               <Button variant="subtle" onClick={handleModalClose}>
                 Cancel
               </Button>
-              <Button onClick={handlePasswordChange}>Change Password</Button>
+              <Button onClick={handlePasswordChange} loading={passwordMutation.isPending}>
+                Change Password
+              </Button>
             </Group>
           </Stack>
         </Modal>
@@ -141,7 +201,6 @@ export default function Profile() {
               <Text size="sm" fw={500} c="dimmed">
                 Student ID
               </Text>
-
               <Text>0{user.user.student.id || "Not provided"}</Text>
             </div>
 
@@ -149,7 +208,6 @@ export default function Profile() {
               <Text size="sm" fw={500} c="dimmed">
                 Program
               </Text>
-
               <Text>{user.user.student.program?.name || "Not assigned"}</Text>
             </div>
 
@@ -157,14 +215,11 @@ export default function Profile() {
               <Text size="sm" fw={500} c="dimmed">
                 Sex
               </Text>
-
               <Text tt="capitalize">{user.user.student.sex || "Not assigned"}</Text>
             </div>
           </div>
         </div>
-      ) : (
-        <></>
-      )}
+      ) : null}
     </div>
   )
 }
