@@ -5,6 +5,8 @@ import { notifications } from "@mantine/notifications"
 import { updateProductStock } from "@/services/products.service"
 import { KEY } from "@/constants/key"
 import { IconMinus, IconPlus } from "@tabler/icons-react"
+import { AxiosError } from "axios"
+import { notifyResponseError } from "@/helper/errorNotification"
 
 interface EditStockModalProps {
   opened: boolean
@@ -57,12 +59,8 @@ export const EditStockModal = ({
       // Close modal and reset form
       handleClose()
     },
-    onError: (error: any) => {
-      notifications.show({
-        title: "Error",
-        message: error?.response?.data?.message || "Failed to update stock",
-        color: "red",
-      })
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Stock", "update")
     },
   })
 

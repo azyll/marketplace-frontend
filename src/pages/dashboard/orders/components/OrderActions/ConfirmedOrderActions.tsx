@@ -9,7 +9,8 @@ import { useMemo, useState } from "react"
 import { ORDER_STATUS } from "@/constants/order"
 import { notifications } from "@mantine/notifications"
 import { KEY } from "@/constants/key"
-import Axios from "axios"
+import Axios, { AxiosError } from "axios"
+import { notifyResponseError } from "@/helper/errorNotification"
 
 interface Props {
   selectedOrders?: IOrder[]
@@ -62,21 +63,8 @@ export const ConfirmedOrderActions = ({ selectedOrders: orders = [], onSuccess }
         setActiveOrderIndex((prev) => prev + 1)
       }
     },
-    onError: (error: any) => {
-      if (Axios.isAxiosError(error)) {
-        notifications.show({
-          title: "Error",
-          message: error?.response?.data.message ?? "Something went wrong",
-          color: "red",
-        })
-        return
-      }
-
-      notifications.show({
-        title: "Error",
-        message: error?.message ?? "Something went wrong",
-        color: "red",
-      })
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Order Status", "update")
     },
   })
 

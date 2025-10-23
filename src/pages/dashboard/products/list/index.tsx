@@ -17,6 +17,7 @@ import { AxiosError } from "axios"
 import { useDisclosure } from "@mantine/hooks"
 import { useState } from "react"
 import { IUser } from "@/types/user.type"
+import { notifyResponseError } from "@/helper/errorNotification"
 
 export const ProductList = () => {
   const DEFAULT_PAGE = 1
@@ -69,12 +70,8 @@ export const ProductList = () => {
       close()
       setProductForDeletion(undefined)
     },
-    onError: (error: AxiosError<{ message: string; error: string }>) => {
-      notifications.show({
-        title: "Delete Failed",
-        message: error?.response?.data?.error ?? "Can't Delete Product",
-        color: "red",
-      })
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Product", "delete")
     },
   })
 
