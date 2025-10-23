@@ -34,7 +34,7 @@ export const InventoryFilter = ({ filters, onFilter, disabled }: Props) => {
 
   const { data: departmentOptions, isLoading: isDepartmentLoading } = useQuery({
     queryKey: [KEY.PRODUCT_DEPARTMENTS],
-    queryFn: () => getProductDepartments({ all: "true", page: 1, limit: 100 }),
+    queryFn: () => getProductDepartments({ all: false, page: 1, limit: 100 }),
     select: (departments) => departments?.map(({ name }) => ({ label: name, value: name })),
   })
 

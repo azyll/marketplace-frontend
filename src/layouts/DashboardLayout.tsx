@@ -11,7 +11,7 @@ import {
   Text,
 } from "@mantine/core"
 import { Link, Outlet, useLocation, useNavigate } from "react-router"
-import { useContext } from "react"
+import { useContext, useMemo } from "react"
 import { AuthContext } from "@/contexts/AuthContext"
 import {
   IconArrowLeft,
@@ -23,7 +23,10 @@ import {
   IconUser,
   IconShield,
   IconBook,
-  IconLibrary
+  IconLibrary,
+  IconTruckReturn,
+  IconActivity,
+  IconCarouselHorizontal,
 } from "@tabler/icons-react"
 import { ROUTES } from "@/constants/routes"
 import { useQuery } from "@tanstack/react-query"
@@ -85,21 +88,21 @@ export const DashboardLayout = () => {
       indicator: false,
       count: 0,
     },
-      {
+    {
       label: "Roles",
       path: ROUTES.DASHBOARD.ROLES.BASE,
       icon: <IconShield size={14} />,
       indicator: false,
       count: 0,
     },
-      {
+    {
       label: "Department",
       path: ROUTES.DASHBOARD.DEPARTMENTS.BASE,
       icon: <IconLibrary size={14} />,
       indicator: false,
       count: 0,
     },
-      {
+    {
       label: "Program",
       path: ROUTES.DASHBOARD.PROGRAMS.BASE,
       icon: <IconBook size={14} />,
@@ -134,7 +137,48 @@ export const DashboardLayout = () => {
       indicator: false,
       count: 0,
     },
+    {
+      label: "Return Items",
+      path: ROUTES.DASHBOARD.RETURN_ITEMS.BASE,
+      icon: <IconTruckReturn size={14} />,
+      indicator: false,
+      count: 0,
+    },
+    {
+      label: "Activity Logs",
+      path: ROUTES.DASHBOARD.ACTIVITY_LOG.BASE,
+      icon: <IconActivity size={14} />,
+      indicator: false,
+      count: 0,
+    },
+    {
+      label: "Announcement Carousel",
+      path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
+      icon: <IconCarouselHorizontal size={14} />,
+      indicator: false,
+      count: 0,
+    },
   ]
+  console.log(user)
+  const itemsFiltered = useMemo(
+    () =>
+      items.filter((item) => {
+        if (user?.role.systemTag === "admin") {
+          return true
+        }
+        if (
+          user?.role.systemTag === "employee" &&
+          (item.label === "Sales" ||
+            item.label === "Orders" ||
+            item.label === "Inventory" ||
+            item.label === "Return Items")
+        ) {
+          return true
+        }
+        return false
+      }),
+    [],
+  )
 
   if (!user) return null
 
@@ -189,7 +233,7 @@ export const DashboardLayout = () => {
       </AppShell.Header>
 
       <AppShell.Navbar p="md">
-        {items.map((item, index) => (
+        {itemsFiltered.map((item, index) => (
           <NavLink
             leftSection={
               <Indicator

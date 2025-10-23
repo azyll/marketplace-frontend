@@ -2,56 +2,49 @@ import { useState, useEffect } from "react"
 import { Modal, NumberInput, Button, Group, Space } from "@mantine/core"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { notifications } from "@mantine/notifications"
-import { updateProductStock } from "@/services/products.service"
 import { KEY } from "@/constants/key"
-import { IconMinus, IconPlus } from "@tabler/icons-react"
+import { updateReturnItemQuantity } from "@/services/return-item.service"
 
-interface EditStockModalProps {
+interface EditReturnItemQuantityProps {
   opened: boolean
   onClose: () => void
-  variantId: string | undefined
-  initialAction?: "add" | "minus"
+  returnItemId: string | undefined
   initialQuantity?: number
 }
 
-export const EditStockModal = ({
+export const EditReturnItemQuantity = ({
   opened,
   onClose,
-  variantId,
-  initialAction = "add",
+  returnItemId,
+
   initialQuantity = 0,
-}: EditStockModalProps) => {
+}: EditReturnItemQuantityProps) => {
   const queryClient = useQueryClient()
-  const [action, setAction] = useState<"add" | "minus">(initialAction)
   const [quantity, setQuantity] = useState<number>(initialQuantity)
 
   // Reset form when modal opens/closes
   useEffect(() => {
     if (opened) {
-      setAction(initialAction)
       setQuantity(initialQuantity)
     }
-  }, [opened, initialAction, initialQuantity])
+  }, [opened, initialQuantity])
 
   const mutation = useMutation({
     mutationFn: () => {
-      if (!variantId) {
+      if (!returnItemId) {
         throw new Error("Product variant ID is required")
       }
-      return updateProductStock({
-        productVariantId: variantId,
-        newStockQuantity: quantity,
-        action,
-      })
+      return updateReturnItemQuantity(returnItemId, quantity)
     },
     onSuccess: () => {
       notifications.show({
         title: "Success",
-        message: `Stock ${action === "add" ? "added" : "subtracted"} successfully`,
+        message: "Quantity update successfully",
         color: "green",
       })
 
       // Invalidate and refetch inventory data
+      queryClient.invalidateQueries({ queryKey: [KEY.RETURN_ITEMS] })
       queryClient.invalidateQueries({ queryKey: [KEY.PRODUCTS] })
 
       // Close modal and reset form
@@ -60,20 +53,19 @@ export const EditStockModal = ({
     onError: (error: any) => {
       notifications.show({
         title: "Error",
-        message: error?.response?.data?.error || "Failed to update stock",
+        message: error?.response?.data?.error || "Failed to update quantity",
         color: "red",
       })
     },
   })
 
   const handleClose = () => {
-    setAction("add")
     setQuantity(0)
     onClose()
   }
 
   const handleSubmit = () => {
-    if (!variantId) {
+    if (!returnItemId) {
       notifications.show({
         title: "Error",
         message: "No product variant selected",
@@ -95,37 +87,14 @@ export const EditStockModal = ({
   }
 
   return (
-    <Modal opened={opened} onClose={handleClose} title="Update Stock Quantity" centered>
-      <Group mb="md" gap="sm">
-        <Button
-          variant={action === "add" ? "filled" : "subtle"}
-          onClick={() => setAction("add")}
-          leftSection={<IconPlus size={16} />}
-        >
-          Add
-        </Button>
-
-        <Button
-          variant={action === "minus" ? "filled" : "subtle"}
-          onClick={() => setAction("minus")}
-          leftSection={<IconMinus size={16} />}
-        >
-          Subtract
-        </Button>
-      </Group>
-
+    <Modal opened={opened} onClose={handleClose} title="Update Return Item Quantity" centered>
       <NumberInput
         label="Quantity"
         placeholder="Enter quantity"
         value={quantity}
         onChange={(val) => setQuantity(Number(val) || 0)}
         min={1}
-        leftSection={action === "add" ? <IconPlus size={16} /> : <IconMinus size={16} />}
-        description={
-          action === "add"
-            ? "Amount to add to current stock"
-            : "Amount to subtract from current stock"
-        }
+        description={"Update return item quantity"}
       />
 
       <Group justify="flex-end" mt="md">
@@ -135,7 +104,7 @@ export const EditStockModal = ({
         <Button
           onClick={handleSubmit}
           loading={mutation.isPending}
-          disabled={!variantId || quantity <= 0}
+          disabled={!returnItemId || quantity <= 0}
         >
           Confirm
         </Button>

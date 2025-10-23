@@ -8,6 +8,7 @@ import { getLogs } from "@/services/notification.service"
 import { ILog } from "@/types/notification.type"
 import { replace, useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
+import { KEY } from "@/constants/key"
 
 dayjs.extend(relativeTime)
 
@@ -26,11 +27,11 @@ export const LogsCard = ({ type, limit = 5, height = 250 }: LogsProps) => {
   })
 
   const { data: logs, isLoading } = useQuery({
-    queryKey: ["logs", type, filters],
+    queryKey: [KEY.ACTIVITY_LOGS, type, filters],
     queryFn: () => getLogs(type),
   })
 
-  const logData = logs?.data?.data ?? []
+  const logData = logs?.data ?? []
 
   const navigate = useNavigate()
 

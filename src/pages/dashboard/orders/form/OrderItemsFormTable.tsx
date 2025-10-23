@@ -26,6 +26,7 @@ export const OrderItemsFormTable = ({ onProductSelect, disabled }: Props) => {
   const [filters, setFilters, setFilterValues] = useFilters<IInventoryFilter>({
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
+    all:false,
   })
 
   const { data: products, isLoading } = useQuery({

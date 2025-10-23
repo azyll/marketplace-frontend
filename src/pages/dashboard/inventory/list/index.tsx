@@ -10,6 +10,7 @@ import {
   Group,
   Grid,
   Stack,
+  Tooltip,
 } from "@mantine/core"
 import {
   IconEdit,
@@ -17,6 +18,9 @@ import {
   IconChevronRight,
   IconAlertTriangle,
   IconAlertCircle,
+  IconNewSection,
+  IconPlus,
+  IconTruckReturn,
 } from "@tabler/icons-react"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import dayjs from "dayjs"
@@ -38,6 +42,7 @@ import { EditStockModal } from "./EditStockModal"
 import { PRODUCT_SIZE } from "@/constants/product"
 import { AlertsCard } from "./AlertsCard"
 import { InventoryFilter } from "./InventoryFilters"
+import { MarkAsReturnItemModal } from "./MarkAsReturnItemModal"
 
 export const InventoryList = () => {
   const DEFAULT_PAGE = 1
@@ -46,13 +51,17 @@ export const InventoryList = () => {
   const [filters, setFilters, setFilterValues] = useFilters<IInventoryFilter>({
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
+    all: false,
   })
 
   const sizeOrder = Object.keys(PRODUCT_SIZE)
 
   const [expandedRecordIds, setExpandedRecordIds] = useState<string[]>([])
   const [opened, { open, close }] = useDisclosure(false)
-  const [selectedVariantId, setSelectedVariantId] = useState<string>()
+  const [selectedVariantId, setSelectedVariantId] = useState<{
+    id: string
+    type: "stock-update" | "mark-item-as-return"
+  }>()
 
   const { data: products, isLoading } = useQuery({
     queryKey: [KEY.PRODUCTS, filters],
@@ -117,9 +126,12 @@ export const InventoryList = () => {
     return map
   }, [inventoryValues])
 
-  const handleOnEditProduct = (productVariantId: string) => {
+  const handleOnEditProduct = (
+    productVariantId: string,
+    type: "stock-update" | "mark-item-as-return",
+  ) => {
     console.log("Opening modal for variant:", productVariantId)
-    setSelectedVariantId(productVariantId)
+    setSelectedVariantId({ id: productVariantId, type })
     open()
   }
 
@@ -260,17 +272,37 @@ export const InventoryList = () => {
       width: 100,
       textAlign: "center",
       render: (variant) => (
-        <ActionIcon size="lg" variant="light" onClick={() => handleOnEditProduct(variant.id)}>
-          <IconEdit size={14} />
-        </ActionIcon>
+        <div className="space-x-2">
+          <Tooltip label="Update Stock Quantity">
+            <ActionIcon
+              size="lg"
+              variant="light"
+              onClick={() => handleOnEditProduct(variant.id, "stock-update")}
+            >
+              <IconEdit size={14} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Mark item as return item">
+            <ActionIcon
+              size="lg"
+              variant="light"
+              onClick={() => handleOnEditProduct(variant.id, "mark-item-as-return")}
+            >
+              <IconTruckReturn size={14} />
+            </ActionIcon>
+          </Tooltip>
+        </div>
       ),
     },
   ]
 
   return (
     <>
-      {selectedVariantId && (
-        <EditStockModal opened={opened} onClose={close} variantId={selectedVariantId} />
+      {selectedVariantId && selectedVariantId.type === "stock-update" && (
+        <EditStockModal opened={opened} onClose={close} variantId={selectedVariantId.id} />
+      )}
+      {selectedVariantId && selectedVariantId.type === "mark-item-as-return" && (
+        <MarkAsReturnItemModal opened={opened} onClose={close} variantId={selectedVariantId.id} />
       )}
 
       <Grid grow gutter="lg" align="stretch">

@@ -20,6 +20,12 @@ export const deleteProgram = async (programId: string) => {
 
   return response.data
 }
+
+export const restoreProgram = async (programId: string) => {
+  const response = await axios.put(ENDPOINT.PROGRAM.RESTORE.replace(":programId", programId))
+
+  return response.data
+}
 export const getProgramById = async (programId: string) => {
   const response = await axios.get<IProgram>(ENDPOINT.PROGRAM.ID.replace(":programId", programId))
 

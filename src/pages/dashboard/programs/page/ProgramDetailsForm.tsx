@@ -33,7 +33,7 @@ export const ProgramDetailsForm = ({ ref, disabled, program: program, initialVal
 
   const { data: departmentOptions, isLoading: isDepartmentLoading } = useQuery({
     queryKey: [KEY.PRODUCT_DEPARTMENTS],
-    queryFn: () => getDepartments({ all: "true", page: 1, limit: 100 }),
+    queryFn: () => getDepartments({ all: false, page: 1, limit: 100 }),
     select: (response) => response?.data?.map(({ name, id }) => ({ label: name, value: id })),
   })
 

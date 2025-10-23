@@ -1,6 +1,4 @@
-import { KEY } from "@/constants/key"
-import { getProductDepartments } from "@/services/product-department.service"
-import { IDepartmentsFilter } from "@/types/department.type"
+import { IActivityLogFilters } from "@/types/activity-log"
 import { IProgramsFilter } from "@/types/program.type"
 import { CloseButton, ComboboxItem, Group, Input, OptionsFilter, Select } from "@mantine/core"
 import { IconSearch } from "@tabler/icons-react"
@@ -8,13 +6,13 @@ import { useQuery } from "@tanstack/react-query"
 import { KeyboardEvent, useMemo, useState } from "react"
 
 interface Props {
-  filters: Partial<IDepartmentsFilter>
-  onFilter: (obj: Partial<IDepartmentsFilter>) => void
+  filters: Partial<IActivityLogFilters>
+  onFilter: (obj: Partial<IActivityLogFilters>) => void
   disabled?: boolean
 }
 
-export const DepartmentFilter = ({ filters, onFilter, disabled }: Props) => {
-  const handleOnFilter = (key: keyof IDepartmentsFilter, value: unknown) => {
+export const ActivityLogFilter = ({ filters, onFilter, disabled }: Props) => {
+  const handleOnFilter = (key: keyof IActivityLogFilters, value: unknown) => {
     onFilter({
       [key]: value,
       page: 1,
@@ -33,15 +31,27 @@ export const DepartmentFilter = ({ filters, onFilter, disabled }: Props) => {
     handleOnFilter("search", undefined)
   }
 
-  const statusOptions = useMemo(() => {
+  const typeOptions = useMemo(() => {
     return [
       {
-        value: "active",
-        label: "Active",
+        value: "user",
+        label: "User",
       },
       {
-        value: "archived",
-        label: "Archived",
+        value: "system",
+        label: "System",
+      },
+      {
+        value: "inventory",
+        label: "Inventory",
+      },
+      {
+        value: "sales",
+        label: "Sales",
+      },
+      {
+        value: "order",
+        label: "Order",
       },
     ]
   }, [])
@@ -58,7 +68,7 @@ export const DepartmentFilter = ({ filters, onFilter, disabled }: Props) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={handleOnSearch}
-          placeholder="Name / Acronym"
+          placeholder="Title / Content"
           w={280}
           rightSectionPointerEvents="all"
           rightSection={
@@ -73,13 +83,13 @@ export const DepartmentFilter = ({ filters, onFilter, disabled }: Props) => {
         />
 
         <Select
-          placeholder="Select Status"
-          data={statusOptions ?? []}
+          placeholder="Select Type"
+          data={typeOptions ?? []}
           w={240}
           clearable
           clearButtonProps={{ "aria-label": "Clear input" }}
-          onClear={() => handleOnFilter("status", null)}
-          onChange={(value) => handleOnFilter("status", value)}
+          onClear={() => handleOnFilter("type", null)}
+          onChange={(value) => handleOnFilter("type", value)}
           disabled={disabled}
         />
       </div>

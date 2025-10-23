@@ -32,6 +32,9 @@ import { ProgramList as DashboardProgramList } from "@/pages/dashboard/programs/
 import { ProgramPage } from "@/pages/dashboard/programs/page"
 import { DepartmentPage } from "@/pages/dashboard/departments/page"
 import { RolePage } from "@/pages/dashboard/roles/page"
+import { ReturnItemList } from "@/pages/dashboard/return-item/list"
+import { ActivityLogList } from "@/pages/dashboard/activity-logs/list"
+import { AnnouncementCarouselList } from "@/pages/dashboard/announcement-carousel/list"
 
 export const router = createBrowserRouter([
   {
@@ -175,6 +178,21 @@ export const router = createBrowserRouter([
           {
             path: ROUTES.DASHBOARD.PROGRAMS.ID,
             Component: ProgramPage,
+          },
+          // Return Item
+          {
+            path: ROUTES.DASHBOARD.RETURN_ITEMS.BASE,
+            Component: ReturnItemList,
+          },
+          // Activity Log
+          {
+            path: ROUTES.DASHBOARD.ACTIVITY_LOG.BASE,
+            Component: ActivityLogList,
+          },
+          // Announcement Carousel List
+          {
+            path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
+            Component: AnnouncementCarouselList,
           },
         ],
       },

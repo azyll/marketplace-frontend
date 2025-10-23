@@ -116,3 +116,8 @@ export const deleteProduct = async (productId: string) => {
 
   return response.data
 }
+export const restoreProduct = async (productId: string) => {
+  const response = await axios.put(ENDPOINT.PRODUCT.RESTORE.replace(":id", productId))
+
+  return response.data
+}
