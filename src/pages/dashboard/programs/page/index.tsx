@@ -99,7 +99,8 @@ export const ProgramPage = () => {
         let errorMessage = "Unable to Update Program, Please contact your Admin"
 
         if (Axios.isAxiosError(error)) {
-          errorMessage = error.response?.data.error?.[0]?.message ?? errorMessage
+          errorMessage =
+            error.response?.data.error?.[0]?.message ?? error.response?.data.error ?? errorMessage
         }
 
         notifications.show({
@@ -117,7 +118,8 @@ export const ProgramPage = () => {
       let errorMessage = "Unable to Update Program, Please contact your Admin"
 
       if (Axios.isAxiosError(error)) {
-        errorMessage = error.response?.data.error?.[0]?.message ?? errorMessage
+        errorMessage =
+          error.response?.data.error?.[0]?.message ?? error.response?.data.error ?? errorMessage
       }
 
       notifications.show({

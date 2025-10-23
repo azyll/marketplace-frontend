@@ -92,4 +92,6 @@ export interface IInventoryFilter extends IPagination {
   name?: string
   category?: string
   search?: string
+  status?: "archived" | "active"
+  all: boolean
 }

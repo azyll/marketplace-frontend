@@ -4,7 +4,7 @@ import { IProgramsFilter } from "@/types/program.type"
 import { CloseButton, ComboboxItem, Group, Input, OptionsFilter, Select } from "@mantine/core"
 import { IconSearch } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
-import { KeyboardEvent, useState } from "react"
+import { KeyboardEvent, useMemo, useState } from "react"
 
 interface Props {
   filters: Partial<IProgramsFilter>
@@ -21,7 +21,7 @@ export const ProgramFilter = ({ filters, onFilter, disabled }: Props) => {
   }
   const { data: departmentOptions, isLoading: isDepartmentLoading } = useQuery({
     queryKey: [KEY.PRODUCT_DEPARTMENTS],
-    queryFn: () => getProductDepartments({ all: "true", page: 1, limit: 100 }),
+    queryFn: () => getProductDepartments({ all: false, page: 1, limit: 100 }),
     select: (departments) => departments?.map(({ name }) => ({ label: name, value: name })),
   })
 
@@ -48,6 +48,19 @@ export const ProgramFilter = ({ filters, onFilter, disabled }: Props) => {
     setSearch("")
     handleOnFilter("search", undefined)
   }
+
+  const statusOptions = useMemo(() => {
+    return [
+      {
+        value: "active",
+        label: "Active",
+      },
+      {
+        value: "archived",
+        label: "Archived",
+      },
+    ]
+  }, [])
 
   return (
     <Group
@@ -87,6 +100,16 @@ export const ProgramFilter = ({ filters, onFilter, disabled }: Props) => {
           onClear={() => handleOnFilter("department", null)}
           onChange={(value) => handleOnFilter("department", value)}
           disabled={disabled || isDepartmentLoading}
+        />
+        <Select
+          placeholder="Select Status"
+          data={statusOptions ?? []}
+          w={240}
+          clearable
+          clearButtonProps={{ "aria-label": "Clear input" }}
+          onClear={() => handleOnFilter("status", null)}
+          onChange={(value) => handleOnFilter("status", value)}
+          disabled={disabled}
         />
       </div>
     </Group>

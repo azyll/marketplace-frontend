@@ -37,3 +37,10 @@ export const updateDepartment = async (departmentId: string, payload: ICreateDep
 
   return response.data
 }
+export const restoreDepartment = async (departmentId: string) => {
+  const response = await axios.put(
+    ENDPOINT.DEPARTMENT.RESTORE.replace(":departmentId", departmentId),
+  )
+
+  return response.data
+}

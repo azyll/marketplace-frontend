@@ -33,6 +33,15 @@ export const ROUTES = {
       BASE: "/dashboard/programs",
       ID: "/dashboard/programs/:programId",
     },
+    RETURN_ITEMS: {
+      BASE: "/dashboard/return-items",
+    },
+    ACTIVITY_LOG: {
+      BASE: "/dashboard/activity-logs",
+    },
+    ANNOUNCEMENT_CAROUSEL: {
+      BASE: "/dashboard/announcement-carousel",
+    },
   },
   AUTH: {
     BASE: "/auth",

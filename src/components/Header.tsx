@@ -149,7 +149,7 @@ export default function Header() {
                     </Text>
 
                     <Badge variant="light" size="xs" radius="sm" color="blue">
-                      {user.student ? user.student?.program?.acronym : user.role.systemTag}
+                      {user.student ? user.student?.program?.acronym : user.role.name}
                     </Badge>
                   </Stack>
                 </Group>
@@ -165,7 +165,7 @@ export default function Header() {
                       </Text>
 
                       <Badge variant="light" size="xs" radius="sm" color="blue">
-                        {user.student ? user.student?.program?.acronym : user.role.systemTag}
+                        {user.student ? user.student?.program?.acronym : user.role.name}
                       </Badge>
                     </Group>
                   </Menu.Label>

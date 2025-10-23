@@ -24,6 +24,9 @@ import {
   IconShield,
   IconBook,
   IconLibrary,
+  IconTruckReturn,
+  IconActivity,
+  IconCarouselHorizontal,
 } from "@tabler/icons-react"
 import { ROUTES } from "@/constants/routes"
 import { useQuery } from "@tanstack/react-query"
@@ -142,7 +145,48 @@ export const DashboardLayout = () => {
       count: 0,
       roles: ["admin", "employee"],
     },
+    {
+      label: "Return Items",
+      path: ROUTES.DASHBOARD.RETURN_ITEMS.BASE,
+      icon: <IconTruckReturn size={14} />,
+      indicator: false,
+      count: 0,
+    },
+    {
+      label: "Activity Logs",
+      path: ROUTES.DASHBOARD.ACTIVITY_LOG.BASE,
+      icon: <IconActivity size={14} />,
+      indicator: false,
+      count: 0,
+    },
+    {
+      label: "Announcement Carousel",
+      path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
+      icon: <IconCarouselHorizontal size={14} />,
+      indicator: false,
+      count: 0,
+    },
   ]
+  console.log(user)
+  const itemsFiltered = useMemo(
+    () =>
+      items.filter((item) => {
+        if (user?.role.systemTag === "admin") {
+          return true
+        }
+        if (
+          user?.role.systemTag === "employee" &&
+          (item.label === "Sales" ||
+            item.label === "Orders" ||
+            item.label === "Inventory" ||
+            item.label === "Return Items")
+        ) {
+          return true
+        }
+        return false
+      }),
+    [],
+  )
 
   const filteredItems = useMemo(
     () =>

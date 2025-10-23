@@ -1,7 +1,7 @@
 import { KEY } from "@/constants/key"
 import { ROUTES } from "@/constants/routes"
 import { useFilters } from "@/hooks/useFilters"
-import { deleteDepartment, getDepartments } from "@/services/department.service"
+import { deleteDepartment, getDepartments, restoreDepartment } from "@/services/department.service"
 import { getRoles } from "@/services/role.service"
 import { IDepartment, IGetDepartmentFilters } from "@/types/department.type"
 import { IRole, IRoleFilters } from "@/types/role.type"
@@ -17,7 +17,7 @@ import {
   IconShieldPlus,
 } from "@tabler/icons-react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import Axios from "axios"
+import Axios, { AxiosError } from "axios"
 import dayjs from "dayjs"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import { useState } from "react"
@@ -29,7 +29,7 @@ export const DepartmentList = () => {
   const DEFAULT_LIMIT = 10
 
   const [filters, setFilters, setFilterValues] = useFilters<IGetDepartmentFilters>({
-    all: "true",
+    all: true,
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
   })
@@ -40,7 +40,10 @@ export const DepartmentList = () => {
 
   const navigate = useNavigate()
   const [opened, { open, close }] = useDisclosure(false)
-  const [departmentForDeletion, setDepartmentForDeletion] = useState<IDepartment>()
+  const [selectedDepartment, setSelectDepartment] = useState<{
+    department: IDepartment
+    type: "archive" | "restore"
+  }>()
   const queryClient = useQueryClient()
   const deleteMutation = useMutation({
     mutationFn: async (departmentId: string) => {
@@ -48,7 +51,7 @@ export const DepartmentList = () => {
     },
     onSuccess: async () => {
       notifications.show({
-        title: "Delete Success",
+        title: "Archive Success",
         message: "Successfully archive department",
         color: "green",
       })
@@ -56,7 +59,7 @@ export const DepartmentList = () => {
       close()
 
       await queryClient.invalidateQueries({ queryKey: [KEY.PRODUCT_DEPARTMENTS] })
-      setDepartmentForDeletion(undefined)
+      setSelectDepartment(undefined)
     },
     onError: (error) => {
       if (Axios.isAxiosError(error)) {
@@ -70,6 +73,29 @@ export const DepartmentList = () => {
       }
     },
   })
+
+  const restoreMutation = useMutation({
+    mutationFn: (departmentId: string) => restoreDepartment(departmentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [KEY.PRODUCT_DEPARTMENTS] })
+
+      notifications.show({
+        title: "Restore Success",
+        message: "Successfully Restore Department",
+        color: "green",
+      })
+
+      close()
+      setSelectDepartment(undefined)
+    },
+    onError: (error: AxiosError<{ message: string; error: string }>) => {
+      notifications.show({
+        title: "Restore Failed",
+        message: error?.response?.data?.error ?? "Can't Restore Department",
+        color: "red",
+      })
+    },
+  })
   const handleOnCreateDepartment = () => {
     navigate(ROUTES.DASHBOARD.DEPARTMENTS.ID.replace(":departmentId", "create"))
   }
@@ -78,7 +104,15 @@ export const DepartmentList = () => {
     const department = departments?.data?.find(({ id }) => id === departmentId)
 
     if (department) {
-      setDepartmentForDeletion(department)
+      setSelectDepartment({ department, type: "archive" })
+      open()
+    }
+  }
+  const handleOnRestoreDepartment = (departmentId: string) => {
+    const department = departments?.data?.find(({ id }) => id === departmentId)
+
+    if (department) {
+      setSelectDepartment({ department, type: "restore" })
       open()
     }
   }
@@ -87,7 +121,15 @@ export const DepartmentList = () => {
 
     close()
     setTimeout(() => {
-      setDepartmentForDeletion(undefined)
+      setSelectDepartment(undefined)
+    }, 200)
+  }
+  const handleOnCancelRestoreDepartment = () => {
+    if (deleteMutation.isPending) return
+
+    close()
+    setTimeout(() => {
+      setSelectDepartment(undefined)
     }, 200)
   }
   const handleOnEditDepartment = (departmentId: string) => {
@@ -126,32 +168,33 @@ export const DepartmentList = () => {
       textAlign: "center",
       render: ({ id, deletedAt }) => (
         <div className="flex justify-center gap-4">
-          <ActionIcon size="lg" variant="light" onClick={() => handleOnEditDepartment(id)}>
-            <IconEdit size={14} />
-          </ActionIcon>
-
           {deletedAt ? (
-            <Tooltip label="Archive Department (wala pa function)">
+            <Tooltip label="Restore Department">
               <ActionIcon
                 size="lg"
                 color="green"
                 variant="light"
-                onClick={() => handleOnDeleteDepartment(id)}
+                onClick={() => handleOnRestoreDepartment(id)}
               >
                 <IconRestore size={14} />
               </ActionIcon>
             </Tooltip>
           ) : (
-            <Tooltip label="Restore Department ">
-              <ActionIcon
-                size="lg"
-                color="red"
-                variant="light"
-                onClick={() => handleOnDeleteDepartment(id)}
-              >
-                <IconArchive size={14} />
+            <>
+              <ActionIcon size="lg" variant="light" onClick={() => handleOnEditDepartment(id)}>
+                <IconEdit size={14} />
               </ActionIcon>
-            </Tooltip>
+              <Tooltip label="Archive Department ">
+                <ActionIcon
+                  size="lg"
+                  color="red"
+                  variant="light"
+                  onClick={() => handleOnDeleteDepartment(id)}
+                >
+                  <IconArchive size={14} />
+                </ActionIcon>
+              </Tooltip>
+            </>
           )}
         </div>
       ),
@@ -159,40 +202,77 @@ export const DepartmentList = () => {
   ]
   return (
     <Card>
-      <Modal
-        opened={opened}
-        onClose={() => handleOnCancelDeleteDepartment()}
-        withCloseButton={false}
-        centered
-        closeOnClickOutside={!deleteMutation.isPending}
-      >
-        <Title order={5} mb={4}>
-          Archive Department
-        </Title>
+      {selectedDepartment?.type == "archive" ? (
+        <Modal
+          opened={opened}
+          onClose={() => handleOnCancelDeleteDepartment()}
+          withCloseButton={false}
+          centered
+          closeOnClickOutside={!deleteMutation.isPending}
+        >
+          <Title order={5} mb={4}>
+            Archive Department
+          </Title>
 
-        <Text fz={14}>
-          Are you sure you want to archive <b>{departmentForDeletion?.name}</b>?
-        </Text>
+          <Text fz={14}>
+            Are you sure you want to archive <b>{selectedDepartment.department?.name}</b>?
+          </Text>
 
-        <div className="mt-8 flex justify-end gap-2">
-          <Button
-            variant="light"
-            color="black"
-            onClick={() => handleOnCancelDeleteDepartment()}
-            disabled={deleteMutation.isPending}
-          >
-            Cancel
-          </Button>
+          <div className="mt-8 flex justify-end gap-2">
+            <Button
+              variant="light"
+              color="black"
+              onClick={() => handleOnCancelDeleteDepartment()}
+              disabled={deleteMutation.isPending}
+            >
+              Cancel
+            </Button>
 
-          <Button
-            color="red"
-            loading={deleteMutation.isPending}
-            onClick={() => deleteMutation.mutate(departmentForDeletion?.id ?? "")}
-          >
-            Archive
-          </Button>
-        </div>
-      </Modal>
+            <Button
+              color="red"
+              loading={deleteMutation.isPending}
+              onClick={() => deleteMutation.mutate(selectedDepartment.department?.id ?? "")}
+            >
+              Archive
+            </Button>
+          </div>
+        </Modal>
+      ) : (
+        <Modal
+          opened={opened}
+          onClose={() => handleOnCancelRestoreDepartment()}
+          withCloseButton={false}
+          centered
+          closeOnClickOutside={!restoreMutation.isPending}
+        >
+          <Title order={5} mb={4}>
+            Restore Program
+          </Title>
+
+          <Text fz={14}>
+            Are you sure you want to restore <b>{selectedDepartment?.department?.name}</b>?
+          </Text>
+
+          <div className="mt-8 flex justify-end gap-2">
+            <Button
+              variant="light"
+              color="black"
+              onClick={() => handleOnCancelRestoreDepartment()}
+              disabled={restoreMutation.isPending}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              color="green"
+              loading={restoreMutation.isPending}
+              onClick={() => restoreMutation.mutate(selectedDepartment?.department.id ?? "")}
+            >
+              Restore
+            </Button>
+          </div>
+        </Modal>
+      )}
       <Card.Section px={24} pt={24}>
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Department</h1>

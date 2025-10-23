@@ -4,6 +4,7 @@ export const ENDPOINT = {
   PRODUCT: {
     BASE: "/product",
     ID: "/product/:id",
+    RESTORE: "/product/:id/restore",
     ATTRIBUTE: {
       BASE: "/product/create",
     },
@@ -52,21 +53,19 @@ export const ENDPOINT = {
   PROGRAM: {
     BASE: "/program",
     ID: "/program/:programId",
+    RESTORE: "/program/:programId/restore",
   },
 
   DEPARTMENT: {
     BASE: "/department",
     ID: "/department/:departmentId",
+    RESTORE: "/department/:departmentId/restore",
   },
 
   NOTIFICATION: {
     BASE: "/notification",
     ID: "/notification/:userId",
     RECEIVER: "/notification/receiver",
-  },
-
-  LOG: {
-    BASE: "/log",
   },
 
   SALES: {
@@ -83,5 +82,13 @@ export const ENDPOINT = {
     PRODUCT: "/report/product",
     INVENTORY: "/report/inventory",
     ORDER: "report/order",
+  },
+
+  RETURN_ITEM: {
+    BASE: "/return-item",
+    ID: "/return-item/:returnItemId",
+  },
+  ACTIVITY_LOG: {
+    BASE: "/activity-log",
   },
 }

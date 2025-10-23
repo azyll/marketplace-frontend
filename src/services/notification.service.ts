@@ -22,7 +22,7 @@ export const updateNotificationStatus = async (userId: string, notificationId: s
 
 //Logs
 export const getLogs = async (type: string) => {
-  const response = await axios.get(ENDPOINT.LOG.BASE, { params: { type } })
+  const response = await axios.get(ENDPOINT.ACTIVITY_LOG.BASE, { params: { type } })
 
   return response.data
 }

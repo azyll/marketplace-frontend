@@ -11,11 +11,13 @@ export interface IDepartment {
   updatedAt: Date | null
 }
 export interface IGetDepartmentFilters extends IPagination {
-  all: "true" | "false"
+  all: boolean
+  status?: "archived" | "active"
 }
 
 export interface IDepartmentsFilter extends IPagination {
   search?: string
+  status?: "archived" | "active"
 }
 export interface ICreateDepartmentInput {
   name: string

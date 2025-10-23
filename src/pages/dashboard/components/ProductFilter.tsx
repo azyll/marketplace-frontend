@@ -3,7 +3,7 @@ import { CloseButton, ComboboxItem, Group, Input, OptionsFilter, Select } from "
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
 import { getPrograms } from "@/services/program.service"
-import { KeyboardEvent, useState } from "react"
+import { KeyboardEvent, useMemo, useState } from "react"
 import { PRODUCT_CATEGORY } from "@/constants/product"
 import { IconSearch } from "@tabler/icons-react"
 import { getProductDepartments } from "@/services/product-department.service"
@@ -23,7 +23,7 @@ export const ProductFilter = ({ filters, onFilter, disabled }: Props) => {
 
   const { data: departmentOptions, isLoading: isDepartmentLoading } = useQuery({
     queryKey: [KEY.PRODUCT_DEPARTMENTS],
-    queryFn: () => getProductDepartments({ all: "true", page: 1, limit: 100 }),
+    queryFn: () => getProductDepartments({ all: false, page: 1, limit: 100 }),
     select: (departments) => departments?.map(({ name }) => ({ label: name, value: name })),
   })
 
@@ -56,6 +56,19 @@ export const ProductFilter = ({ filters, onFilter, disabled }: Props) => {
     { label: "Proware Item", value: PRODUCT_CATEGORY.PROWARE },
     { label: "Fabric", value: PRODUCT_CATEGORY.FABRIC },
   ]
+
+  const statusOptions = useMemo(() => {
+    return [
+      {
+        value: "active",
+        label: "Active",
+      },
+      {
+        value: "archived",
+        label: "Archived",
+      },
+    ]
+  }, [])
 
   return (
     <Group gap="sm" wrap="nowrap" className="hide-scrollbar mt-4 overflow-x-auto">
@@ -103,6 +116,16 @@ export const ProductFilter = ({ filters, onFilter, disabled }: Props) => {
         }}
         onClear={() => handleOnFilter("category", null)}
         onChange={(value) => handleOnFilter("category", value)}
+        disabled={disabled}
+      />
+      <Select
+        placeholder="Select Status"
+        data={statusOptions ?? []}
+        w={240}
+        clearable
+        clearButtonProps={{ "aria-label": "Clear input" }}
+        onClear={() => handleOnFilter("status", null)}
+        onChange={(value) => handleOnFilter("status", value)}
         disabled={disabled}
       />
     </Group>

@@ -12,10 +12,13 @@ export interface IProgram {
   updatedAt: Date | null
 }
 
-export interface IGetProgramsFilters extends IPagination {}
+export interface IGetProgramsFilters extends IPagination {
+  all: boolean
+}
 export interface IProgramsFilter extends IPagination {
   search?: string
   department?: string
+  status: "archived" | "active"
 }
 export interface ICreateProgramInput {
   name: string

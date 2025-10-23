@@ -14,7 +14,7 @@ export const OrderStudentCreateForm = ({ disabled }: Props) => {
 
   const { data: programOptions, isLoading: isProgramsLoading } = useQuery({
     queryKey: [KEY.PROGRAMS],
-    queryFn: () => getPrograms({ page: 1, limit: 100 }),
+    queryFn: () => getPrograms({ page: 1, limit: 100,all:false }),
     select: (response) => response?.data?.map(({ name, id }) => ({ label: name, value: id })),
   })
 

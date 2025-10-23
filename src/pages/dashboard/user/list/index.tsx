@@ -141,8 +141,8 @@ export const UserList = () => {
     },
     onSuccess: async () => {
       notifications.show({
-        title: "Delete Success",
-        message: "Successfully Deleted User",
+        title: "Archive Success",
+        message: "Successfully Archived User",
         color: "green",
       })
 
@@ -156,7 +156,7 @@ export const UserList = () => {
         error.response?.data.error?.[0]?.message
 
         notifications.show({
-          title: "Delete Failed",
+          title: "Archive Failed",
           message: error.response?.data.error?.[0]?.message,
           color: "red",
         })
@@ -183,11 +183,11 @@ export const UserList = () => {
         closeOnClickOutside={!deleteMutation.isPending}
       >
         <Title order={5} mb={4}>
-          Delete User
+          Archive User
         </Title>
 
         <Text fz={14}>
-          Are you sure you want to delete <b>{userForDeletion?.fullName}</b>?
+          Are you sure you want to archive <b>{userForDeletion?.fullName}</b>?
         </Text>
 
         <div className="mt-8 flex justify-end gap-2">
@@ -205,7 +205,7 @@ export const UserList = () => {
             loading={deleteMutation.isPending}
             onClick={() => deleteMutation.mutate(userForDeletion?.id ?? "")}
           >
-            Delete
+            Archive
           </Button>
         </div>
       </Modal>
