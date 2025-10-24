@@ -368,12 +368,13 @@ export default function ProductPage() {
               loading="lazy"
               fallbackSrc={FALLBACK_IMAGE}
             />
+
             {/* Stock badge overlay */}
-            {currentVariant.stock !== null && (
+            {/* {currentVariant.stock !== null && (
               <Badge variant="filled" size="lg" className="absolute top-4 right-4">
                 {currentVariant.stockCondition}
               </Badge>
-            )}
+            )} */}
           </div>
         </Grid.Col>
 
