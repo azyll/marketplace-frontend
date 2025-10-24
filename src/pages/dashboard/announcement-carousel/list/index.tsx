@@ -281,9 +281,12 @@ export function AnnouncementCarouselList() {
         size="xl"
         closeOnClickOutside={!uploadMutation.isPending}
       >
-        <Title order={5} mb={16}>
-          Upload Announcement Image
-        </Title>
+        <Title order={5}>Upload Announcement Image</Title>
+
+        <Text size="sm" mb={16}>
+          Recommended Size: 1200 × 600 pixels
+        </Text>
+
         <ImageUpload maxFiles={1} multiple={false} onDrop={handleOnImageUpload} />
         {uploadMutation.isPending && (
           <Center mt={16}>
