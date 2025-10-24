@@ -49,8 +49,8 @@ export const AnnouncementFilter = ({ filters, onFilter, disabled }: Props) => {
           w={240}
           clearable
           clearButtonProps={{ "aria-label": "Clear status filter" }}
-          onClear={() => handleOnFilter("status", null)}
-          onChange={(value) => handleOnFilter("status", value as "active" | "archived" | null)}
+          onClear={() => handleOnFilter("status", undefined)} // Changed from null to undefined
+          onChange={(value) => handleOnFilter("status", value as "active" | "archived" | undefined)} // Changed to undefined
           disabled={disabled}
         />
       </div>
