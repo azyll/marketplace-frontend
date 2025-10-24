@@ -10,18 +10,6 @@ import {
   Text,
   Title,
 } from "@mantine/core"
-import {
-  ActionIcon,
-  Badge,
-  Box,
-  Button,
-  Card,
-  Image,
-  Modal,
-  Space,
-  Text,
-  Title,
-} from "@mantine/core"
 import { IconEdit, IconMoodSad, IconPlus, IconRestore, IconTrashX } from "@tabler/icons-react"
 import { useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
