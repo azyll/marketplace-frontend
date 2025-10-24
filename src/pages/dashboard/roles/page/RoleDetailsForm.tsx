@@ -1,6 +1,6 @@
 import { createRoleSchema, updateRoleSchema } from "@/schema/role.schema"
 import { ICreateRoleInput, IRole, IRoleAccessModule, Module } from "@/types/role.type"
-import { Checkbox, Grid, Group, Select, TextInput, Title } from "@mantine/core"
+import { Checkbox, Grid, Group, Radio, Select, TextInput, Title } from "@mantine/core"
 import { useForm, UseFormReturnType } from "@mantine/form"
 import { zod4Resolver } from "mantine-form-zod-resolver"
 import { Ref, useImperativeHandle, useMemo } from "react"
@@ -125,55 +125,56 @@ export const RoleDetailsForm = ({ ref, isEmployee, disabled, role, initialValues
             />
           </Grid.Col>
         </Grid>
-        <Grid>
-          {form.values.systemTag === "employee" && (
-            <Grid mt={12}>
-              <Grid.Col span={12}>
-                <Title order={5}>Assign Modules and Permissions</Title>
-              </Grid.Col>
 
-              {/* Module Selection and Permission Assignment */}
-              <Grid.Col span={12}>
-                <Group>
-                  {modulesOption.map((module) => {
-                    const modulePermission = form.values.modulePermission?.find(
-                      (perm) => perm.module === module.value,
-                    )
+        {form.values.systemTag === "employee" && (
+          <Grid mt={12}>
+            <Grid.Col span={12}>
+              <Title order={5}>Assign Modules and Permissions</Title>
+            </Grid.Col>
 
-                    return (
-                      <div key={module.value} style={{ width: "100%" }}>
-                        <Checkbox
-                          {...form.getInputProps("modulePermission")}
-                          label={module.name}
-                          checked={!!modulePermission}
-                          onChange={(e) =>
-                            handleModuleChange(module.value, e.currentTarget.checked)
+            {/* Module Selection and Permission Assignment */}
+            <Grid.Col span={12}>
+              <Group>
+                {modulesOption.map((module) => {
+                  const modulePermission = form.values.modulePermission?.find(
+                    (perm) => perm.module === module.value,
+                  )
+
+                  return (
+                    <div key={module.value} style={{ width: "100%" }}>
+                      <Checkbox
+                        {...form.getInputProps("modulePermission")}
+                        label={module.name}
+                        checked={!!modulePermission}
+                        onChange={(e) => handleModuleChange(module.value, e.currentTarget.checked)}
+                        disabled={disabled}
+                      />
+                      {modulePermission && (
+                        <Radio.Group
+                          label="Permission"
+                          value={modulePermission.permission}
+                          onChange={(value) =>
+                            handlePermissionChange(module.value, value as "view" | "edit")
                           }
-                          disabled={disabled}
-                        />
-                        {modulePermission && (
-                          <Select
-                            label="Permission"
-                            value={modulePermission.permission}
-                            onChange={(value) =>
-                              handlePermissionChange(module.value, value as "view" | "edit")
-                            }
-                            data={permissionOptions.map((permission) => ({
-                              value: permission,
-                              label: permission.charAt(0).toUpperCase() + permission.slice(1),
-                            }))}
-                            disabled={disabled}
-                            style={{ width: "200px" }}
-                          />
-                        )}
-                      </div>
-                    )
-                  })}
-                </Group>
-              </Grid.Col>
-            </Grid>
-          )}
-        </Grid>
+                        >
+                          <Group>
+                            {permissionOptions.map((permission) => (
+                              <Radio
+                                key={permission}
+                                value={permission}
+                                label={permission.charAt(0).toUpperCase() + permission.slice(1)}
+                              />
+                            ))}
+                          </Group>
+                        </Radio.Group>
+                      )}
+                    </div>
+                  )
+                })}
+              </Group>
+            </Grid.Col>
+          </Grid>
+        )}
       </form>
     </div>
   )

@@ -27,6 +27,7 @@ export const RolePage = () => {
     enabled: isUpdate,
   })
   const roleFormRef = useRef<RoleDetailsFormRef>(null)
+
   useEffect(() => {
     // Initialize default form values
     if (role) {
@@ -50,6 +51,7 @@ export const RolePage = () => {
     mutationFn: (data: { payload: IUpdateRoleInput; roleId: string }) =>
       updateRole(data.roleId, data.payload),
   })
+
   const handleOnCreateRole = async (payload: ICreateRoleInput) => {
     // Create department
     await createRoleMutation.mutateAsync(payload)
@@ -63,6 +65,7 @@ export const RolePage = () => {
     await queryClient.invalidateQueries({ queryKey: [KEY.ROLES] })
     navigate(ROUTES.DASHBOARD.ROLES.BASE)
   }
+
   const handleOnUpdateRole = async (payload: ICreateRoleInput) => {
     if (!role) return
 
