@@ -6,7 +6,7 @@ import { notifications } from "@mantine/notifications"
 import { authenticateUser } from "@/services/auth.service"
 
 export default function Login() {
-  const { fetchUser } = useContext(AuthContext)
+  const { fetchUser, user } = useContext(AuthContext)
 
   const navigate = useNavigate()
 
@@ -27,7 +27,7 @@ export default function Login() {
 
       fetchUser()
 
-      navigate("/")
+      user?.roleSystemTag === "student" ? navigate("/") : navigate("/dashboard")
     } catch (error) {
       setIsLoading(false)
 
