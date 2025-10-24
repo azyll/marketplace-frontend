@@ -88,7 +88,14 @@ export const ENDPOINT = {
     BASE: "/return-item",
     ID: "/return-item/:returnItemId",
   },
+
   ACTIVITY_LOG: {
     BASE: "/activity-log",
+  },
+
+  ANNOUNCEMENT: {
+    BASE: "/announcement",
+    ID: "/announcement/:announcementId",
+    ARCHIVE: "/announcement/archived",
   },
 }

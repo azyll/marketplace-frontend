@@ -23,7 +23,7 @@ function ProtectedRoute({ roles = [] }: Props) {
     select: (response) => response.data,
   })
 
-  if (isLoading) return "Loading.."
+  if (isLoading) return ""
   if (!token) return <Navigate to="/" replace />
   if (!user) return <Navigate to="/" replace />
 

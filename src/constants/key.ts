@@ -13,6 +13,7 @@ export const KEY = {
     ORDERS: "dashboard-orders",
     ORDER: "dashboard-order",
     SALES: "dashboard-sales",
+    ANNOUNCEMENT: "dashboard-announcements",
   },
   STUDENTS: {
     ALL: "all-students",
