@@ -17,6 +17,7 @@ import {
   Modal,
   Title,
   Tooltip,
+  Badge,
 } from "@mantine/core"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import { IconPhotoPlus, IconRestore, IconArchive, IconEye } from "@tabler/icons-react"
@@ -38,12 +39,15 @@ interface IAnnouncementFilters {
 }
 
 export function AnnouncementCarouselList() {
+  const DEFAULT_PAGE = 1
+  const DEFAULT_LIMIT = 10
+
   const queryClient = useQueryClient()
 
   const [filters, setFilters] = useState<IAnnouncementFilters>({
     status: undefined,
-    page: 1,
-    limit: 10,
+    page: DEFAULT_PAGE,
+    limit: DEFAULT_LIMIT,
   })
 
   const [uploadModalOpened, { open: openUploadModal, close: closeUploadModal }] =
@@ -193,7 +197,12 @@ export function AnnouncementCarouselList() {
     {
       accessor: "deletedAt",
       title: "Status",
-      render: ({ deletedAt }) => (deletedAt ? "Archived" : "Active"),
+      textAlign: "center",
+      render: ({ deletedAt }) => (
+        <Badge color={deletedAt ? "gray" : "green"} variant="light">
+          {deletedAt ? "Archived" : "Active"}
+        </Badge>
+      ),
     },
     {
       accessor: "actions",
@@ -373,10 +382,6 @@ export function AnnouncementCarouselList() {
           records={announcements}
           // State
           fetching={isLoading}
-          totalRecords={totalRecords}
-          recordsPerPage={filters.limit ?? 10}
-          page={filters.page ?? 1}
-          onPageChange={(p) => handleOnFilter({ page: p })}
           noRecordsText="No announcements found"
           // Styling
           verticalSpacing="md"
@@ -385,6 +390,11 @@ export function AnnouncementCarouselList() {
           striped
           borderRadius={6}
           minHeight={340}
+          // Pagination
+          totalRecords={data?.meta.totalItems ?? 0}
+          recordsPerPage={filters.limit ?? DEFAULT_LIMIT}
+          page={filters.page ?? DEFAULT_PAGE}
+          onPageChange={(p) => handleOnFilter({ page: p })}
         />
       </Card.Section>
     </Card>

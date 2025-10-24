@@ -1,4 +1,15 @@
-import { ActionIcon, Box, Button, Card, Image, Modal, Space, Text, Title } from "@mantine/core"
+import {
+  ActionIcon,
+  Badge,
+  Box,
+  Button,
+  Card,
+  Image,
+  Modal,
+  Space,
+  Text,
+  Title,
+} from "@mantine/core"
 import { IconEdit, IconMoodSad, IconPlus, IconRestore, IconTrashX } from "@tabler/icons-react"
 import { useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
@@ -151,7 +162,12 @@ export const ProductList = () => {
     {
       accessor: "deletedAt",
       title: "Status",
-      render: ({ deletedAt }) => (deletedAt ? "Archived" : "Active"),
+      textAlign: "center",
+      render: ({ deletedAt }) => (
+        <Badge color={deletedAt ? "gray" : "green"} variant="light">
+          {deletedAt ? "Archived" : "Active"}
+        </Badge>
+      ),
     },
     {
       // Required yung 'accessor' kaya nilagyan ko nalang ng value kahit wala sa IProduct na type

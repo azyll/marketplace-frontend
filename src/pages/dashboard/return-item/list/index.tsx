@@ -2,7 +2,18 @@ import { KEY } from "@/constants/key"
 import { useFilters } from "@/hooks/useFilters"
 import { deleteReturnItem, getReturnItems } from "@/services/return-item.service"
 import { IGetReturnItemFilters, IReturnItem } from "@/types/return-item.type"
-import { ActionIcon, Box, Button, Card, Modal, Space, Text, Title, Tooltip } from "@mantine/core"
+import {
+  ActionIcon,
+  Badge,
+  Box,
+  Button,
+  Card,
+  Modal,
+  Space,
+  Text,
+  Title,
+  Tooltip,
+} from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { IconArchive, IconEdit, IconMoodSad } from "@tabler/icons-react"
@@ -128,7 +139,12 @@ export const ReturnItemList = () => {
     {
       accessor: "deletedAt",
       title: "Status",
-      render: ({ deletedAt }) => (deletedAt ? "Archived" : "Active"),
+      textAlign: "center",
+      render: ({ deletedAt }) => (
+        <Badge color={deletedAt ? "gray" : "green"} variant="light">
+          {deletedAt ? "Archived" : "Active"}
+        </Badge>
+      ),
     },
     {
       accessor: "actions",
