@@ -14,7 +14,7 @@ export const OrderStudentCreateForm = ({ disabled }: Props) => {
 
   const { data: programOptions, isLoading: isProgramsLoading } = useQuery({
     queryKey: [KEY.PROGRAMS],
-    queryFn: () => getPrograms({ page: 1, limit: 100,all:false }),
+    queryFn: () => getPrograms({ page: 1, limit: 100, all: false }),
     select: (response) => response?.data?.map(({ name, id }) => ({ label: name, value: id })),
   })
 
@@ -45,7 +45,10 @@ export const OrderStudentCreateForm = ({ disabled }: Props) => {
       <div className="mb-4">
         <Title order={4}>Create new Student</Title>
         <Text size="sm" c={"dimmed"}>
-          Create a new student to proceed with Order Create
+          Add a student to continue with order creation.
+        </Text>
+        <Text size="xs" c={"dimmed"}>
+          Note: The student's default password is the same as their username.
         </Text>
       </div>
 
