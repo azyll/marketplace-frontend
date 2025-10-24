@@ -23,9 +23,10 @@ export default function User() {
           align="center"
           className="max-w-page-width page-x-padding relative mx-auto"
         >
-          <Group gap="md" wrap="nowrap">
-            <Avatar src={getImage("bm.jpg")} size="95" radius="md" />
-            <Stack gap={2}>
+          <Group gap="md" wrap="nowrap" align="flex-start">
+            <Avatar src={getImage("avatar.png")} size={80} radius="md" />
+
+            <Stack gap={2} justify="center">
               <Title c="white" order={3}>
                 {user.user?.fullName}
               </Title>
