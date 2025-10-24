@@ -3,7 +3,18 @@ import { ROUTES } from "@/constants/routes"
 import { useFilters } from "@/hooks/useFilters"
 import { deleteProgram, getPrograms, restoreProgram } from "@/services/program.service"
 import { IGetProgramsFilters, IProgram } from "@/types/program.type"
-import { ActionIcon, Box, Card, Button, Space, Tooltip, Modal, Title, Text } from "@mantine/core"
+import {
+  ActionIcon,
+  Box,
+  Card,
+  Button,
+  Space,
+  Tooltip,
+  Modal,
+  Title,
+  Text,
+  Badge,
+} from "@mantine/core"
 import {
   IconArchive,
   IconBookUpload,
@@ -159,7 +170,11 @@ export const ProgramList = () => {
     {
       accessor: "deletedAt",
       title: "Status",
-      render: ({ deletedAt }) => (deletedAt ? "Archived" : "Active"),
+      render: ({ deletedAt }) => (
+        <Badge color={deletedAt ? "gray" : "green"} variant="light">
+          {deletedAt ? "Archived" : "Active"}
+        </Badge>
+      ),
     },
     {
       accessor: "actions",

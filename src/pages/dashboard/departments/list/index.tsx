@@ -5,7 +5,18 @@ import { deleteDepartment, getDepartments, restoreDepartment } from "@/services/
 import { getRoles } from "@/services/role.service"
 import { IDepartment, IGetDepartmentFilters } from "@/types/department.type"
 import { IRole, IRoleFilters } from "@/types/role.type"
-import { ActionIcon, Box, Card, Button, Space, Tooltip, Modal, Title, Text } from "@mantine/core"
+import {
+  ActionIcon,
+  Box,
+  Card,
+  Button,
+  Space,
+  Tooltip,
+  Modal,
+  Title,
+  Text,
+  Badge,
+} from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import {
@@ -157,7 +168,11 @@ export const DepartmentList = () => {
     {
       accessor: "deletedAt",
       title: "Status",
-      render: ({ deletedAt }) => (deletedAt ? "Archived" : "Active"),
+      render: ({ deletedAt }) => (
+        <Badge color={deletedAt ? "gray" : "green"} variant="light">
+          {deletedAt ? "Archived" : "Active"}
+        </Badge>
+      ),
     },
     {
       accessor: "actions",
@@ -244,7 +259,7 @@ export const DepartmentList = () => {
           closeOnClickOutside={!restoreMutation.isPending}
         >
           <Title order={5} mb={4}>
-            Restore Program
+            Restore Department
           </Title>
 
           <Text fz={14}>

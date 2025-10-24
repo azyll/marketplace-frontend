@@ -128,7 +128,11 @@ export const ReturnItemList = () => {
     {
       accessor: "deletedAt",
       title: "Status",
-      render: ({ deletedAt }) => (deletedAt ? "Archived" : "Active"),
+      render: ({ deletedAt }) => (
+        <Badge color={deletedAt ? "gray" : "green"} variant="light">
+          {deletedAt ? "Archived" : "Active"}
+        </Badge>
+      ),
     },
     {
       accessor: "actions",

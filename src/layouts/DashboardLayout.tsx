@@ -33,6 +33,7 @@ import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
 import { getOrders } from "@/services/order.service"
 import { getInventoryAlerts } from "@/services/products.service"
+import { checkModuleAccess, getModuleFromPathname } from "@/router/components/ProtectedRoute"
 
 export const DashboardLayout = () => {
   const navigate = useNavigate()
@@ -88,7 +89,7 @@ export const DashboardLayout = () => {
       icon: <IconUser size={14} />,
       indicator: false,
       count: 0,
-      roles: ["admin"],
+      roles: ["admin",'employee'],
     },
     {
       label: "Roles",
@@ -173,33 +174,31 @@ export const DashboardLayout = () => {
       roles: ["admin", "employee"],
     },
   ]
-  console.log(user)
-  const itemsFiltered = useMemo(
-    () =>
-      items.filter((item) => {
-        if (user?.role.systemTag === "admin") {
-          return true
-        }
-        if (
-          user?.role.systemTag === "employee" &&
-          (item.label === "Sales" ||
-            item.label === "Orders" ||
-            item.label === "Inventory" ||
-            item.label === "Return Items")
-        ) {
-          return true
-        }
-        return false
-      }),
-    [],
-  )
 
   const filteredItems = useMemo(
     () =>
       items.filter((item) => {
         if (!item?.roles || !user) return false
 
-        return item.roles.includes(user.role.systemTag)
+        const userRoleTag = user.role.systemTag
+
+        // 1. High-level Role Check: Filter out links not allowed for the user's general role
+        if (!item.roles.includes(userRoleTag)) return false
+
+        // 2. Granular Module Check: ONLY apply for the 'employee' systemTag
+        if (userRoleTag === "employee") {
+          const module = getModuleFromPathname(item.path)
+
+          // If the link does not map to a protected Module (e.g., /dashboard/home), allow it.
+          if (!module) return true
+
+          // Check if the employee has VIEW or EDIT permission for this specific module
+          return checkModuleAccess(module, user.role.modulePermission)
+        }
+
+        // 3. For 'admin' (or any role not explicitly checked),
+        // if it passed the high-level role check (step 1), show the link.
+        return true
       }),
     [user, items],
   )

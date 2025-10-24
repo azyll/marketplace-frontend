@@ -29,6 +29,7 @@ import { getImage } from "@/services/media.service"
 import { notifications } from "@mantine/notifications"
 import { AxiosError } from "axios"
 import { notifyResponseError } from "@/helper/errorNotification"
+import { getLoggedInUser } from "@/services/user.service"
 
 export const ProductPage = () => {
   const { productId } = useParams<{ productId: string }>()
@@ -50,11 +51,7 @@ export const ProductPage = () => {
     select: (response) => response.data,
   })
 
-  const { data: naAttribute, isLoading: isAttributesLoading } = useQuery({
-    queryKey: [KEY.PRODUCT_ATTRIBUTES],
-    queryFn: () => getProductAttributes(),
-    select: (attributes: IProductAttribute[]) => attributes.find(({ name }) => name === "N/A"),
-  })
+
 
   const [simpleProduct, setSimpleProduct] = useState<boolean>(true)
   const [imageDefaultValue, setImageDefaultValue] = useState<string>()

@@ -108,16 +108,6 @@ export const router = createBrowserRouter([
           {
             Component: createProtectedRoute(["admin"]),
             children: [
-              // Users
-              {
-                path: ROUTES.DASHBOARD.USER.BASE,
-                Component: UserList,
-              },
-              {
-                path: ROUTES.DASHBOARD.USER.ID,
-                Component: UserPage,
-              },
-
               // Roles
               {
                 path: ROUTES.DASHBOARD.ROLES.BASE,
@@ -166,6 +156,15 @@ export const router = createBrowserRouter([
           {
             Component: createProtectedRoute(["admin", "employee"]),
             children: [
+              // Users
+              {
+                path: ROUTES.DASHBOARD.USER.BASE,
+                Component: UserList,
+              },
+              {
+                path: ROUTES.DASHBOARD.USER.ID,
+                Component: UserPage,
+              },
               // Products
               {
                 path: ROUTES.DASHBOARD.PRODUCTS.BASE,

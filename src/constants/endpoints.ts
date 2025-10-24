@@ -37,6 +37,7 @@ export const ENDPOINT = {
     ID: "/user/:userId",
     ORDER: "/user/orders",
     FORGOT_PASSWORD: "/user/password",
+    RESTORE: "/user/:userId/restore",
   },
 
   STUDENT: {
@@ -49,6 +50,7 @@ export const ENDPOINT = {
   ROLE: {
     BASE: "/role",
     ID: "/role/:roleId",
+    RESTORE: "/role/:roleId/restore",
   },
 
   PROGRAM: {

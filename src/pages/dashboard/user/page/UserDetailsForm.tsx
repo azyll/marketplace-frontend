@@ -83,18 +83,14 @@ export const UserDetailsForm = ({ ref, disabled, user, onRoleChange, initialValu
             <Select
               label="Role"
               data={roleOptions}
-              disabled={isUpdate || disabled || isRolesLoading}
+              disabled={disabled || isRolesLoading}
               {...form.getInputProps("roleId")}
             />
           </Grid.Col>
 
           <Grid.Col span={4}>
             {/* Username */}
-            <TextInput
-              label="Username"
-              disabled={isUpdate || disabled}
-              {...form.getInputProps("username")}
-            />
+            <TextInput label="Username" disabled={disabled} {...form.getInputProps("username")} />
           </Grid.Col>
 
           <Grid.Col span={4}>

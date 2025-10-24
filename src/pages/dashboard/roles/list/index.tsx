@@ -1,14 +1,31 @@
 import { KEY } from "@/constants/key"
 import { ROUTES } from "@/constants/routes"
 import { useFilters } from "@/hooks/useFilters"
-import { deleteRole, getRoles } from "@/services/role.service"
+import { deleteRole, getRoles, restoreRole } from "@/services/role.service"
 import { IRole, IRoleFilters } from "@/types/role.type"
-import { ActionIcon, Box, Card, Button, Space, Tooltip, Modal, Title, Text } from "@mantine/core"
+import {
+  ActionIcon,
+  Box,
+  Card,
+  Button,
+  Space,
+  Tooltip,
+  Modal,
+  Title,
+  Text,
+  Badge,
+} from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-import { IconArchive, IconEdit, IconMoodSad, IconShieldPlus } from "@tabler/icons-react"
+import {
+  IconArchive,
+  IconEdit,
+  IconMoodSad,
+  IconRestore,
+  IconShieldPlus,
+} from "@tabler/icons-react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import Axios from "axios"
+import Axios, { AxiosError } from "axios"
 import dayjs from "dayjs"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import { useState } from "react"
@@ -30,7 +47,7 @@ export const RoleList = () => {
   })
   const navigate = useNavigate()
   const [opened, { open, close }] = useDisclosure(false)
-  const [roleForDeletion, setRoleForDeletion] = useState<IRole>()
+  const [selectRole, setSelectRole] = useState<{ role: IRole; type: "restore" | "archived" }>()
   const queryClient = useQueryClient()
   const deleteMutation = useMutation({
     mutationFn: async (roleId: string) => {
@@ -46,7 +63,7 @@ export const RoleList = () => {
       close()
 
       await queryClient.invalidateQueries({ queryKey: [KEY.ROLES] })
-      setRoleForDeletion(undefined)
+      setSelectRole(undefined)
     },
     onError: (error) => {
       if (Axios.isAxiosError(error)) {
@@ -58,15 +75,45 @@ export const RoleList = () => {
       }
     },
   })
+  const restoreMutation = useMutation({
+    mutationFn: (roleId: string) => restoreRole(roleId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [KEY.ROLES] })
+
+      notifications.show({
+        title: "Restore Success",
+        message: "Successfully Restore Department",
+        color: "green",
+      })
+
+      close()
+      setSelectRole(undefined)
+    },
+    onError: (error: AxiosError<{ message: string; error: string }>) => {
+      notifications.show({
+        title: "Restore Failed",
+        message: error?.response?.data?.error ?? "Can't Restore Department",
+        color: "red",
+      })
+    },
+  })
   const handleOnCreateRole = () => {
     navigate(ROUTES.DASHBOARD.ROLES.ID.replace(":roleId", "create"))
   }
 
   const handleOnDeleteRole = (roleId: string) => {
-    const department = roles?.data?.find(({ id }) => id === roleId)
+    const role = roles?.data?.find(({ id }) => id === roleId)
 
-    if (department) {
-      setRoleForDeletion(department)
+    if (role) {
+      setSelectRole({ role, type: "archived" })
+      open()
+    }
+  }
+  const handleOnRestoreRole = (roleId: string) => {
+    const role = roles?.data?.find(({ id }) => id === roleId)
+
+    if (role) {
+      setSelectRole({ role, type: "restore" })
       open()
     }
   }
@@ -75,7 +122,15 @@ export const RoleList = () => {
 
     close()
     setTimeout(() => {
-      setRoleForDeletion(undefined)
+      setSelectRole(undefined)
+    }, 200)
+  }
+  const handleOnCancelRestoreRole = () => {
+    if (deleteMutation.isPending) return
+
+    close()
+    setTimeout(() => {
+      setSelectRole(undefined)
     }, 200)
   }
   const handleOnEditRole = (roleId: string) => {
@@ -86,7 +141,11 @@ export const RoleList = () => {
       accessor: "name",
       title: "Name",
     },
-
+    {
+      accessor: "systemTag",
+      title: "System Tag",
+      render: ({ systemTag }) => systemTag.toUpperCase(),
+    },
     {
       accessor: "updatedAt",
       title: "Updated At",
@@ -99,26 +158,49 @@ export const RoleList = () => {
       render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM D, YYYY h:mm A") : "-"),
     },
     {
+      accessor: "deletedAt",
+      title: "Status",
+      render: ({ deletedAt }) => (
+        <Badge color={deletedAt ? "gray" : "green"} variant="light">
+          {deletedAt ? "Archived" : "Active"}
+        </Badge>
+      ),
+    },
+    {
       accessor: "actions",
       title: "Actions",
       width: 120,
       textAlign: "center",
-      render: ({ id }) => (
+      render: ({ id, deletedAt }) => (
         <div className="flex justify-center gap-4">
-          <ActionIcon size="lg" variant="light" onClick={() => handleOnEditRole(id)}>
-            <IconEdit size={14} />
-          </ActionIcon>
-
-          <Tooltip label="Archive Role">
-            <ActionIcon
-              size="lg"
-              color="red"
-              variant="light"
-              onClick={() => handleOnDeleteRole(id)}
-            >
-              <IconArchive size={14} />
-            </ActionIcon>
-          </Tooltip>
+          {deletedAt ? (
+            <Tooltip label="Restore Department">
+              <ActionIcon
+                size="lg"
+                color="green"
+                variant="light"
+                onClick={() => handleOnRestoreRole(id)}
+              >
+                <IconRestore size={14} />
+              </ActionIcon>
+            </Tooltip>
+          ) : (
+            <>
+              <ActionIcon size="lg" variant="light" onClick={() => handleOnEditRole(id)}>
+                <IconEdit size={14} />
+              </ActionIcon>
+              <Tooltip label="Archive Role">
+                <ActionIcon
+                  size="lg"
+                  color="red"
+                  variant="light"
+                  onClick={() => handleOnDeleteRole(id)}
+                >
+                  <IconArchive size={14} />
+                </ActionIcon>
+              </Tooltip>
+            </>
+          )}
         </div>
       ),
     },
@@ -126,40 +208,77 @@ export const RoleList = () => {
 
   return (
     <Card>
-      <Modal
-        opened={opened}
-        onClose={() => handleOnCancelDeleteRole()}
-        withCloseButton={false}
-        centered
-        closeOnClickOutside={!deleteMutation.isPending}
-      >
-        <Title order={5} mb={4}>
-          Archive Role
-        </Title>
+      {selectRole?.type === "archived" ? (
+        <Modal
+          opened={opened}
+          onClose={() => handleOnCancelDeleteRole()}
+          withCloseButton={false}
+          centered
+          closeOnClickOutside={!deleteMutation.isPending}
+        >
+          <Title order={5} mb={4}>
+            Archive Role
+          </Title>
 
-        <Text fz={14}>
-          Are you sure you want to archive <b>{roleForDeletion?.name}</b>?
-        </Text>
+          <Text fz={14}>
+            Are you sure you want to archive <b>{selectRole?.role.name}</b>?
+          </Text>
 
-        <div className="mt-8 flex justify-end gap-2">
-          <Button
-            variant="light"
-            color="black"
-            onClick={() => handleOnCancelDeleteRole()}
-            disabled={deleteMutation.isPending}
-          >
-            Cancel
-          </Button>
+          <div className="mt-8 flex justify-end gap-2">
+            <Button
+              variant="light"
+              color="black"
+              onClick={() => handleOnCancelDeleteRole()}
+              disabled={deleteMutation.isPending}
+            >
+              Cancel
+            </Button>
 
-          <Button
-            color="red"
-            loading={deleteMutation.isPending}
-            onClick={() => deleteMutation.mutate(roleForDeletion?.id ?? "")}
-          >
-            Archive
-          </Button>
-        </div>
-      </Modal>
+            <Button
+              color="red"
+              loading={deleteMutation.isPending}
+              onClick={() => deleteMutation.mutate(selectRole?.role.id ?? "")}
+            >
+              Archive
+            </Button>
+          </div>
+        </Modal>
+      ) : (
+        <Modal
+          opened={opened}
+          onClose={() => handleOnCancelRestoreRole()}
+          withCloseButton={false}
+          centered
+          closeOnClickOutside={!restoreMutation.isPending}
+        >
+          <Title order={5} mb={4}>
+            Restore Program
+          </Title>
+
+          <Text fz={14}>
+            Are you sure you want to restore <b>{selectRole?.role.name}</b>?
+          </Text>
+
+          <div className="mt-8 flex justify-end gap-2">
+            <Button
+              variant="light"
+              color="black"
+              onClick={() => handleOnCancelRestoreRole()}
+              disabled={restoreMutation.isPending}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              color="green"
+              loading={restoreMutation.isPending}
+              onClick={() => restoreMutation.mutate(selectRole?.role?.id ?? "")}
+            >
+              Restore
+            </Button>
+          </div>
+        </Modal>
+      )}
       <Card.Section px={24} pt={24}>
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Roles</h1>

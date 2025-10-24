@@ -44,7 +44,11 @@ export const deleteUser = async (userId: string) => {
 
   return response.data
 }
+export const restoreUser = async (userId: string) => {
+  const response = await axios.put(ENDPOINT.USER.RESTORE.replace(":userId", userId))
 
+  return response.data
+}
 export const updatePassword = async (
   userId: string,
   data: { oldPassword: string; newPassword: string },
@@ -61,6 +65,7 @@ export const forgotUserPassword = async (payload: IForgotPasswordUserInput) => {
 
   return response.data
 }
+
 // export const postUsers = async () => {
 //   try {
 //     const response = await axios.post("/api/user")

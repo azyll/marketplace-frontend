@@ -43,6 +43,9 @@ import { PRODUCT_SIZE } from "@/constants/product"
 import { AlertsCard } from "./AlertsCard"
 import { InventoryFilter } from "./InventoryFilters"
 import { MarkAsReturnItemModal } from "./MarkAsReturnItemModal"
+import { getLoggedInUser } from "@/services/user.service"
+import { ROUTES } from "@/constants/routes"
+import { Navigate, useNavigate } from "react-router"
 
 export const InventoryList = () => {
   const DEFAULT_PAGE = 1
@@ -62,6 +65,26 @@ export const InventoryList = () => {
     id: string
     type: "stock-update" | "mark-item-as-return"
   }>()
+
+  const { data: user, isLoading: iseGettingUser } = useQuery({
+    queryKey: [KEY.ME],
+    queryFn: () => getLoggedInUser(),
+    select: (response) => response.data,
+  })
+  const modulePermission = user?.role.modulePermission.find(
+    (modulePermission) => modulePermission.module == "inventory",
+  )
+  const haveInventoryModuleEditPermission = modulePermission?.permission == "edit"
+  const moduleReturnItem = user?.role.modulePermission.find(
+    (modulePermission) => modulePermission.module == "return-items",
+  )
+  const haveReturnItemModuleEditPermission = moduleReturnItem?.permission === "edit"
+const navigate = useNavigate()
+  if (!modulePermission && user?.role.systemTag === "employee") {
+    navigate(ROUTES.DASHBOARD.PRODUCTS.BASE, {  
+      replace: true,
+    })
+  }
 
   const { data: products, isLoading } = useQuery({
     queryKey: [KEY.PRODUCTS, filters],
@@ -273,24 +296,28 @@ export const InventoryList = () => {
       textAlign: "center",
       render: (variant) => (
         <div className="space-x-2">
-          <Tooltip label="Update Stock Quantity">
-            <ActionIcon
-              size="lg"
-              variant="light"
-              onClick={() => handleOnEditProduct(variant.id, "stock-update")}
-            >
-              <IconEdit size={14} />
-            </ActionIcon>
-          </Tooltip>
-          <Tooltip label="Mark item as return item">
-            <ActionIcon
-              size="lg"
-              variant="light"
-              onClick={() => handleOnEditProduct(variant.id, "mark-item-as-return")}
-            >
-              <IconTruckReturn size={14} />
-            </ActionIcon>
-          </Tooltip>
+          {haveInventoryModuleEditPermission ? (
+            <Tooltip label="Update Stock Quantity">
+              <ActionIcon
+                size="lg"
+                variant="light"
+                onClick={() => handleOnEditProduct(variant.id, "stock-update")}
+              >
+                <IconEdit size={14} />
+              </ActionIcon>
+            </Tooltip>
+          ) : null}
+          {haveReturnItemModuleEditPermission ? (
+            <Tooltip label="Mark item as return item">
+              <ActionIcon
+                size="lg"
+                variant="light"
+                onClick={() => handleOnEditProduct(variant.id, "mark-item-as-return")}
+              >
+                <IconTruckReturn size={14} />
+              </ActionIcon>
+            </Tooltip>
+          ) : null}
         </div>
       ),
     },
@@ -312,21 +339,21 @@ export const InventoryList = () => {
             <AlertsCard
               title="No Stock"
               data={inventoryAlertData?.data?.[0]}
-              isLoading={isAlertsLoading}
+              isLoading={isAlertsLoading || iseGettingUser}
               description="Item needs to be restocked"
             />
 
             <AlertsCard
               title="Low Stock"
               data={inventoryAlertData?.data?.[1]}
-              isLoading={isAlertsLoading}
+              isLoading={isAlertsLoading || iseGettingUser}
               description="Item has less than 20 stock"
             />
 
             <AlertsCard
               title="In Stock"
               data={inventoryAlertData?.data?.[2]}
-              isLoading={isAlertsLoading}
+              isLoading={isAlertsLoading || iseGettingUser}
               description="Items have enough stock"
             />
           </Stack>
