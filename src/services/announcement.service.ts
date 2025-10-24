@@ -21,7 +21,7 @@ export const createAnnouncement = async (image: File) => {
 
 export const deleteAnnouncement = async (announcementId: string) => {
   const response = await axios.delete(
-    ENDPOINT.ANNOUNCEMENT.ID.replace("announcementId", announcementId),
+    ENDPOINT.ANNOUNCEMENT.ID.replace(":announcementId", announcementId),
   )
 
   return response.data
@@ -29,7 +29,7 @@ export const deleteAnnouncement = async (announcementId: string) => {
 
 export const restoreArchivedAnnouncement = async (announcementId: string) => {
   const response = await axios.put(
-    ENDPOINT.ANNOUNCEMENT.ID.replace("announcementId", announcementId),
+    ENDPOINT.ANNOUNCEMENT.ID.replace(":announcementId", announcementId),
   )
 
   return response.data
