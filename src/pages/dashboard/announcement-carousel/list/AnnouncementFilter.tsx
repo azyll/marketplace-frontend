@@ -2,7 +2,7 @@ import { Group, Select } from "@mantine/core"
 import { useMemo } from "react"
 
 interface IAnnouncementFilters {
-  status?: "active" | "archived" | null
+  status?: "active" | "archived"
   page?: number
   limit?: number
 }

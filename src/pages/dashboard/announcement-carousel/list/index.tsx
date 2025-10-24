@@ -4,13 +4,11 @@ import {
   deleteAnnouncement,
   createAnnouncement,
   restoreArchivedAnnouncement,
-  getArchivedAnnouncements,
 } from "@/services/announcement.service"
 import {
   Card,
   Image,
   ActionIcon,
-  Group,
   Text,
   Loader,
   Center,
@@ -21,10 +19,10 @@ import {
   Tooltip,
 } from "@mantine/core"
 import { DataTable, DataTableColumn } from "mantine-datatable"
-import { IconTrash, IconEye, IconPhotoPlus, IconRestore, IconArchive } from "@tabler/icons-react"
+import { IconPhotoPlus, IconRestore, IconArchive, IconEye } from "@tabler/icons-react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { notifications } from "@mantine/notifications"
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import { IAnnouncement } from "@/types/announcement.type"
 import { AxiosError } from "axios"
 import { notifyResponseError } from "@/helper/errorNotification"
@@ -34,53 +32,46 @@ import { useDisclosure } from "@mantine/hooks"
 import { AnnouncementFilter } from "./AnnouncementFilter"
 
 interface IAnnouncementFilters {
-  status?: "active" | "archived" | null
+  status?: "active" | "archived"
   page?: number
   limit?: number
 }
 
 export function AnnouncementCarouselList() {
   const queryClient = useQueryClient()
-  const [page, setPage] = useState(1)
-  const pageSize = 10
+
   const [filters, setFilters] = useState<IAnnouncementFilters>({
-    status: null,
+    status: undefined,
     page: 1,
     limit: 10,
   })
 
   const [uploadModalOpened, { open: openUploadModal, close: closeUploadModal }] =
     useDisclosure(false)
+
   const [actionModalOpened, { open: openActionModal, close: closeActionModal }] =
     useDisclosure(false)
+
   const [imageModalOpened, { open: openImageModal, close: closeImageModal }] = useDisclosure(false)
+
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<{
     announcement: IAnnouncement
     type: "archive" | "restore"
   }>()
+
   const [viewingImage, setViewingImage] = useState<string>("")
 
-  const showArchived = filters.status === "archived"
-
   const { data, isLoading, error } = useQuery({
-    queryKey: ["announcements", showArchived],
-    queryFn: showArchived ? getArchivedAnnouncements : getAnnouncements,
+    queryKey: ["announcements", filters.status],
+    queryFn: () =>
+      getAnnouncements({
+        all: true,
+        status: filters.status,
+      }),
   })
 
   const announcements: IAnnouncement[] = data?.data ?? []
-
-  // Filter announcements based on status
-  const filteredAnnouncements = useMemo(() => {
-    if (!filters.status) return announcements
-
-    if (filters.status === "active") {
-      return announcements.filter((a) => !a.deletedAt)
-    } else if (filters.status === "archived") {
-      return announcements.filter((a) => a.deletedAt)
-    }
-
-    return announcements
-  }, [announcements, filters.status])
+  const totalRecords = data?.meta?.totalItems ?? 0
 
   // Delete/Archive mutation
   const deleteMutation = useMutation({
@@ -176,9 +167,6 @@ export function AnnouncementCarouselList() {
 
   const handleOnFilter = (newFilters: Partial<IAnnouncementFilters>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }))
-    if (newFilters.page) {
-      setPage(newFilters.page)
-    }
   }
 
   const columns: DataTableColumn<IAnnouncement>[] = [
@@ -382,13 +370,13 @@ export function AnnouncementCarouselList() {
       <Card.Section px={24} pb={24}>
         <DataTable
           columns={columns}
-          records={filteredAnnouncements}
+          records={announcements}
           // State
           fetching={isLoading}
-          totalRecords={filteredAnnouncements.length}
-          recordsPerPage={pageSize}
-          page={page}
-          onPageChange={setPage}
+          totalRecords={totalRecords}
+          recordsPerPage={filters.limit ?? 10}
+          page={filters.page ?? 1}
+          onPageChange={(p) => handleOnFilter({ page: p })}
           noRecordsText="No announcements found"
           // Styling
           verticalSpacing="md"

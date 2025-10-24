@@ -11,8 +11,8 @@ export default function HeroCarousel() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["announcements"],
-    queryFn: getAnnouncements,
+    queryKey: ["announcements", "active"],
+    queryFn: () => getAnnouncements({ all: true, status: "active" }),
     select: (response) => response.data,
   })
 
@@ -30,7 +30,7 @@ export default function HeroCarousel() {
       </Center>
     )
 
-  if (announcements.length === 0) return ""
+  if (!announcements || announcements.length === 0) return null
 
   return (
     <>
@@ -55,7 +55,7 @@ export default function HeroCarousel() {
           align: "center",
         }}
       >
-        {announcements.map((item: any) => (
+        {announcements.map((item) => (
           <Carousel.Slide key={item.id}>
             <Image
               src={getImage(item.image)}
