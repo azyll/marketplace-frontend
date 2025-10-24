@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { deleteUser, getUsers, restoreUser } from "@/services/user.service"
+import { deleteUser, getLoggedInUser, getUsers, restoreUser } from "@/services/user.service"
 import { useFilters } from "@/hooks/useFilters"
 import { IGetUserFilter, IUser, IUserFilters } from "@/types/user.type"
 import {
@@ -51,6 +51,17 @@ export const UserList = () => {
     queryKey: [KEY.USERS, filters],
     queryFn: () => getUsers(filters),
   })
+
+  const { data: user, isLoading: iseGettingUser } = useQuery({
+    queryKey: [KEY.ME],
+    queryFn: () => getLoggedInUser(),
+    select: (response) => response.data,
+  })
+  const modulePermission = user?.role.modulePermission.find(
+    (modulePermission) => modulePermission.module == "users",
+  )
+  const haveModuleEditPermission =
+    user?.role.systemTag === "admin" || modulePermission?.permission === "edit"
 
   const navigate = useNavigate()
 
@@ -248,6 +259,9 @@ export const UserList = () => {
       ),
     },
   ]
+  if (!haveModuleEditPermission) {
+    columns.pop()
+  }
 
   return (
     <Card>
@@ -324,33 +338,34 @@ export const UserList = () => {
       )}
 
       <Card.Section px={24} pt={24}>
-        <div className="flex items-center justify-between gap-4">
-          <h1 className="text-xl font-bold">Manage Users</h1>
-          <div className="flex">
-            <FileButton
-              onChange={(file) => file && handleOnBulkUploadStudent(file)}
-              accept=".xlsx,.xls"
-            >
-              {(props) => (
-                <Button variant="light" {...props} loading={bulkUploadMutation.isPending}>
-                  <IconFileTypeXls size={14} /> <Space w={6} />
-                  Bulk Upload Students
-                </Button>
-              )}
-            </FileButton>
+        {haveModuleEditPermission ? (
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="text-xl font-bold">Manage Users</h1>
+            <div className="flex">
+              <FileButton
+                onChange={(file) => file && handleOnBulkUploadStudent(file)}
+                accept=".xlsx,.xls"
+              >
+                {(props) => (
+                  <Button variant="light" {...props} loading={bulkUploadMutation.isPending}>
+                    <IconFileTypeXls size={14} /> <Space w={6} />
+                    Bulk Upload Students
+                  </Button>
+                )}
+              </FileButton>
 
-            <Space w={10} />
+              <Space w={10} />
 
-            <Button onClick={() => handleOnCreateUser()}>
-              <IconPlus size={14} /> <Space w={6} /> Create User
-            </Button>
+              <Button onClick={() => handleOnCreateUser()}>
+                <IconPlus size={14} /> <Space w={6} /> Create User
+              </Button>
+            </div>
           </div>
-        </div>
+        ) : null}
         <UsersFilter filters={filters} onFilter={setFilterValues} />
       </Card.Section>
 
       <Space h={16} />
-
       <Card.Section px={24} pb={24}>
         <DataTable
           columns={columns}
