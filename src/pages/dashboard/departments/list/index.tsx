@@ -17,6 +17,18 @@ import {
   Text,
   Badge,
 } from "@mantine/core"
+import {
+  ActionIcon,
+  Box,
+  Card,
+  Button,
+  Space,
+  Tooltip,
+  Modal,
+  Title,
+  Text,
+  Badge,
+} from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import {
@@ -74,11 +86,9 @@ export const DepartmentList = () => {
     },
     onError: (error) => {
       if (Axios.isAxiosError(error)) {
-        error.response?.data.error?.[0]?.message
-
         notifications.show({
           title: "Archive Failed",
-          message: error.response?.data.error?.[0]?.message,
+          message: error.response?.data.error || error.response?.data.error?.[0]?.message,
           color: "red",
         })
       }
@@ -262,7 +272,7 @@ export const DepartmentList = () => {
           closeOnClickOutside={!restoreMutation.isPending}
         >
           <Title order={5} mb={4}>
-            Restore Program
+            Restore Department
           </Title>
 
           <Text fz={14}>

@@ -16,6 +16,18 @@ import {
   Badge,
 } from "@mantine/core"
 import {
+  ActionIcon,
+  Box,
+  Card,
+  Button,
+  Space,
+  Tooltip,
+  Modal,
+  Title,
+  Text,
+  Badge,
+} from "@mantine/core"
+import {
   IconArchive,
   IconBookUpload,
   IconEdit,
@@ -73,11 +85,9 @@ export const ProgramList = () => {
     },
     onError: (error) => {
       if (Axios.isAxiosError(error)) {
-        error.response?.data.error?.[0]?.message
-
         notifications.show({
           title: "Archive Failed",
-          message: error.response?.data.error?.[0]?.message,
+          message: error.response?.data.error?.[0]?.message || error.response?.data.error,
           color: "red",
         })
       }

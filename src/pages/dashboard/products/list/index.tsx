@@ -10,6 +10,18 @@ import {
   Text,
   Title,
 } from "@mantine/core"
+import {
+  ActionIcon,
+  Badge,
+  Box,
+  Button,
+  Card,
+  Image,
+  Modal,
+  Space,
+  Text,
+  Title,
+} from "@mantine/core"
 import { IconEdit, IconMoodSad, IconPlus, IconRestore, IconTrashX } from "@tabler/icons-react"
 import { useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
@@ -34,6 +46,7 @@ import { useDisclosure } from "@mantine/hooks"
 import { useState } from "react"
 import { IUser } from "@/types/user.type"
 import { notifyResponseError } from "@/helper/errorNotification"
+import { getLoggedInUser } from "@/services/user.service"
 
 export const ProductList = () => {
   const DEFAULT_PAGE = 1
@@ -49,6 +62,16 @@ export const ProductList = () => {
     queryKey: [KEY.PRODUCTS, filters],
     queryFn: () => getInventoryProducts(filters),
   })
+
+  const { data: user, isLoading: iseGettingUser } = useQuery({
+    queryKey: [KEY.ME],
+    queryFn: () => getLoggedInUser(),
+    select: (response) => response.data,
+  })
+  const modulePermission = user?.role.modulePermission.find(
+    (modulePermission) => modulePermission.module == "products",
+  )
+  const havePermissionToEdit = modulePermission?.permission == "edit"
 
   const navigate = useNavigate()
 
@@ -209,6 +232,9 @@ export const ProductList = () => {
       ),
     },
   ]
+  if (!havePermissionToEdit) {
+    columns.pop()
+  }
 
   return (
     <Card>
@@ -288,9 +314,11 @@ export const ProductList = () => {
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Products</h1>
 
-          <Button onClick={() => handleOnCreateProduct()}>
-            <IconPlus size={14} /> <Space w={6} /> Add Product
-          </Button>
+          {havePermissionToEdit ? (
+            <Button onClick={() => handleOnCreateProduct()}>
+              <IconPlus size={14} /> <Space w={6} /> Add Product
+            </Button>
+          ) : null}
         </div>
 
         <ProductFilter filters={filters} onFilter={setFilterValues} />

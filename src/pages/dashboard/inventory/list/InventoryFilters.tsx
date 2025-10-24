@@ -93,7 +93,6 @@ export const InventoryFilter = ({ filters, onFilter, disabled }: Props) => {
       wrap="nowrap"
       className="hide-scrollbar mt-4 overflow-x-auto"
     >
-      {/* Stock Condition Filter */}
       <div className="flex gap-2">
         {stockConditionOptions.map((option) => (
           <Button
@@ -107,6 +106,8 @@ export const InventoryFilter = ({ filters, onFilter, disabled }: Props) => {
           </Button>
         ))}
       </div>
+
+      {/* Stock Condition Filter */}
 
       <div className="flex gap-3">
         {/* Search Name */}
