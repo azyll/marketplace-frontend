@@ -129,6 +129,7 @@ export const ConfirmOrderActionsModal = ({
         mt={16}
         placeholder="Sales Invoice"
         key={order.id}
+        type="number"
         value={salesInvoice.replace("FAI", "")}
         onChange={(e) => setSalesInvoice("FAI" + e.target.value)}
         leftSection={"FAI"}

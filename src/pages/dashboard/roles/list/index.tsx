@@ -50,11 +50,9 @@ export const RoleList = () => {
     },
     onError: (error) => {
       if (Axios.isAxiosError(error)) {
-        error.response?.data.error?.[0]?.message
-
         notifications.show({
           title: "Archive Failed",
-          message: error.response?.data.error?.[0]?.message,
+          message: error.response?.data.error?.[0]?.message || error.response?.data.error,
           color: "red",
         })
       }

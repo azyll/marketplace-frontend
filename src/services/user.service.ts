@@ -1,4 +1,10 @@
-import { ICreateUserInput, IGetUserFilter, IUpdateUserInput, IUser } from "@/types/user.type"
+import {
+  ICreateUserInput,
+  IForgotPasswordUserInput,
+  IGetUserFilter,
+  IUpdateUserInput,
+  IUser,
+} from "@/types/user.type"
 import axios from "@/utils/axios"
 import { ENDPOINT } from "@/constants/endpoints"
 import { IPaginatedResponse } from "@/types/common.type"
@@ -50,7 +56,11 @@ export const updatePassword = async (
 
   return response.data
 }
+export const forgotUserPassword = async (payload: IForgotPasswordUserInput) => {
+  const response = await axios.put<IUser>(ENDPOINT.USER.FORGOT_PASSWORD, payload)
 
+  return response.data
+}
 // export const postUsers = async () => {
 //   try {
 //     const response = await axios.post("/api/user")
