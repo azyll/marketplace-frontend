@@ -145,9 +145,15 @@ export default function OrderHistory() {
                         </Stack>
                       </div>
                     </Group>
-
                     <Group justify="space-between" className="mt-2">
-                      <div />
+                      {order.status === "ongoing" ? (
+                        <Text size="sm" c="red">
+                          Your order will be cancelled if not confirmed at proware within 24 hours
+                          after ordering.
+                        </Text>
+                      ) : (
+                        ""
+                      )}
                       <div>
                         <Text size="sm" c="dimmed">
                           Student ID:

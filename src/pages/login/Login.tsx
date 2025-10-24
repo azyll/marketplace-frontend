@@ -23,7 +23,7 @@ import { useDisclosure } from "@mantine/hooks"
 import { ForgotPasswordModal } from "./ForgotPasswordModal"
 
 export default function Login() {
-  const { fetchUser } = useContext(AuthContext)
+  const { fetchUser, user } = useContext(AuthContext)
 
   const navigate = useNavigate()
 
@@ -46,7 +46,7 @@ export default function Login() {
 
       fetchUser()
 
-      navigate("/")
+      user?.roleSystemTag === "student" ? navigate("/") : navigate("/dashboard")
     } catch (error) {
       setIsLoading(false)
 

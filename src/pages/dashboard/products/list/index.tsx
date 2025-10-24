@@ -59,7 +59,8 @@ export const ProductList = () => {
   const modulePermission = user?.role.modulePermission.find(
     (modulePermission) => modulePermission.module == "products",
   )
-  const havePermissionToEdit = modulePermission?.permission == "edit"
+  const havePermissionToEdit =
+    user?.role.systemTag === "admin" || modulePermission?.permission === "edit"
 
   const navigate = useNavigate()
 
@@ -173,6 +174,7 @@ export const ProductList = () => {
     {
       accessor: "deletedAt",
       title: "Status",
+      textAlign: "center",
       render: ({ deletedAt }) => (
         <Badge color={deletedAt ? "gray" : "green"} variant="light">
           {deletedAt ? "Archived" : "Active"}

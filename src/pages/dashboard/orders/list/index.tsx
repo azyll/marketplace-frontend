@@ -62,7 +62,9 @@ export const OrdersList = () => {
   const modulePermission = user?.role.modulePermission.find(
     (modulePermission) => modulePermission.module == "orders",
   )
-  const haveOrderEditPermission = modulePermission?.permission == "edit"
+  const haveOrderEditPermission =
+    user?.role.systemTag === "admin" || modulePermission?.permission === "edit"
+
   const navigate = useNavigate()
 
   if (!modulePermission && user?.role.systemTag === "employee") {

@@ -170,6 +170,7 @@ export const ProgramList = () => {
     {
       accessor: "deletedAt",
       title: "Status",
+      textAlign: "center",
       render: ({ deletedAt }) => (
         <Badge color={deletedAt ? "gray" : "green"} variant="light">
           {deletedAt ? "Archived" : "Active"}

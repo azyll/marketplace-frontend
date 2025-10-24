@@ -99,6 +99,31 @@ export default function NotificationButton() {
     }
   }
 
+  const getAnnouncementColors = (title: string) => {
+    if (title.includes("Low Stock Alert")) {
+      return {
+        bg: "bg-orange-100",
+        text: "text-orange-600",
+      }
+    }
+    if (title.includes("Product Restocked")) {
+      return {
+        bg: "bg-green-100",
+        text: "text-green-600",
+      }
+    }
+    if (title.includes("Product Out of Stock")) {
+      return {
+        bg: "bg-red-100",
+        text: "text-red-600",
+      }
+    }
+    return {
+      bg: "bg-purple-100",
+      text: "text-purple-600",
+    }
+  }
+
   return (
     <Popover
       width={380}
@@ -171,6 +196,10 @@ export default function NotificationButton() {
                 {notificationsList.map((notification) => {
                   const receiver = notification.notificationReceiver[0]
                   const isUnread = !receiver?.isRead
+                  const announcementColors =
+                    notification.type === "announcement"
+                      ? getAnnouncementColors(notification.title)
+                      : null
 
                   return (
                     <div
@@ -185,22 +214,25 @@ export default function NotificationButton() {
                       }}
                     >
                       <Group align="flex-start" gap="sm" wrap="nowrap">
-                        <div
-                          className={`mt-1 rounded-full p-2 ${
-                            notification.type === "order"
-                              ? "bg-blue-100 text-blue-600"
-                              : "bg-purple-100 text-purple-600"
-                          }`}
-                        >
-                          {getNotificationIcon(notification.type)}
-                        </div>
+                        <Indicator disabled={!isUnread} offset={5} withBorder>
+                          <div
+                            className={`mt-1 rounded-full p-2 ${
+                              notification.type === "order"
+                                ? "bg-blue-100 text-blue-600"
+                                : announcementColors
+                                  ? `${announcementColors.bg} ${announcementColors.text}`
+                                  : "bg-purple-100 text-purple-600"
+                            }`}
+                          >
+                            {getNotificationIcon(notification.type)}
+                          </div>
+                        </Indicator>
 
                         <Stack gap={4} style={{ flex: 1 }}>
                           <Group justify="space-between" gap="xs">
                             <Text fw={600} size="sm" lineClamp={1}>
                               {notification.title}
                             </Text>
-                            {isUnread && <div className="h-2 w-2 rounded-full bg-blue-600" />}
                           </Group>
 
                           <Text size="xs" c="dimmed" lineClamp={2}>

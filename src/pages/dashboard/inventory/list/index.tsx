@@ -74,14 +74,17 @@ export const InventoryList = () => {
   const modulePermission = user?.role.modulePermission.find(
     (modulePermission) => modulePermission.module == "inventory",
   )
-  const haveInventoryModuleEditPermission = modulePermission?.permission == "edit"
+  const haveInventoryModuleEditPermission =
+    user?.role.systemTag === "admin" || modulePermission?.permission === "edit"
+
   const moduleReturnItem = user?.role.modulePermission.find(
     (modulePermission) => modulePermission.module == "return-items",
   )
-  const haveReturnItemModuleEditPermission = moduleReturnItem?.permission === "edit"
-const navigate = useNavigate()
+  const haveReturnItemModuleEditPermission =
+    user?.role.systemTag === "admin" || moduleReturnItem?.permission === "edit"
+  const navigate = useNavigate()
   if (!modulePermission && user?.role.systemTag === "employee") {
-    navigate(ROUTES.DASHBOARD.PRODUCTS.BASE, {  
+    navigate(ROUTES.DASHBOARD.PRODUCTS.BASE, {
       replace: true,
     })
   }
