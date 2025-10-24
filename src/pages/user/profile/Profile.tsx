@@ -1,6 +1,6 @@
 import { EditableWrapper } from "@/components/EditableWrapper"
 import { AuthContext } from "@/contexts/AuthContext"
-import { Button, Group, Modal, PasswordInput, Space, Stack, Text, Title } from "@mantine/core"
+import { Button, Card, Group, Modal, PasswordInput, Space, Stack, Text, Title } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { useContext, useEffect, useState } from "react"
 import { useForm } from "@mantine/form"
@@ -112,114 +112,114 @@ export default function Profile() {
 
   return (
     <div className="max-w-page-width page-x-padding mx-auto mt-4">
-      <div>
-        <Title size="h3">User Details</Title>
-
-        <Space h={12} />
-
-        <div className="space-y-3">
-          <Text size="sm" fw={500} c="dimmed">
-            Full Name
-          </Text>
-          <Text>{user.user?.fullName || "Not provided"}</Text>
-        </div>
-
-        <Space h={12} />
-
-        <Group justify="space-between">
-          <div className="space-y-3">
-            <Text size="sm" fw={500} c="dimmed">
-              Password
-            </Text>
-            <Text>{"••••••••"}</Text>
-          </div>
-          <Button variant="light" size="xs" onClick={() => setModalOpened(true)}>
-            Change Password
-          </Button>
-        </Group>
-
-        <Modal
-          opened={modalOpened}
-          onClose={handleModalClose}
-          title="Change Password"
-          centered
-          size="sm"
-        >
-          <Stack gap="md">
-            <PasswordInput
-              disabled={passwordMutation.isPending}
-              label="Current Password"
-              placeholder="Enter your current password"
-              radius="xl"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              required
-            />
-
-            <PasswordInput
-              disabled={passwordMutation.isPending}
-              label="New Password"
-              placeholder="Enter your new password"
-              radius="xl"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-            />
-
-            <PasswordInput
-              disabled={passwordMutation.isPending}
-              label="Confirm New Password"
-              placeholder="Confirm your new password"
-              radius="xl"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-
-            <Group justify="flex-end" mt="md">
-              <Button variant="subtle" onClick={handleModalClose}>
-                Cancel
-              </Button>
-              <Button onClick={handlePasswordChange} loading={passwordMutation.isPending}>
-                Change Password
-              </Button>
-            </Group>
-          </Stack>
-        </Modal>
-      </div>
-
-      <Space h={24} />
-
-      {user.user?.student ? (
+      <Card radius="md">
         <div>
-          <Title size="h3">Student Details</Title>
+          <Title size="h3">User Details</Title>
 
           <Space h={12} />
 
           <div className="space-y-3">
-            <div>
-              <Text size="sm" fw={500} c="dimmed">
-                Student ID
-              </Text>
-              <Text>0{user.user.student.id || "Not provided"}</Text>
-            </div>
+            <Text size="sm" fw={500} c="dimmed">
+              Full Name
+            </Text>
+            <Text>{user.user?.fullName || "Not provided"}</Text>
+          </div>
 
-            <div>
-              <Text size="sm" fw={500} c="dimmed">
-                Program
-              </Text>
-              <Text>{user.user.student.program?.name || "Not assigned"}</Text>
-            </div>
+          <Space h={12} />
 
-            <div>
+          <Group justify="space-between">
+            <div className="space-y-3">
               <Text size="sm" fw={500} c="dimmed">
-                Sex
+                Password
               </Text>
-              <Text tt="capitalize">{user.user.student.sex || "Not assigned"}</Text>
+              <Text>{"••••••••"}</Text>
+            </div>
+            <Button variant="light" size="xs" onClick={() => setModalOpened(true)}>
+              Change Password
+            </Button>
+          </Group>
+
+          <Modal
+            opened={modalOpened}
+            onClose={handleModalClose}
+            title="Change Password"
+            centered
+            size="sm"
+          >
+            <Stack gap="md">
+              <PasswordInput
+                disabled={passwordMutation.isPending}
+                label="Current Password"
+                placeholder="Enter your current password"
+                radius="xl"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                required
+              />
+
+              <PasswordInput
+                disabled={passwordMutation.isPending}
+                label="New Password"
+                placeholder="Enter your new password"
+                radius="xl"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+              />
+
+              <PasswordInput
+                disabled={passwordMutation.isPending}
+                label="Confirm New Password"
+                placeholder="Confirm your new password"
+                radius="xl"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+
+              <Group justify="flex-end" mt="md">
+                <Button variant="subtle" onClick={handleModalClose}>
+                  Cancel
+                </Button>
+                <Button onClick={handlePasswordChange} loading={passwordMutation.isPending}>
+                  Change Password
+                </Button>
+              </Group>
+            </Stack>
+          </Modal>
+        </div>
+        <Space h={24} />
+        {user.user?.student ? (
+          <div>
+            <Title size="h3">Student Details</Title>
+
+            <Space h={12} />
+
+            <div className="space-y-3">
+              <div>
+                <Text size="sm" fw={500} c="dimmed">
+                  Student ID
+                </Text>
+                <Text>0{user.user.student.id || "Not provided"}</Text>
+              </div>
+
+              <div>
+                <Text size="sm" fw={500} c="dimmed">
+                  Program
+                </Text>
+                <Text>{user.user.student.program?.name || "Not assigned"}</Text>
+              </div>
+
+              <div>
+                <Text size="sm" fw={500} c="dimmed">
+                  Sex
+                </Text>
+                <Text tt="capitalize">{user.user.student.sex || "Not assigned"}</Text>
+              </div>
             </div>
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </Card>
     </div>
   )
 }
