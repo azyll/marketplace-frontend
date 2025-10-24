@@ -325,7 +325,7 @@ export default function Cart() {
           <Grid.Col span={{ base: 12, md: 6 }}>
             <Card withBorder radius="md" padding="lg" mih={250}>
               <Title order={4} mb="xs">
-                Order Summary
+                Order Summary{" "}
                 <span className="text-sm text-gray-500">
                   {selectedItems.size > 0 && `(${selectedItems.size} selected)`}
                 </span>
