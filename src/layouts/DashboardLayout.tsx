@@ -89,7 +89,7 @@ export const DashboardLayout = () => {
       icon: <IconUser size={14} />,
       indicator: false,
       count: 0,
-      roles: ["admin",'employee'],
+      roles: ["admin", "employee"],
     },
     {
       label: "Roles",
@@ -123,14 +123,6 @@ export const DashboardLayout = () => {
       count: 0,
       roles: ["admin"],
     },
-    {
-      label: "Announcement Carousel",
-      path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
-      icon: <IconCarouselHorizontal size={14} />,
-      indicator: false,
-      count: 0,
-      roles: ["admin"],
-    },
 
     //Employee & Admin
     {
@@ -150,14 +142,6 @@ export const DashboardLayout = () => {
       roles: ["admin", "employee"],
     },
     {
-      label: "Inventory",
-      path: ROUTES.DASHBOARD.INVENTORY.BASE,
-      icon: <IconBuildingWarehouse size={14} />,
-      indicator: criticalStock?.hasAlerts,
-      count: inventoryCount,
-      roles: ["admin", "employee"],
-    },
-    {
       label: "Sales",
       path: ROUTES.DASHBOARD.SALES.BASE,
       icon: <IconReportMoney size={14} />,
@@ -166,9 +150,25 @@ export const DashboardLayout = () => {
       roles: ["admin", "employee"],
     },
     {
+      label: "Inventory",
+      path: ROUTES.DASHBOARD.INVENTORY.BASE,
+      icon: <IconBuildingWarehouse size={14} />,
+      indicator: criticalStock?.hasAlerts,
+      count: inventoryCount,
+      roles: ["admin", "employee"],
+    },
+    {
       label: "Return Items",
       path: ROUTES.DASHBOARD.RETURN_ITEMS.BASE,
       icon: <IconTruckReturn size={14} />,
+      indicator: false,
+      count: 0,
+      roles: ["admin", "employee"],
+    },
+    {
+      label: "Announcement Carousel",
+      path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
+      icon: <IconCarouselHorizontal size={14} />,
       indicator: false,
       count: 0,
       roles: ["admin", "employee"],
