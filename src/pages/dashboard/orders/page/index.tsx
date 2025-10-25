@@ -13,14 +13,11 @@ import { TotalCard } from "@/pages/dashboard/components/TotalCard"
 import pluralize from "pluralize"
 import { OrderItem, OrderItemSkeleton } from "@/pages/dashboard/orders/page/OrderItem"
 import { OrderActions } from "@/pages/dashboard/orders/components/OrderActions"
-import { downloadOrderSlip } from "@/pages/order/pdf/OrderSlipPDF"
-import { AuthContext } from "@/contexts/AuthContext"
 import { formatDate } from "@/helper/formatDate"
+import { downloadOrderSlip } from "@/pages/order/pdf/OrderSlipPDF"
 
 export const OrdersPage = () => {
   const { orderId } = useParams<{ orderId: string }>()
-
-  const { user } = useContext(AuthContext)
 
   const { data: order, isLoading } = useQuery({
     queryKey: [KEY.DASHBOARD.ORDER, orderId],
@@ -32,10 +29,10 @@ export const OrdersPage = () => {
     if (order) {
       try {
         await downloadOrderSlip({
-          studentName: user?.fullName || "",
-          studentId: user?.student.id,
-          sex: user?.student.sex,
-          program: user?.student.program.name || "",
+          studentName: order.student.user.fullName || "",
+          studentId: order.studentId,
+          sex: order.student.sex,
+          program: order.student.program.name || "",
           orderItems: order.orderItems ?? [],
           total: order.total,
           orderId: order.id.toString(),
