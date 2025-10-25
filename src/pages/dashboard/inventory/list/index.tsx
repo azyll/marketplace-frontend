@@ -272,6 +272,12 @@ export const InventoryList = () => {
       width: 100,
     },
     {
+      accessor: "stockAvailable",
+      title: "Available",
+      textAlign: "center",
+      width: 100,
+    },
+    {
       accessor: "stockValue",
       title: "≈ Stock Value",
       textAlign: "right",
