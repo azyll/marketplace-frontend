@@ -1,6 +1,6 @@
 import { createRoleSchema, updateRoleSchema } from "@/schema/role.schema"
 import { ICreateRoleInput, IRole, IRoleAccessModule, Module } from "@/types/role.type"
-import { Checkbox, Grid, Group, Radio, Select, TextInput, Title } from "@mantine/core"
+import { Checkbox, Grid, Group, Radio, Select, Text, TextInput, Title } from "@mantine/core"
 import { useForm, UseFormReturnType } from "@mantine/form"
 import { zod4Resolver } from "mantine-form-zod-resolver"
 import { Ref, useImperativeHandle, useMemo } from "react"
@@ -130,6 +130,7 @@ export const RoleDetailsForm = ({ ref, isEmployee, disabled, role, initialValues
           <Grid mt={12}>
             <Grid.Col span={12}>
               <Title order={5}>Assign Modules and Permissions</Title>
+              <Text c="dimmed"> Select a module below to see the permissions</Text>
             </Grid.Col>
 
             {/* Module Selection and Permission Assignment */}
