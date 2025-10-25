@@ -130,7 +130,9 @@ export const RoleDetailsForm = ({ ref, isEmployee, disabled, role, initialValues
           <Grid mt={12}>
             <Grid.Col span={12}>
               <Title order={5}>Assign Modules and Permissions</Title>
-              <Text c="dimmed"> Select a module below to see the permissions</Text>
+              <Text c="dimmed">
+                Select which modules this role can access and set the corresponding permissions
+              </Text>
             </Grid.Col>
 
             {/* Module Selection and Permission Assignment */}
@@ -152,7 +154,8 @@ export const RoleDetailsForm = ({ ref, isEmployee, disabled, role, initialValues
                       />
                       {modulePermission && (
                         <Radio.Group
-                          label="Permission"
+                          ml={32}
+                          // label="Permission"
                           value={modulePermission.permission}
                           onChange={(value) =>
                             handlePermissionChange(module.value, value as "view" | "edit")
