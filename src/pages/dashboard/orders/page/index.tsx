@@ -6,22 +6,46 @@ import { getOrder } from "@/services/order.service"
 import { IconArrowLeft } from "@tabler/icons-react"
 import { ROUTES } from "@/constants/routes"
 import { orderStatusColor, orderStatusLabel } from "@/constants/order"
-import { useMemo } from "react"
+import { useContext, useMemo } from "react"
 import dayjs from "dayjs"
 import { StudentCard } from "@/pages/dashboard/components/StudentCard"
 import { TotalCard } from "@/pages/dashboard/components/TotalCard"
 import pluralize from "pluralize"
 import { OrderItem, OrderItemSkeleton } from "@/pages/dashboard/orders/page/OrderItem"
 import { OrderActions } from "@/pages/dashboard/orders/components/OrderActions"
+import { downloadOrderSlip } from "@/pages/order/pdf/OrderSlipPDF"
+import { AuthContext } from "@/contexts/AuthContext"
+import { formatDate } from "@/helper/formatDate"
 
 export const OrdersPage = () => {
   const { orderId } = useParams<{ orderId: string }>()
+
+  const { user } = useContext(AuthContext)
 
   const { data: order, isLoading } = useQuery({
     queryKey: [KEY.DASHBOARD.ORDER, orderId],
     queryFn: () => getOrder(orderId ?? ""),
     select: (response) => response.data,
   })
+
+  const handleDownloadOrder = async () => {
+    if (order) {
+      try {
+        await downloadOrderSlip({
+          studentName: user?.fullName || "",
+          studentId: user?.student.id,
+          sex: user?.student.sex,
+          program: user?.student.program.name || "",
+          orderItems: order.orderItems ?? [],
+          total: order.total,
+          orderId: order.id.toString(),
+          createdAt: formatDate(order.createdAt),
+        })
+      } catch (error) {
+        console.error("Error generating PDF:", error)
+      }
+    }
+  }
 
   const student = useMemo(() => order?.student, [order?.student])
 
@@ -57,8 +81,18 @@ export const OrdersPage = () => {
             ) : (
               <Text c="dimmed">{dayjs(order?.createdAt).format("MMMM DD YYYY • hh:mm A")}</Text>
             )}
-          </div>
 
+            <Button
+              variant="light"
+              color="blue"
+              size="sm"
+              fullWidth
+              mt="xs"
+              onClick={handleDownloadOrder}
+            >
+              Download Order Slip
+            </Button>
+          </div>
           {order && <OrderActions status={order?.status} selectedOrders={[order]} />}
         </div>
       </Card.Section>
