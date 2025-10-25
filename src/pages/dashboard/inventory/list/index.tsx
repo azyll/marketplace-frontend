@@ -61,9 +61,11 @@ export const InventoryList = () => {
 
   const [expandedRecordIds, setExpandedRecordIds] = useState<string[]>([])
   const [opened, { open, close }] = useDisclosure(false)
-  const [selectedVariantId, setSelectedVariantId] = useState<{
+  const [selectedVariant, setSelectedVariant] = useState<{
     id: string
     type: "stock-update" | "mark-item-as-return"
+    stockQuantity?: number
+    name?: string
   }>()
 
   const { data: user, isLoading: iseGettingUser } = useQuery({
@@ -155,9 +157,16 @@ export const InventoryList = () => {
   const handleOnEditProduct = (
     productVariantId: string,
     type: "stock-update" | "mark-item-as-return",
+    stockQuantity?: number,
+    variantName?: string,
   ) => {
     console.log("Opening modal for variant:", productVariantId)
-    setSelectedVariantId({ id: productVariantId, type })
+    setSelectedVariant({
+      id: productVariantId,
+      type,
+      stockQuantity,
+      name: variantName,
+    })
     open()
   }
 
@@ -304,7 +313,14 @@ export const InventoryList = () => {
               <ActionIcon
                 size="lg"
                 variant="light"
-                onClick={() => handleOnEditProduct(variant.id, "stock-update")}
+                onClick={() =>
+                  handleOnEditProduct(
+                    variant.id,
+                    "stock-update",
+                    variant.stockQuantity,
+                    `${variant.name} - ${variant.size}`,
+                  )
+                }
               >
                 <IconEdit size={14} />
               </ActionIcon>
@@ -328,11 +344,17 @@ export const InventoryList = () => {
 
   return (
     <>
-      {selectedVariantId && selectedVariantId.type === "stock-update" && (
-        <EditStockModal opened={opened} onClose={close} variantId={selectedVariantId.id} />
+      {selectedVariant && selectedVariant.type === "stock-update" && (
+        <EditStockModal
+          opened={opened}
+          onClose={close}
+          variantId={selectedVariant.id}
+          currentStock={selectedVariant.stockQuantity}
+          variantName={selectedVariant.name}
+        />
       )}
-      {selectedVariantId && selectedVariantId.type === "mark-item-as-return" && (
-        <MarkAsReturnItemModal opened={opened} onClose={close} variantId={selectedVariantId.id} />
+      {selectedVariant && selectedVariant.type === "mark-item-as-return" && (
+        <MarkAsReturnItemModal opened={opened} onClose={close} variantId={selectedVariant.id} />
       )}
 
       <Grid grow gutter="lg" align="stretch">
