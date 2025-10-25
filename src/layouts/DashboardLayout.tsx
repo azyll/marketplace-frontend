@@ -115,14 +115,6 @@ export const DashboardLayout = () => {
       count: 0,
       roles: ["admin"],
     },
-    {
-      label: "Activity Logs",
-      path: ROUTES.DASHBOARD.ACTIVITY_LOG.BASE,
-      icon: <IconActivity size={14} />,
-      indicator: false,
-      count: 0,
-      roles: ["admin"],
-    },
 
     //Employee & Admin
     {
@@ -158,7 +150,7 @@ export const DashboardLayout = () => {
       roles: ["admin", "employee"],
     },
     {
-      label: "Return Items",
+      label: "Returned Items",
       path: ROUTES.DASHBOARD.RETURN_ITEMS.BASE,
       icon: <IconTruckReturn size={14} />,
       indicator: false,
@@ -172,6 +164,15 @@ export const DashboardLayout = () => {
       indicator: false,
       count: 0,
       roles: ["admin", "employee"],
+    },
+
+    {
+      label: "Activity Logs",
+      path: ROUTES.DASHBOARD.ACTIVITY_LOG.BASE,
+      icon: <IconActivity size={14} />,
+      indicator: false,
+      count: 0,
+      roles: ["admin"],
     },
   ]
 
