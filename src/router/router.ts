@@ -138,12 +138,6 @@ export const router = createBrowserRouter([
                 Component: ProgramPage,
               },
 
-              // Announcement Carousel List
-              {
-                path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
-                Component: AnnouncementCarouselList,
-              },
-
               // Activity Log
               {
                 path: ROUTES.DASHBOARD.ACTIVITY_LOG.BASE,
@@ -189,16 +183,16 @@ export const router = createBrowserRouter([
                 Component: DashboardOrdersPage,
               },
 
-              // Inventory
-              {
-                path: ROUTES.DASHBOARD.INVENTORY.BASE,
-                Component: DashboardInventoryList,
-              },
-
               // Sales
               {
                 path: ROUTES.DASHBOARD.SALES.BASE,
                 Component: DashboardSalesList,
+              },
+
+              // Inventory
+              {
+                path: ROUTES.DASHBOARD.INVENTORY.BASE,
+                Component: DashboardInventoryList,
               },
               {
                 path: ROUTES.DASHBOARD.SALES.ID,
@@ -209,6 +203,12 @@ export const router = createBrowserRouter([
               {
                 path: ROUTES.DASHBOARD.RETURN_ITEMS.BASE,
                 Component: ReturnItemList,
+              },
+
+              // Announcement Carousel List
+              {
+                path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
+                Component: AnnouncementCarouselList,
               },
             ],
           },

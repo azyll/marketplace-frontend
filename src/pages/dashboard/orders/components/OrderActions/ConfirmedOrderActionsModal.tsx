@@ -131,8 +131,16 @@ export const ConfirmOrderActionsModal = ({
         key={order.id}
         type="number"
         value={salesInvoice.replace("FAI", "")}
-        onChange={(e) => setSalesInvoice("FAI" + e.target.value)}
+        onChange={(e) => {
+          const value = e.target.value.replace(/\D/g, "").slice(0, 5)
+          setSalesInvoice("FAI" + value)
+        }}
         leftSection={"FAI"}
+        error={
+          salesInvoice.replace("FAI", "") && salesInvoice.replace("FAI", "").length !== 5
+            ? "Sales invoice must be exactly 5 digits"
+            : undefined
+        }
       />
 
       {/* Action Buttons */}
@@ -149,7 +157,9 @@ export const ConfirmOrderActionsModal = ({
         <Button
           color="green"
           onClick={() => onSubmit(salesInvoice ?? "")}
-          disabled={!salesInvoice.replace("FAI", "")}
+          disabled={
+            !salesInvoice.replace("FAI", "") || salesInvoice.replace("FAI", "").length !== 5
+          }
           loading={loading}
         >
           Yes, complete order

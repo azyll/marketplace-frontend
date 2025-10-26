@@ -10,7 +10,14 @@ import {
   Text,
   Title,
 } from "@mantine/core"
-import { IconEdit, IconMoodSad, IconPlus, IconRestore, IconTrashX } from "@tabler/icons-react"
+import {
+  IconArchive,
+  IconEdit,
+  IconMoodSad,
+  IconPlus,
+  IconRestore,
+  IconTrashX,
+} from "@tabler/icons-react"
 import { useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
 import { DataTable, DataTableColumn } from "mantine-datatable"
@@ -213,7 +220,7 @@ export const ProductList = () => {
                 variant="light"
                 onClick={() => handleOnDeleteProduct(product)}
               >
-                <IconTrashX size={14} />
+                <IconArchive size={14} />
               </ActionIcon>
             </>
           )}
