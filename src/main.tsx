@@ -21,7 +21,14 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <MantineProvider theme={theme}>
-        <Notifications position="top-right" />
+        <Notifications
+          position="top-right"
+          styles={{
+            root: {
+              marginTop: "35px",
+            },
+          }}
+        />
 
         <AuthProvider>
           <RouterProvider router={router} />
