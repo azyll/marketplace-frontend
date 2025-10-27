@@ -18,19 +18,23 @@ import {
   Title,
   Tooltip,
   Badge,
+  Grid,
+  TextInput,
+  Flex,
 } from "@mantine/core"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import { IconPhotoPlus, IconRestore, IconArchive, IconEye } from "@tabler/icons-react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { notifications } from "@mantine/notifications"
 import { useState } from "react"
-import { IAnnouncement } from "@/types/announcement.type"
+import { IAnnouncement, IUpdateAnnouncementInput } from "@/types/announcement.type"
 import { AxiosError } from "axios"
 import { notifyResponseError } from "@/helper/errorNotification"
 import { formatDate } from "@/helper/formatDate"
 import { ImageUpload } from "@/components/ImageUpload"
 import { useDisclosure } from "@mantine/hooks"
 import { AnnouncementFilter } from "./AnnouncementFilter"
+import { KEY } from "@/constants/key"
 
 interface IAnnouncementFilters {
   status?: "active" | "archived"
@@ -57,6 +61,9 @@ export function AnnouncementCarouselList() {
     useDisclosure(false)
 
   const [imageModalOpened, { open: openImageModal, close: closeImageModal }] = useDisclosure(false)
+  const [title, setTitle] = useState<string>()
+  const [message, setMessage] = useState<string>()
+  const [announcementImage, setAnnouncementImage] = useState<File>()
 
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<{
     announcement: IAnnouncement
@@ -66,7 +73,7 @@ export function AnnouncementCarouselList() {
   const [viewingImage, setViewingImage] = useState<string>("")
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["announcements", filters.status],
+    queryKey: [KEY.ANNOUNCEMENTS, filters.status],
     queryFn: () =>
       getAnnouncements({
         all: true,
@@ -81,7 +88,7 @@ export function AnnouncementCarouselList() {
   const deleteMutation = useMutation({
     mutationFn: deleteAnnouncement,
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["announcements"] })
+      queryClient.invalidateQueries({ queryKey: [KEY.ANNOUNCEMENTS] })
       notifications.show({
         title: "Archive Success",
         message: response.message || "Announcement archived successfully",
@@ -99,7 +106,7 @@ export function AnnouncementCarouselList() {
   const restoreMutation = useMutation({
     mutationFn: restoreArchivedAnnouncement,
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["announcements"] })
+      queryClient.invalidateQueries({ queryKey: [KEY.ANNOUNCEMENTS] })
       notifications.show({
         title: "Restore Success",
         message: response.message || "Announcement restored successfully",
@@ -117,7 +124,7 @@ export function AnnouncementCarouselList() {
   const uploadMutation = useMutation({
     mutationFn: createAnnouncement,
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["announcements"] })
+      queryClient.invalidateQueries({ queryKey: [KEY.ANNOUNCEMENTS] })
       notifications.show({
         title: "Upload Success",
         message: response.message || "Announcement image uploaded successfully",
@@ -153,19 +160,42 @@ export function AnnouncementCarouselList() {
       setSelectedAnnouncement(undefined)
     }, 200)
   }
+  const handleOnSaveAnnouncement = () => {
+    const formData = new FormData()
+
+    formData.append("image", announcementImage as File)
+
+    if (title) {
+      formData.append("title", title)
+    }
+    if (message) {
+      formData.append("message", message)
+    }
+    if (!announcementImage) {
+      notifications.show({
+        title: "Announcement image is required",
+        message: "Fields required",
+        color: "red",
+      })
+      return
+    }
+    // formData.append("productId", announcementImage)
+
+    uploadMutation.mutate(formData as any)
+  }
 
   const handleOnImageUpload = async (files: File[]) => {
     if (files.length === 0) return
 
     const file = files[0]
-    const formData = new FormData()
-    formData.append("image", file)
 
-    uploadMutation.mutate(formData as any)
+    setAnnouncementImage(file)
   }
 
-  const handleViewImage = (imageUrl: string) => {
-    setViewingImage(imageUrl)
+  const handleViewAnnouncement = (announcement: IUpdateAnnouncementInput & { image: string }) => {
+    setViewingImage(announcement.image)
+    setTitle(announcement.title ?? "")
+    setMessage(announcement.message ?? "")
     openImageModal()
   }
 
@@ -188,6 +218,18 @@ export function AnnouncementCarouselList() {
           radius="sm"
         />
       ),
+    },
+    {
+      accessor: "title",
+      title: "Title",
+    },
+    {
+      accessor: "message",
+      title: "Message",
+    },
+    {
+      accessor: "product.name",
+      title: "Product Name",
     },
     {
       accessor: "createdAt",
@@ -215,7 +257,14 @@ export function AnnouncementCarouselList() {
             size="lg"
             variant="light"
             color="blue"
-            onClick={() => handleViewImage(getImage(record.image || ""))}
+            onClick={() =>
+              handleViewAnnouncement({
+                // @ts-ignore
+                image: getImage(record.image || "") as string,
+                title: record.title,
+                message: record.message,
+              })
+            }
           >
             <IconEye size={16} />
           </ActionIcon>
@@ -288,6 +337,17 @@ export function AnnouncementCarouselList() {
         </Text>
 
         <ImageUpload maxFiles={1} multiple={false} onDrop={handleOnImageUpload} />
+
+        <Flex direction={{ base: "column" }}>
+          <TextInput label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+
+          {/*  Acronym */}
+          <TextInput label="Message" value={message} onChange={(e) => setMessage(e.target.value)} />
+        </Flex>
+
+        <div className="mt-4 flex items-end justify-end">
+          <Button onClick={() => handleOnSaveAnnouncement()}>Save</Button>
+        </div>
         {uploadMutation.isPending && (
           <Center mt={16}>
             <Loader size="sm" />
@@ -372,7 +432,7 @@ export function AnnouncementCarouselList() {
           <h1 className="text-xl font-bold">Manage Announcement Images</h1>
 
           <Button onClick={openUploadModal}>
-            <IconPhotoPlus size={14} /> <Space w={6} /> Add Image
+            <IconPhotoPlus size={14} /> <Space w={6} /> Add Carousel Image
           </Button>
         </div>
 

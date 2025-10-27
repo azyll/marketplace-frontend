@@ -29,6 +29,7 @@ import OrderConfirmationModal from "./components/OrderConfirmationModal"
 import { ICart } from "@/types/cart.type"
 import { notifyResponseError } from "@/helper/errorNotification"
 import { AxiosError } from "axios"
+import { KEY } from "@/constants/key"
 
 export default function Cart() {
   const { user } = useContext(AuthContext)
@@ -40,7 +41,7 @@ export default function Cart() {
 
   // Fetch cart items - gets ALL items, no limit
   const { data: cart, isLoading } = useQuery({
-    queryKey: ["cart", user?.id],
+    queryKey: [KEY.CART, user?.id],
     queryFn: () => getItems(user!.id),
     enabled: !!user?.id,
     select: (response) => response.data,
@@ -50,7 +51,7 @@ export default function Cart() {
   const removeMutation = useMutation({
     mutationFn: (variantId: string) => removeItem(user!.id, variantId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart", user?.id] })
+      queryClient.invalidateQueries({ queryKey: [KEY.CART, user?.id] })
     },
     onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
       notifyResponseError(error, "Cart", "remove")
@@ -61,7 +62,7 @@ export default function Cart() {
   const addQuantityMutation = useMutation({
     mutationFn: (cartId: number) => addItemQuantity(user!.id, cartId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart", user?.id] })
+      queryClient.invalidateQueries({ queryKey: [KEY.CART, user?.id] })
     },
     onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
       notifyResponseError(error, "Cart", "create")
@@ -72,7 +73,7 @@ export default function Cart() {
   const deductQuantityMutation = useMutation({
     mutationFn: (cartId: number) => deductItemQuantity(user!.id, cartId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart", user?.id] })
+      queryClient.invalidateQueries({ queryKey: [KEY.CART, user?.id] })
     },
     onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
       notifyResponseError(error, "Cart", "remove")
@@ -109,6 +110,7 @@ export default function Cart() {
       setSelectedItems(new Set())
 
       navigate(`/order/${order.data.id}?orderType=cart`)
+      queryClient.invalidateQueries({ queryKey: [KEY.CART, user?.id] })
     },
     onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
       notifyResponseError(error, "Order", "create")

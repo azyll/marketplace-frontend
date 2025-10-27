@@ -29,6 +29,7 @@ import { ROUTES } from "@/constants/routes"
 import { useQuery } from "@tanstack/react-query"
 import { getItems } from "@/services/cart.service"
 import NotificationButton from "./NotificationButton"
+import { KEY } from "@/constants/key"
 
 export default function Header() {
   const navigate = useNavigate()
@@ -39,7 +40,7 @@ export default function Header() {
   )
 
   const { data: cart } = useQuery({
-    queryKey: ["cart", user?.id],
+    queryKey: [KEY.CART, user?.id],
     queryFn: () => getItems(user!.id),
     enabled: !!user?.id && !isAdmin,
   })

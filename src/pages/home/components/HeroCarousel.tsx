@@ -1,9 +1,11 @@
 import { Carousel } from "@mantine/carousel"
-import { Image, Title, Loader, Center, Text } from "@mantine/core"
+import { Image, Title, Text, Center, Loader } from "@mantine/core"
 import { useQuery } from "@tanstack/react-query"
 import { getAnnouncements } from "@/services/announcement.service"
 import { getImage } from "@/services/media.service"
 import "@/styles/carousel.css"
+import { NavLink } from "react-router"
+import { KEY } from "@/constants/key"
 
 export default function HeroCarousel() {
   const {
@@ -11,7 +13,7 @@ export default function HeroCarousel() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["announcements", "active"],
+    queryKey: [KEY.ANNOUNCEMENTS, "active"],
     queryFn: () => getAnnouncements({ all: true, status: "active" }),
     select: (response) => response.data,
   })
@@ -57,11 +59,30 @@ export default function HeroCarousel() {
       >
         {announcements.map((item) => (
           <Carousel.Slide key={item.id}>
-            <Image
-              src={getImage(item.image)}
-              alt={`Announcement ${item.id}`}
-              className="md:!rounded-xl"
-            />
+            <div style={{ position: "relative" }}>
+              {item.product ? (
+                <NavLink to={`/products/${item.product?.productSlug}`}>
+                  <Image
+                    src={getImage(item.image)}
+                    alt={`Announcement ${item.id}`}
+                    className="md:!rounded-xl"
+                  />
+                </NavLink>
+              ) : (
+                <Image
+                  src={getImage(item.image)}
+                  alt={`Announcement ${item.id}`}
+                  className="md:!rounded-xl"
+                />
+              )}
+
+              {item.title && item.message ? (
+                <div className="bg-opacity-50 absolute bottom-2 left-2 rounded-md bg-black p-2 text-white">
+                  {item.title && <Text size="xl">{item.title}</Text>}
+                  {item.message && <Text size="sm">{item.message}</Text>}
+                </div>
+              ) : null}
+            </div>
           </Carousel.Slide>
         ))}
       </Carousel>

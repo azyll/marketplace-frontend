@@ -286,7 +286,7 @@ export default function ProductPage() {
 
       const response = await addItem(user.id, selectedItem.id, quantity)
 
-      queryClient.invalidateQueries({ queryKey: ["cart", user.id] })
+      queryClient.invalidateQueries({ queryKey: [KEY.CART, user.id] })
 
       showNotification("Success", response.message, "success")
     } catch (error: any) {

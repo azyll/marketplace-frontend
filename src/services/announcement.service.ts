@@ -1,5 +1,9 @@
 import { ENDPOINT } from "@/constants/endpoints"
-import { IAnnouncement, IGetAnnouncementFilters } from "@/types/announcement.type"
+import {
+  IAnnouncement,
+  ICreateAnnouncementInput,
+  IGetAnnouncementFilters,
+} from "@/types/announcement.type"
 import { IPaginatedResponse } from "@/types/common.type"
 import axios from "@/utils/axios"
 
@@ -14,18 +18,23 @@ export const getAnnouncements = async (filters: IGetAnnouncementFilters) => {
   return response.data
 }
 
-// export const getArchivedAnnouncements = async () => {
-//   const response = await axios.get(ENDPOINT.ANNOUNCEMENT.ARCHIVE)
-
-//   return response.data
-// }
-
-export const createAnnouncement = async (image: File) => {
-  const response = await axios.post(ENDPOINT.ANNOUNCEMENT.BASE, image)
+export const createAnnouncement = async (payload: ICreateAnnouncementInput) => {
+  const response = await axios.post(ENDPOINT.ANNOUNCEMENT.BASE, payload)
 
   return response.data
 }
 
+export const updateDepartment = async (
+  announcementId: string,
+  payload: ICreateAnnouncementInput,
+) => {
+  const response = await axios.put<IAnnouncement>(
+    ENDPOINT.ANNOUNCEMENT.ID.replace(":announcementId", announcementId),
+    payload,
+  )
+
+  return response.data
+}
 export const deleteAnnouncement = async (announcementId: string) => {
   const response = await axios.delete(
     ENDPOINT.ANNOUNCEMENT.ID.replace(":announcementId", announcementId),
