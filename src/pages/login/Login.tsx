@@ -1,6 +1,7 @@
 import {
   Button,
   ComboboxItem,
+  Flex,
   Group,
   Image,
   Modal,
@@ -83,29 +84,31 @@ export default function Login() {
                 label="Username"
                 description="Enter only the part before @ (e.g., lastname.123456)"
                 placeholder="Enter your username"
-                required
                 disabled={isLoading}
               />
 
-              <PasswordInput
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                variant="filled"
-                label="Password"
-                description="Use the password format from your RAF"
-                placeholder="Enter your password"
-                required
-                disabled={isLoading}
-              />
-              <Button
-                onClick={() => {
-                  open()
-                }}
-                variant="white"
-                type="button"
-              >
-                Forgot Password
-              </Button>
+              <Stack gap="xs">
+                <PasswordInput
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  variant="filled"
+                  label="Password"
+                  description="Use the password format from your RAF"
+                  placeholder="Enter your password"
+                  required
+                  disabled={isLoading}
+                />
+                <Button
+                  onClick={open}
+                  variant="subtle"
+                  size="compact-xs"
+                  p={0}
+                  w="105"
+                  justify="flex-start"
+                >
+                  Forgot Password?
+                </Button>
+              </Stack>
 
               <Button type="submit" loading={isLoading}>
                 Sign In

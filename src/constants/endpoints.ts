@@ -20,6 +20,7 @@ export const ENDPOINT = {
 
   CART: {
     BASE: "/cart",
+    ID: "/cart/:userId",
   },
 
   ORDER: {

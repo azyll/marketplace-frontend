@@ -216,7 +216,29 @@ export default function Order() {
                       </Text>
                     </Group>
 
-                    {order?.orderItems?.map((item: IOrderItems) => (
+                    <Stack gap={2}>
+                      {order.orderItems?.length ? (
+                        order.orderItems.map((item, i) => (
+                          <Text key={i} size="sm" fw={500}>
+                            {item.productVariant.product.name}
+                            <span className="text-gray-500">
+                              {" "}
+                              {item.productVariant.size === "N/A"
+                                ? ""
+                                : item.productVariant.size}{" "}
+                              {item.productVariant.name === "N/A" ? "" : item.productVariant.name} ×{" "}
+                              {item.quantity}
+                            </span>
+                          </Text>
+                        ))
+                      ) : (
+                        <Text size="sm" c="dimmed">
+                          —
+                        </Text>
+                      )}
+                    </Stack>
+
+                    {/* {order?.orderItems?.map((item: IOrderItems) => (
                       <div key={item.id}>
                         <Group
                           justify="space-between"
@@ -239,7 +261,7 @@ export default function Order() {
                           />
                         </Group>
                       </div>
-                    ))}
+                    ))} */}
 
                     <Group justify="space-between" wrap="nowrap">
                       <Text size="md" fw={600}>

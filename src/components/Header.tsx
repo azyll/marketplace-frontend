@@ -74,42 +74,43 @@ export default function Header() {
         <Group className="relative z-10 !gap-4 md:!gap-6" wrap="nowrap">
           <HeaderSearchBar />
 
-          {!isAdmin && (
-            <>
-              {/* Cart Button */}
-              <Indicator
-                inline
-                label={cartCount}
-                size={18}
-                offset={3}
-                withBorder
-                disabled={!cartCount}
-                classNames={{ indicator: "!text-[12px] !p-1" }}
-              >
-                <ActionIcon
-                  variant="subtle"
-                  radius="xl"
-                  onClick={() => {
-                    if (!user) {
-                      notifications.show({
-                        title: "Login required",
-                        message: "Please log in to view your cart",
-                        icon: <IconLock size={18} />,
-                      })
-                      navigate(ENDPOINT.LOGIN)
-                    } else {
-                      navigate(ENDPOINT.CART.BASE)
-                    }
-                  }}
+          {!user ||
+            (!isAdmin && (
+              <>
+                {/* Cart Button */}
+                <Indicator
+                  inline
+                  label={cartCount}
+                  size={18}
+                  offset={3}
+                  withBorder
+                  disabled={!cartCount}
+                  classNames={{ indicator: "!text-[12px] !p-1" }}
                 >
-                  <IconShoppingBag />
-                </ActionIcon>
-              </Indicator>
+                  <ActionIcon
+                    variant="subtle"
+                    radius="xl"
+                    onClick={() => {
+                      if (!user) {
+                        notifications.show({
+                          title: "Login required",
+                          message: "Please log in to view your cart",
+                          icon: <IconLock size={18} />,
+                        })
+                        navigate(ENDPOINT.LOGIN)
+                      } else {
+                        navigate(ENDPOINT.CART.BASE)
+                      }
+                    }}
+                  >
+                    <IconShoppingBag />
+                  </ActionIcon>
+                </Indicator>
 
-              {/* Notifications Component */}
-              <NotificationButton />
-            </>
-          )}
+                {/* Notifications Component */}
+                <NotificationButton />
+              </>
+            ))}
 
           {/* Loading State */}
           {isLoading ? (
