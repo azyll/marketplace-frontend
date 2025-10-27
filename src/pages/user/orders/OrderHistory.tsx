@@ -122,9 +122,15 @@ export default function OrderHistory() {
                   <div>
                     <Group justify="space-between">
                       <div>
-                        <Text size="sm" c="dimmed">
-                          Item(s)
-                        </Text>
+                        <span className="flex items-center gap-1">
+                          <Text size="sm" c="dimmed">
+                            Item(s)
+                          </Text>
+                          <Badge circle size="sm">
+                            {order.orderItems?.length}
+                          </Badge>
+                        </span>
+
                         <Stack gap={2}>
                           {order.orderItems?.length ? (
                             order.orderItems.map((item, i) => (
@@ -132,8 +138,13 @@ export default function OrderHistory() {
                                 {item.productVariant.product.name}
                                 <span className="text-gray-500">
                                   {" "}
-                                  • {item.productVariant.size}, {item.productVariant.name} ×{" "}
-                                  {item.quantity}
+                                  {item.productVariant.size === "N/A"
+                                    ? ""
+                                    : item.productVariant.size}{" "}
+                                  {item.productVariant.name === "N/A"
+                                    ? ""
+                                    : item.productVariant.name}{" "}
+                                  × {item.quantity}
                                 </span>
                               </Text>
                             ))
