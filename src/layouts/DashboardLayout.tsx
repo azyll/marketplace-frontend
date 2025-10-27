@@ -11,7 +11,7 @@ import {
   Text,
 } from "@mantine/core"
 import { Link, Outlet, useLocation, useNavigate } from "react-router"
-import { useContext } from "react"
+import { useContext, useMemo } from "react"
 import { AuthContext } from "@/contexts/AuthContext"
 import {
   IconArrowLeft,
@@ -21,12 +21,19 @@ import {
   IconReportMoney,
   IconShoppingBagCheck,
   IconUser,
+  IconShield,
+  IconBook,
+  IconLibrary,
+  IconTruckReturn,
+  IconActivity,
+  IconCarouselHorizontal,
 } from "@tabler/icons-react"
 import { ROUTES } from "@/constants/routes"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
 import { getOrders } from "@/services/order.service"
 import { getInventoryAlerts } from "@/services/products.service"
+import { checkModuleAccess, getModuleFromPathname } from "@/router/components/ProtectedRoute"
 
 export const DashboardLayout = () => {
   const navigate = useNavigate()
@@ -75,19 +82,48 @@ export const DashboardLayout = () => {
   const inventoryCount = (criticalStock?.noStock || 0) + (criticalStock?.lowStock || 0)
 
   const items = [
+    //Admin Only
     {
       label: "Users",
       path: ROUTES.DASHBOARD.USER.BASE,
       icon: <IconUser size={14} />,
       indicator: false,
       count: 0,
+      roles: ["admin", "employee"],
     },
+    {
+      label: "Roles",
+      path: ROUTES.DASHBOARD.ROLES.BASE,
+      icon: <IconShield size={14} />,
+      indicator: false,
+      count: 0,
+      roles: ["admin"],
+    },
+    {
+      label: "Department",
+      path: ROUTES.DASHBOARD.DEPARTMENTS.BASE,
+      icon: <IconLibrary size={14} />,
+      indicator: false,
+      count: 0,
+      roles: ["admin"],
+    },
+    {
+      label: "Program",
+      path: ROUTES.DASHBOARD.PROGRAMS.BASE,
+      icon: <IconBook size={14} />,
+      indicator: false,
+      count: 0,
+      roles: ["admin"],
+    },
+
+    //Employee & Admin
     {
       label: "Products",
       path: ROUTES.DASHBOARD.PRODUCTS.BASE,
       icon: <IconBuildingStore size={14} />,
       indicator: false,
       count: 0,
+      roles: ["admin", "employee"],
     },
     {
       label: "Orders",
@@ -95,13 +131,7 @@ export const DashboardLayout = () => {
       icon: <IconShoppingBagCheck size={14} />,
       indicator: totalOrdersCount > 0,
       count: totalOrdersCount,
-    },
-    {
-      label: "Inventory",
-      path: ROUTES.DASHBOARD.INVENTORY.BASE,
-      icon: <IconBuildingWarehouse size={14} />,
-      indicator: criticalStock?.hasAlerts,
-      count: inventoryCount,
+      roles: ["admin", "employee"],
     },
     {
       label: "Sales",
@@ -109,8 +139,70 @@ export const DashboardLayout = () => {
       icon: <IconReportMoney size={14} />,
       indicator: false,
       count: 0,
+      roles: ["admin", "employee"],
+    },
+    {
+      label: "Inventory",
+      path: ROUTES.DASHBOARD.INVENTORY.BASE,
+      icon: <IconBuildingWarehouse size={14} />,
+      indicator: criticalStock?.hasAlerts,
+      count: inventoryCount,
+      roles: ["admin", "employee"],
+    },
+    {
+      label: "Returned Items",
+      path: ROUTES.DASHBOARD.RETURN_ITEMS.BASE,
+      icon: <IconTruckReturn size={14} />,
+      indicator: false,
+      count: 0,
+      roles: ["admin", "employee"],
+    },
+    {
+      label: "Announcement Carousel",
+      path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
+      icon: <IconCarouselHorizontal size={14} />,
+      indicator: false,
+      count: 0,
+      roles: ["admin", "employee"],
+    },
+
+    {
+      label: "Activity Logs",
+      path: ROUTES.DASHBOARD.ACTIVITY_LOG.BASE,
+      icon: <IconActivity size={14} />,
+      indicator: false,
+      count: 0,
+      roles: ["admin"],
     },
   ]
+
+  const filteredItems = useMemo(
+    () =>
+      items.filter((item) => {
+        if (!item?.roles || !user) return false
+
+        const userRoleTag = user.role.systemTag
+
+        // 1. High-level Role Check: Filter out links not allowed for the user's general role
+        if (!item.roles.includes(userRoleTag)) return false
+
+        // 2. Granular Module Check: ONLY apply for the 'employee' systemTag
+        if (userRoleTag === "employee") {
+          const module = getModuleFromPathname(item.path)
+
+          // If the link does not map to a protected Module (e.g., /dashboard/home), allow it.
+          if (!module) return true
+
+          // Check if the employee has VIEW or EDIT permission for this specific module
+          return checkModuleAccess(module, user.role.modulePermission)
+        }
+
+        // 3. For 'admin' (or any role not explicitly checked),
+        // if it passed the high-level role check (step 1), show the link.
+        return true
+      }),
+    [user, items],
+  )
 
   if (!user) return null
 
@@ -165,7 +257,7 @@ export const DashboardLayout = () => {
       </AppShell.Header>
 
       <AppShell.Navbar p="md">
-        {items.map((item, index) => (
+        {filteredItems.map((item, index) => (
           <NavLink
             leftSection={
               <Indicator

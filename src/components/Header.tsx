@@ -10,11 +10,9 @@ import {
   Badge,
   Skeleton,
   Indicator,
-  Popover,
 } from "@mantine/core"
 import {
   IconShoppingBag,
-  IconBell,
   IconUser,
   IconLogout,
   IconLock,
@@ -23,33 +21,30 @@ import {
 } from "@tabler/icons-react"
 import HeaderSearchBar from "./HeaderSearchBar"
 import { useNavigate } from "react-router"
-import { useContext, useEffect, useMemo } from "react"
+import { useContext, useMemo } from "react"
 import { AuthContext } from "@/contexts/AuthContext"
 import { notifications } from "@mantine/notifications"
 import { ENDPOINT } from "@/constants/endpoints"
 import { ROUTES } from "@/constants/routes"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { getItems } from "@/services/cart.service"
-import { supabase } from "@/utils/supabase"
-import { getUserNotifications } from "@/services/notification.service"
+import NotificationButton from "./NotificationButton"
 
 export default function Header() {
   const navigate = useNavigate()
-
   const { user, logout, isLoading } = useContext(AuthContext)
-
-  const { data: cart } = useQuery({
-    queryKey: ["cart", user?.id],
-    queryFn: () => getItems(user!.id),
-    enabled: !!user?.id,
-  })
-
-  const cartCount = cart?.length ?? 0
-
   const isAdmin = useMemo(
     () => user?.role.systemTag === "admin" || user?.role.systemTag === "employee",
     [user],
   )
+
+  const { data: cart } = useQuery({
+    queryKey: ["cart", user?.id],
+    queryFn: () => getItems(user!.id),
+    enabled: !!user?.id && !isAdmin,
+  })
+
+  const cartCount = cart?.data.length ?? 0
 
   return (
     <nav className="h-14">
@@ -79,68 +74,43 @@ export default function Header() {
         <Group className="relative z-10 !gap-4 md:!gap-6" wrap="nowrap">
           <HeaderSearchBar />
 
-          {/* Cart Button */}
+          {!user ||
+            (!isAdmin && (
+              <>
+                {/* Cart Button */}
+                <Indicator
+                  inline
+                  label={cartCount}
+                  size={18}
+                  offset={3}
+                  withBorder
+                  disabled={!cartCount}
+                  classNames={{ indicator: "!text-[12px] !p-1" }}
+                >
+                  <ActionIcon
+                    variant="subtle"
+                    radius="xl"
+                    onClick={() => {
+                      if (!user) {
+                        notifications.show({
+                          title: "Login required",
+                          message: "Please log in to view your cart",
+                          icon: <IconLock size={18} />,
+                        })
+                        navigate(ENDPOINT.LOGIN)
+                      } else {
+                        navigate(ENDPOINT.CART.BASE)
+                      }
+                    }}
+                  >
+                    <IconShoppingBag />
+                  </ActionIcon>
+                </Indicator>
 
-          {cartCount > 0 ? (
-            <Indicator
-              inline
-              label={cartCount}
-              size={18}
-              offset={3}
-              withBorder
-              classNames={{ indicator: "!text-[12px] !p-1" }}
-            >
-              <ActionIcon
-                variant="subtle"
-                radius="xl"
-                onClick={() => {
-                  if (!user) {
-                    notifications.show({
-                      title: "Login required",
-                      message: "Please log in to view your cart",
-                      icon: <IconLock size={18} />,
-                    })
-                    navigate(ENDPOINT.LOGIN)
-                  } else {
-                    navigate(ENDPOINT.CART.BASE)
-                  }
-                }}
-              >
-                <IconShoppingBag />
-              </ActionIcon>
-            </Indicator>
-          ) : (
-            <ActionIcon
-              variant="subtle"
-              radius="xl"
-              onClick={() => {
-                if (!user) {
-                  notifications.show({
-                    title: "Login required",
-                    message: "Please log in to view your cart",
-                    icon: <IconLock size={18} />,
-                  })
-                  navigate(ENDPOINT.LOGIN)
-                } else {
-                  navigate(ENDPOINT.CART.BASE)
-                }
-              }}
-            >
-              <IconShoppingBag />
-            </ActionIcon>
-          )}
-
-          {/* Notifications Button */}
-          <Popover>
-            <Popover.Target>
-              <div>
-                <ActionIcon variant="subtle" radius="xl">
-                  <IconBell />
-                </ActionIcon>
-              </div>
-            </Popover.Target>
-            {user && <Popover.Dropdown>{}</Popover.Dropdown>}
-          </Popover>
+                {/* Notifications Component */}
+                <NotificationButton />
+              </>
+            ))}
 
           {/* Loading State */}
           {isLoading ? (
@@ -180,7 +150,7 @@ export default function Header() {
                     </Text>
 
                     <Badge variant="light" size="xs" radius="sm" color="blue">
-                      {user.student ? user.student?.program?.acronym : user.role.systemTag}
+                      {user.student ? user.student?.program?.acronym : user.role.name}
                     </Badge>
                   </Stack>
                 </Group>
@@ -196,7 +166,7 @@ export default function Header() {
                       </Text>
 
                       <Badge variant="light" size="xs" radius="sm" color="blue">
-                        {user.student ? user.student?.program?.acronym : user.role.systemTag}
+                        {user.student ? user.student?.program?.acronym : user.role.name}
                       </Badge>
                     </Group>
                   </Menu.Label>

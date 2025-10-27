@@ -1,44 +1,18 @@
-import {
-  Combobox,
-  ComboboxItem,
-  Grid,
-  LoadingOverlay,
-  OptionsFilter,
-  Select,
-  SelectProps,
-  Text,
-  TextInput,
-  Title,
-  useCombobox,
-} from "@mantine/core"
-import { Ref, useEffect, useImperativeHandle, useState } from "react"
+import { Combobox, Grid, LoadingOverlay, Text, TextInput, Title, useCombobox } from "@mantine/core"
+import { useEffect, useState } from "react"
 import { IStudent } from "@/types/student.type"
-import { useForm, UseFormReturnType } from "@mantine/form"
-import { ICreateOrderStudentCreateInput, ICreateOrderStudentInput } from "@/types/order.type"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { getPrograms } from "@/services/program.service"
 import { getAllStudents } from "@/services/student.service"
 import { useDebouncedState } from "@mantine/hooks"
-import { zod4Resolver } from "mantine-form-zod-resolver"
-import { createOrderStudentSchema } from "@/schema/order.schema"
-
-export interface OrderStudentFormRef {
-  form: UseFormReturnType<Partial<ICreateOrderStudentInput>>
-}
+import { useOrderForm } from "@/pages/dashboard/orders/form/index"
 
 interface Props {
-  ref: Ref<OrderStudentFormRef>
   disabled?: boolean
 }
 
-export const OrderStudentForm = ({ ref, disabled }: Props) => {
-  const form = useForm<Partial<ICreateOrderStudentCreateInput>>({
-    initialValues: {
-      studentNumber: undefined,
-    },
-    validate: zod4Resolver(createOrderStudentSchema),
-  })
+export const OrderStudentExistingForm = ({ disabled }: Props) => {
+  const { orderStudentForm: form } = useOrderForm()
 
   const [studentDebouncedSearch, setStudentDebouncedSearch] = useDebouncedState("", 300)
   const [studentSearch, setStudentSearch] = useState<string>()
@@ -62,14 +36,31 @@ export const OrderStudentForm = ({ ref, disabled }: Props) => {
   const handleOnSelectStudent = (studentId: string) => {
     const student = students?.find(({ id }) => id.toString() === studentId)
 
-    if (student) {
+    if (!!student) {
       setSelectedStudent(student)
+      form.setValues({
+        studentNumber: student.id.toString(),
+        sex: student.sex as IStudent["sex"],
+        program: student.programId,
+        firstName: student.user.firstName,
+        lastName: student.user.lastName,
+      })
       setStudentSearch(`${student.user.fullName} (${student.id})`)
+
       return
     }
 
     setStudentSearch(studentId)
   }
+
+  useEffect(() => {
+    const student = form.getValues()
+    const fullName = student.firstName + " " + student.lastName
+
+    if (student.firstName) {
+      setStudentSearch(`${fullName} (${student.studentNumber})`)
+    }
+  }, [])
 
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -84,23 +75,17 @@ export const OrderStudentForm = ({ ref, disabled }: Props) => {
     </Combobox.Option>
   ))
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      form,
-    }),
-    [form],
-  )
-
   return (
     <div>
       <div className="mb-4">
         <Title order={4}>Select Existing Student</Title>
-        <Text c="dimmed">Find and select an existing student to proceed with registration.</Text>
+        <Text size="sm" c={"dimmed"}>
+          Search and Select an Existing Student to proceed with Order Create
+        </Text>
       </div>
 
       <Grid>
-        <Grid.Col span={4}>
+        <Grid.Col span={12}>
           <Combobox
             onOptionSubmit={(optionValue) => {
               handleOnSelectStudent(optionValue)

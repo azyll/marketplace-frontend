@@ -32,4 +32,9 @@ export interface ICreateUserInput {
   roleId: string
 }
 
+export interface IForgotPasswordUserInput {
+  firstName: string
+  lastName: string
+  username: string
+}
 export type IUpdateUserInput = Partial<Omit<ICreateUserInput, "password">>

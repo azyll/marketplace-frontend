@@ -1,15 +1,19 @@
 import { useState, useEffect } from "react"
-import { Modal, NumberInput, Button, Group, Space } from "@mantine/core"
+import { Modal, NumberInput, Button, Group, Space, Text } from "@mantine/core"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { notifications } from "@mantine/notifications"
 import { updateProductStock } from "@/services/products.service"
 import { KEY } from "@/constants/key"
 import { IconMinus, IconPlus } from "@tabler/icons-react"
+import { AxiosError } from "axios"
+import { notifyResponseError } from "@/helper/errorNotification"
 
 interface EditStockModalProps {
   opened: boolean
   onClose: () => void
   variantId: string | undefined
+  currentStock?: number // Add this prop
+  variantName?: string // Optional: to show which variant is being edited
   initialAction?: "add" | "minus"
   initialQuantity?: number
 }
@@ -18,6 +22,8 @@ export const EditStockModal = ({
   opened,
   onClose,
   variantId,
+  currentStock = 0, // Default to 0 if not provided
+  variantName,
   initialAction = "add",
   initialQuantity = 0,
 }: EditStockModalProps) => {
@@ -57,12 +63,8 @@ export const EditStockModal = ({
       // Close modal and reset form
       handleClose()
     },
-    onError: (error: any) => {
-      notifications.show({
-        title: "Error",
-        message: error?.response?.data?.message || "Failed to update stock",
-        color: "red",
-      })
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Stock", "update")
     },
   })
 
@@ -94,8 +96,22 @@ export const EditStockModal = ({
     mutation.mutate()
   }
 
+  // Calculate the new stock quantity
+  const newStockQuantity =
+    action === "add" ? currentStock + quantity : Math.max(0, currentStock - quantity)
+
   return (
     <Modal opened={opened} onClose={handleClose} title="Update Stock Quantity" centered>
+      {variantName && (
+        <Text size="sm" c="dimmed" mb="md">
+          Editing: <strong>{variantName}</strong>
+        </Text>
+      )}
+
+      <Text size="sm" mb="md">
+        Current Stock: <strong>{currentStock}</strong>
+      </Text>
+
       <Group mb="md" gap="sm">
         <Button
           variant={action === "add" ? "filled" : "subtle"}
@@ -127,6 +143,12 @@ export const EditStockModal = ({
             : "Amount to subtract from current stock"
         }
       />
+
+      {quantity > 0 && (
+        <Text size="sm" mt="md" c={action === "minus" && newStockQuantity === 0 ? "red" : "blue"}>
+          New stock will be: <strong>{newStockQuantity}</strong>
+        </Text>
+      )}
 
       <Group justify="flex-end" mt="md">
         <Button variant="default" onClick={handleClose} disabled={mutation.isPending}>

@@ -15,6 +15,9 @@ export const PRODUCT_SIZE = {
   "3 Extra Large": "3XL",
   "4 Extra Large": "4XL",
   "5 Extra Large": "5XL",
+  "6 Extra Large": "6XL",
+  "7 Extra Large": "7XL",
+  "8 Extra Large": "8XL",
 }
 
 export const PRODUCT_TYPE = {

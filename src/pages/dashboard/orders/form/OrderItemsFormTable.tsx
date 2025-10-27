@@ -1,32 +1,41 @@
-import { Component } from "react"
-import { ActionIcon, Box, Button, Card, Image, Pagination, Space } from "@mantine/core"
+import { ActionIcon, Box, Button, Card, Image, Pagination, Space, Title } from "@mantine/core"
 import { DataTable, DataTableColumn } from "mantine-datatable"
-import { IconEdit, IconMoodSad, IconPlus, IconTrashX } from "@tabler/icons-react"
-import { IProduct, IProductListFilters, IProductVariant } from "@/types/product.type"
+import { IconEdit, IconMoodSad, IconPlus } from "@tabler/icons-react"
+import {
+  IInventoryFilter,
+  IProduct,
+  IProductListFilters,
+  IProductVariant,
+} from "@/types/product.type"
 import { getImage } from "@/services/media.service"
-import dayjs from "dayjs"
 import { ProductFilter } from "@/pages/dashboard/components/ProductFilter"
 import { useFilters } from "@/hooks/useFilters"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { getProductList } from "@/services/products.service"
+import { getInventoryProducts } from "@/services/products.service"
 
-export const OrderItemsFormTable = () => {
+interface Props {
+  onProductSelect: (product: IProduct) => void
+  disabled?: boolean
+}
+
+export const OrderItemsFormTable = ({ onProductSelect, disabled }: Props) => {
   const DEFAULT_PAGE = 1
   const DEFAULT_LIMIT = 10
 
-  const [filters, setFilters, setFilterValues] = useFilters<IProductListFilters>({
+  const [filters, setFilters, setFilterValues] = useFilters<IInventoryFilter>({
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
+    all:false,
   })
 
   const { data: products, isLoading } = useQuery({
     queryKey: [KEY.PRODUCTS, filters],
-    queryFn: () => getProductList(filters),
+    queryFn: () => getInventoryProducts(filters),
   })
 
   const handleOnAddToCard = (product: IProduct) => {
-    console.log("onAddToCard", product)
+    onProductSelect(product)
   }
 
   const displayPriceRange = (variants: IProductVariant[]) => {
@@ -62,7 +71,12 @@ export const OrderItemsFormTable = () => {
       textAlign: "center",
       render: (product) => (
         <div className="flex justify-center gap-4">
-          <ActionIcon size="lg" variant="light" onClick={() => handleOnAddToCard(product)}>
+          <ActionIcon
+            size="lg"
+            variant="light"
+            onClick={() => handleOnAddToCard(product)}
+            disabled={disabled}
+          >
             <IconPlus size={14} />
           </ActionIcon>
         </div>
@@ -71,9 +85,9 @@ export const OrderItemsFormTable = () => {
   ]
 
   return (
-    <Card>
-      <Card.Section px={24} pt={4}>
-        <ProductFilter filters={filters} onFilter={setFilterValues} />
+    <Card radius="md">
+      <Card.Section px={24} pt={10}>
+        <ProductFilter filters={filters} onFilter={setFilterValues} disabled={disabled} />
       </Card.Section>
 
       <Space h={16} />
@@ -89,6 +103,7 @@ export const OrderItemsFormTable = () => {
             value={filters.page ?? DEFAULT_PAGE}
             onChange={(p) => setFilters("page", p)}
             size="sm"
+            disabled={disabled}
           />
         </div>
         <div>
@@ -123,6 +138,7 @@ export const OrderItemsFormTable = () => {
             value={filters.page ?? DEFAULT_PAGE}
             onChange={(p) => setFilters("page", p)}
             size="sm"
+            disabled={disabled}
           />
         </div>
       </Card.Section>

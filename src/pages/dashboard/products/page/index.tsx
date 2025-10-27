@@ -28,6 +28,8 @@ import { getProductAttributes } from "@/services/product-attribute.service"
 import { getImage } from "@/services/media.service"
 import { notifications } from "@mantine/notifications"
 import { AxiosError } from "axios"
+import { notifyResponseError } from "@/helper/errorNotification"
+import { getLoggedInUser } from "@/services/user.service"
 
 export const ProductPage = () => {
   const { productId } = useParams<{ productId: string }>()
@@ -49,11 +51,7 @@ export const ProductPage = () => {
     select: (response) => response.data,
   })
 
-  const { data: naAttribute, isLoading: isAttributesLoading } = useQuery({
-    queryKey: [KEY.PRODUCT_ATTRIBUTES],
-    queryFn: () => getProductAttributes(),
-    select: (attributes: IProductAttribute[]) => attributes.find(({ name }) => name === "N/A"),
-  })
+
 
   const [simpleProduct, setSimpleProduct] = useState<boolean>(true)
   const [imageDefaultValue, setImageDefaultValue] = useState<string>()
@@ -61,40 +59,6 @@ export const ProductPage = () => {
   const productDetailsFormRef = useRef<ProductDetailsFormRef>(null)
   const singleVariantFormRef = useRef<SingleVariantFormRef>(null)
   const multipleVariantFormRef = useRef<MultipleVariantFormRef>(null)
-
-  const notifyResponseError = (
-    error: AxiosError<{ message: string; error: string | any[] }>,
-    type: "create" | "update",
-  ) => {
-    const label = type === "create" ? "Create" : "Update"
-
-    if (Array.isArray(error?.response?.data?.error)) {
-      notifications.show({
-        title: `${label} Failed`,
-        message:
-          error?.response?.data?.error?.[0]?.message ??
-          error?.response?.data?.error ??
-          `Can't ${label} Product`,
-        color: "red",
-      })
-      return
-    }
-
-    if (typeof error?.response?.data?.error === "string") {
-      notifications.show({
-        title: `${label} Failed`,
-        message: error?.response?.data?.error ?? `Can't ${label} Product`,
-        color: "red",
-      })
-      return
-    }
-
-    notifications.show({
-      title: `${label} Failed`,
-      message: `Can't ${label} Product`,
-      color: "red",
-    })
-  }
 
   const createMutation = useMutation({
     mutationFn: (payload: ICreateProductInput) => createProduct(payload),
@@ -108,7 +72,7 @@ export const ProductPage = () => {
       navigate(ROUTES.DASHBOARD.PRODUCTS.BASE)
     },
     onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
-      notifyResponseError(error, "create")
+      notifyResponseError(error, "Product", "create")
     },
   })
 
@@ -126,7 +90,7 @@ export const ProductPage = () => {
       navigate(ROUTES.DASHBOARD.PRODUCTS.BASE)
     },
     onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
-      notifyResponseError(error, "update")
+      notifyResponseError(error, "Product", "update")
     },
   })
 
@@ -179,18 +143,18 @@ export const ProductPage = () => {
         const multipleProductVariants = multipleVariantForm.values
           .variants as IUpdateProductVariantInput[]
 
+        const payloadVariants = simpleProduct ? singleProductVariants : multipleProductVariants
+
         updateMutation.mutate({
           productId: product?.id as string,
           payload: {
             ...productDetails,
-            variants: simpleProduct
-              ? singleProductVariants
-              : (multipleProductVariants.map((variant, index) => {
-                  if (!variant.id) {
-                    return { ...variant, id: index }
-                  }
-                  return variant
-                }) as IUpdateProductVariantInput[]),
+            variants: payloadVariants.map((variant, index) => {
+              if (!variant.id) {
+                return { ...variant, id: index }
+              }
+              return variant
+            }) as IUpdateProductVariantInput[],
           },
         })
       }

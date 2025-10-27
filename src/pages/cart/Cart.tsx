@@ -4,6 +4,7 @@ import { getItems, removeItem, addItemQuantity, deductItemQuantity } from "@/ser
 import { createOrder } from "@/services/order.service"
 import {
   ActionIcon,
+  Badge,
   Button,
   Card,
   Checkbox,
@@ -26,6 +27,8 @@ import { useNavigate } from "react-router"
 import QuantityInput from "../products/components/QuantityInput"
 import OrderConfirmationModal from "./components/OrderConfirmationModal"
 import { ICart } from "@/types/cart.type"
+import { notifyResponseError } from "@/helper/errorNotification"
+import { AxiosError } from "axios"
 
 export default function Cart() {
   const { user } = useContext(AuthContext)
@@ -35,7 +38,7 @@ export default function Cart() {
   // State for selected items
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set())
 
-  // Fetch cart items
+  // Fetch cart items - gets ALL items, no limit
   const { data: cart, isLoading } = useQuery({
     queryKey: ["cart", user?.id],
     queryFn: () => getItems(user!.id),
@@ -49,12 +52,8 @@ export default function Cart() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart", user?.id] })
     },
-    onError: (error: any) => {
-      notifications.show({
-        title: "Error",
-        message: error.response?.data?.message || error.message,
-        color: "red",
-      })
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Cart", "remove")
     },
   })
 
@@ -64,12 +63,8 @@ export default function Cart() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart", user?.id] })
     },
-    onError: (error: any) => {
-      notifications.show({
-        title: "Error",
-        message: error.response?.data?.message || error.message,
-        color: "red",
-      })
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Cart", "create")
     },
   })
 
@@ -79,12 +74,8 @@ export default function Cart() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart", user?.id] })
     },
-    onError: (error: any) => {
-      notifications.show({
-        title: "Error",
-        message: error.response?.data?.message || error.message,
-        color: "red",
-      })
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Cart", "remove")
     },
   })
 
@@ -119,12 +110,8 @@ export default function Cart() {
 
       navigate(`/order/${order.data.id}?orderType=cart`)
     },
-    onError: (error: any) => {
-      notifications.show({
-        title: error.response.data.message,
-        message: error.response?.data?.error || error.message,
-        color: "red",
-      })
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Order", "create")
     },
   })
 
@@ -200,13 +187,12 @@ export default function Cart() {
       <Grid gutter="xl" mt="md" px={{ base: 16, sm: "xl", xl: 0 }}>
         {/* Cart items */}
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <Stack gap="md">
-            <Group justify="space-between" align="center">
-              {cart?.length === 0 ? (
+          <Card withBorder radius="md">
+            <Stack gap="md">
+              <Group gap={8} align="center">
                 <Title order={4}>My Cart</Title>
-              ) : (
-                <Title order={4}>My Cart - {cart?.length || 0} item(s)</Title>
-              )}
+                <Badge>{cart?.length}</Badge>
+              </Group>
 
               {cart && cart.length > 0 && (
                 <Checkbox
@@ -216,131 +202,134 @@ export default function Cart() {
                   onChange={handleSelectAll}
                 />
               )}
-            </Group>
 
-            {isLoading && !user ? (
-              Array.from({ length: 2 }).map((_, i) => <CartItemSkeleton key={i} />)
-            ) : cart && cart.length > 0 ? (
-              cart.map((data: ICart) => (
-                <Card
-                  key={data.id}
-                  withBorder
-                  radius="md"
-                  padding="md"
-                  className={`relative transition-opacity ${
-                    isRemoving || isUpdatingQuantity ? "pointer-events-none opacity-50" : ""
-                  }`}
-                >
-                  <Group justify="space-between" align="flex-start" wrap="nowrap">
-                    <Group align="flex-start" wrap="nowrap" style={{ flex: 1 }}>
-                      <Checkbox
-                        checked={selectedItems.has(data.id)}
-                        onChange={() => handleSelectItem(data.id)}
-                        mt={4}
-                        disabled={data.productVariant.stockCondition === "out-of-stock"}
-                      />
-
-                      <Image
-                        src={getImage(data.productVariant.product.image)}
-                        alt={data.productVariant.name}
-                        onClick={() =>
-                          navigate(`/products/${data.productVariant.product.productSlug}`)
-                        }
-                        className="cursor-pointer"
+              {/* Scrollable container */}
+              <div style={{ maxHeight: "500px", overflowY: "auto" }}>
+                <Stack gap="md">
+                  {isLoading && !user ? (
+                    Array.from({ length: 2 }).map((_, i) => <CartItemSkeleton key={i} />)
+                  ) : cart && cart.length > 0 ? (
+                    cart.map((data: ICart) => (
+                      <Card
+                        key={data.id}
+                        withBorder
                         radius="md"
-                        w={80}
-                        h={80}
-                      />
+                        padding="md"
+                        className={`relative transition-opacity ${
+                          isRemoving || isUpdatingQuantity ? "pointer-events-none opacity-50" : ""
+                        }`}
+                      >
+                        <Group justify="space-between" align="flex-start" wrap="nowrap">
+                          <Group align="flex-start" wrap="nowrap" style={{ flex: 1 }}>
+                            <Checkbox
+                              checked={selectedItems.has(data.id)}
+                              onChange={() => handleSelectItem(data.id)}
+                              mt={4}
+                              disabled={data.productVariant.stockCondition === "out-of-stock"}
+                            />
 
-                      <Stack gap={4} style={{ flex: 1 }}>
-                        <Text
-                          fw={500}
-                          className="cursor-pointer"
-                          onClick={() =>
-                            navigate(`/products/${data.productVariant.product.productSlug}`)
-                          }
-                          truncate
-                        >
-                          {data.productVariant.product.name}
+                            <Image
+                              src={getImage(data.productVariant.product.image)}
+                              alt={data.productVariant.name}
+                              onClick={() =>
+                                navigate(`/products/${data.productVariant.product.productSlug}`)
+                              }
+                              className="cursor-pointer"
+                              radius="md"
+                              w={80}
+                              h={80}
+                            />
+
+                            <Stack gap={4} style={{ flex: 1 }}>
+                              <Text
+                                fw={500}
+                                className="cursor-pointer"
+                                onClick={() =>
+                                  navigate(`/products/${data.productVariant.product.productSlug}`)
+                                }
+                                truncate
+                              >
+                                {data.productVariant.product.name}
+                              </Text>
+
+                              <Text size="sm">
+                                <NumberFormatter
+                                  prefix="₱ "
+                                  decimalScale={2}
+                                  thousandSeparator
+                                  decimalSeparator="."
+                                  fixedDecimalScale
+                                  value={data.productVariant.price * data.quantity}
+                                />
+                              </Text>
+
+                              <Text size="xs" c="dimmed">
+                                {data.productVariant.productAttribute?.name !== "N/A" && (
+                                  <>
+                                    {data.productVariant.name}, {""}
+                                    {data.productVariant.size !== "N/A" && data.productVariant.size}
+                                  </>
+                                )}
+                              </Text>
+
+                              <QuantityInput
+                                quantity={data.quantity}
+                                setQuantity={(newQuantity) =>
+                                  handleQuantityChange(data.quantity, newQuantity, data.id)
+                                }
+                              />
+
+                              {data.productVariant.stockCondition === "out-of-stock" ? (
+                                <Text size="xs" c="red">
+                                  Out of stock
+                                </Text>
+                              ) : (
+                                <Text size="xs">
+                                  {data.productVariant.stockAvailable} available
+                                </Text>
+                              )}
+                            </Stack>
+                          </Group>
+
+                          <ActionIcon
+                            variant="subtle"
+                            radius="xl"
+                            color="gray"
+                            onClick={() => {
+                              removeMutation.mutate(data.productVariantId)
+                            }}
+                            loading={isRemoving}
+                          >
+                            <IconTrash size={18} />
+                          </ActionIcon>
+                        </Group>
+                      </Card>
+                    ))
+                  ) : cart && cart.length === 0 ? (
+                    <Card h={300} w="100%" bg="#e9edf3" padding="sm" radius="md">
+                      <div className="flex h-full flex-col items-center justify-center">
+                        <IconMoodSad color="gray" size={32} stroke={1.5} />
+
+                        <Text ta="center" c="dimmed">
+                          No items in cart.
                         </Text>
 
-                        <Text size="sm">
-                          <NumberFormatter
-                            prefix="₱ "
-                            decimalScale={2}
-                            thousandSeparator
-                            decimalSeparator="."
-                            fixedDecimalScale
-                            value={data.productVariant.price * data.quantity}
-                          />
-                        </Text>
-
-                        <Text size="xs" c="dimmed">
-                          {data.productVariant.productAttribute?.name !== "N/A" && (
-                            <>
-                              {data.productVariant.productAttribute?.name}:{" "}
-                              {data.productVariant.name}
-                              <br />
-                            </>
-                          )}
-
-                          {data.productVariant.size !== "N/A" &&
-                            `Size: ${data.productVariant.size}`}
-                        </Text>
-
-                        <QuantityInput
-                          quantity={data.quantity}
-                          setQuantity={(newQuantity) =>
-                            handleQuantityChange(data.quantity, newQuantity, data.id)
-                          }
-                        />
-
-                        {data.productVariant.stockCondition === "out-of-stock" ? (
-                          <Text size="xs" c="red">
-                            Out of stock
-                          </Text>
-                        ) : (
-                          <Text size="xs">{data.productVariant.stockAvailable} available</Text>
-                        )}
-                      </Stack>
-                    </Group>
-
-                    <ActionIcon
-                      variant="subtle"
-                      radius="xl"
-                      color="gray"
-                      onClick={() => {
-                        removeMutation.mutate(data.productVariantId)
-                      }}
-                      loading={isRemoving}
-                    >
-                      <IconTrash size={18} />
-                    </ActionIcon>
-                  </Group>
-                </Card>
-              ))
-            ) : cart && cart.length === 0 ? (
-              <Card h={300} w="100%" bg="#e9edf3" padding="sm" radius="md">
-                <div className="flex h-full flex-col items-center justify-center">
-                  <IconMoodSad color="gray" size={32} stroke={1.5} />
-
-                  <Text ta="center" c="dimmed">
-                    No items in cart.
-                  </Text>
-
-                  <Button mt="sm" radius="xl" onClick={() => navigate("/products")}>
-                    Browse products
-                  </Button>
-                </div>
-              </Card>
-            ) : null}
-          </Stack>
+                        <Button mt="sm" radius="xl" onClick={() => navigate("/products")}>
+                          Browse products
+                        </Button>
+                      </div>
+                    </Card>
+                  ) : null}
+                </Stack>
+              </div>
+            </Stack>
+          </Card>
         </Grid.Col>
 
         {/* Order summary */}
         {!cart || cart.length === 0 ? null : (
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <Card mt="42" withBorder radius="md" padding="lg" mih={250}>
+            <Card withBorder radius="md" padding="lg" mih={250}>
               <Title order={4} mb="xs">
                 Order Summary{" "}
                 <span className="text-sm text-gray-500">
@@ -394,9 +383,23 @@ export default function Cart() {
                     </Grid>
                   ))
                 ) : (
-                  <Text size="sm" c="dimmed" ta="center" py="md">
-                    No items selected
-                  </Text>
+                  <Grid align="center">
+                    <Grid.Col span={3}>
+                      <Text size="sm" c="dimmed">
+                        -
+                      </Text>
+                    </Grid.Col>
+                    <Grid.Col span={5}>
+                      <Text size="sm" c="dimmed">
+                        -
+                      </Text>
+                    </Grid.Col>
+                    <Grid.Col span={4} ta="right">
+                      <Text size="sm" c="dimmed">
+                        -
+                      </Text>
+                    </Grid.Col>
+                  </Grid>
                 )}
 
                 <Divider />

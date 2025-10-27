@@ -7,7 +7,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 export const DepartmentSalesChart = () => {
   const { data: deptRes, isLoading: deptLoading } = useQuery({
     queryKey: ["departments"],
-    queryFn: getDepartments,
+    queryFn: async () => await getDepartments({ all: false }),
   })
 
   const { data: salesRes, isLoading: salesLoading } = useQuery({

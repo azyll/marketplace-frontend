@@ -171,7 +171,8 @@ export const UserPage = () => {
         let errorMessage = "Unable to Update User, Please contact your Admin"
 
         if (Axios.isAxiosError(error)) {
-          errorMessage = error.response?.data.error?.[0]?.message ?? errorMessage
+          errorMessage =
+            (error.response?.data.error?.[0]?.message || error.response?.data.error) ?? errorMessage
         }
 
         notifications.show({
@@ -192,7 +193,8 @@ export const UserPage = () => {
       let errorMessage = "Unable to Update User, Please contact your Admin"
 
       if (Axios.isAxiosError(error)) {
-        errorMessage = error.response?.data.error?.[0]?.message ?? errorMessage
+        errorMessage =
+          (error.response?.data.error?.[0]?.message || error.response?.data.error) ?? errorMessage
       }
 
       notifications.show({

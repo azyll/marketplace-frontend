@@ -1,14 +1,37 @@
-import { ActionIcon, Box, Button, Card, Image, Modal, Space, Text, Title } from "@mantine/core"
-import { IconEdit, IconMoodSad, IconPlus, IconTrashX } from "@tabler/icons-react"
+import {
+  ActionIcon,
+  Badge,
+  Box,
+  Button,
+  Card,
+  Image,
+  Modal,
+  Space,
+  Text,
+  Title,
+} from "@mantine/core"
+import {
+  IconArchive,
+  IconEdit,
+  IconMoodSad,
+  IconPlus,
+  IconRestore,
+  IconTrashX,
+} from "@tabler/icons-react"
 import { useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import dayjs from "dayjs"
-import { IProduct, IProductListFilters } from "@/types/product.type"
+import { IInventoryFilter, IProduct, IProductListFilters } from "@/types/product.type"
 import { useFilters } from "@/hooks/useFilters"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { deleteProduct, getProductList } from "@/services/products.service"
+import {
+  deleteProduct,
+  getInventoryProducts,
+  getProductList,
+  restoreProduct,
+} from "@/services/products.service"
 import { getImage } from "@/services/media.service"
 import FilterBar from "@/components/FilterBar"
 import { ProductFilter } from "@/pages/dashboard/components/ProductFilter"
@@ -17,20 +40,34 @@ import { AxiosError } from "axios"
 import { useDisclosure } from "@mantine/hooks"
 import { useState } from "react"
 import { IUser } from "@/types/user.type"
+import { notifyResponseError } from "@/helper/errorNotification"
+import { getLoggedInUser } from "@/services/user.service"
 
 export const ProductList = () => {
   const DEFAULT_PAGE = 1
   const DEFAULT_LIMIT = 10
 
-  const [filters, setFilters, setFilterValues] = useFilters<IProductListFilters>({
+  const [filters, setFilters, setFilterValues] = useFilters<IInventoryFilter>({
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
+    all: true,
   })
 
   const { data: products, isLoading } = useQuery({
     queryKey: [KEY.PRODUCTS, filters],
-    queryFn: () => getProductList(filters),
+    queryFn: () => getInventoryProducts(filters),
   })
+
+  const { data: user, isLoading: iseGettingUser } = useQuery({
+    queryKey: [KEY.ME],
+    queryFn: () => getLoggedInUser(),
+    select: (response) => response.data,
+  })
+  const modulePermission = user?.role.modulePermission.find(
+    (modulePermission) => modulePermission.module == "products",
+  )
+  const havePermissionToEdit =
+    user?.role.systemTag === "admin" || modulePermission?.permission === "edit"
 
   const navigate = useNavigate()
 
@@ -46,47 +83,80 @@ export const ProductList = () => {
 
   const [opened, { open, close }] = useDisclosure(false)
 
-  const [productForDeletion, setProductForDeletion] = useState<IProduct>()
+  const [selectedProduct, setSelectedProduct] = useState<{
+    product: IProduct
+    type: "restore" | "archived"
+  }>()
 
   const handleOnDeleteProduct = (product: IProduct) => {
     if (product) {
-      setProductForDeletion(product)
+      setSelectedProduct({ product: product, type: "archived" })
       open()
     }
   }
-
+  const handleOnRestoreProduct = (product: IProduct) => {
+    if (product) {
+      setSelectedProduct({ product: product, type: "restore" })
+      open()
+    }
+  }
   const deleteMutation = useMutation({
     mutationFn: (productId: string) => deleteProduct(productId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [KEY.PRODUCTS] })
 
       notifications.show({
-        title: "Delete Success",
-        message: "Successfully Deleted Product",
+        title: "Archive Success",
+        message: "Successfully Archived Product",
         color: "green",
       })
 
       close()
-      setProductForDeletion(undefined)
+      setSelectedProduct(undefined)
+    },
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Product", "delete")
+    },
+  })
+
+  const restoreMutation = useMutation({
+    mutationFn: (productId: string) => restoreProduct(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [KEY.PRODUCTS] })
+
+      notifications.show({
+        title: "Restore Success",
+        message: "Successfully Restore Product",
+        color: "green",
+      })
+
+      close()
+      setSelectedProduct(undefined)
     },
     onError: (error: AxiosError<{ message: string; error: string }>) => {
       notifications.show({
-        title: "Delete Failed",
-        message: error?.response?.data?.error ?? "Can't Delete Product",
+        title: "Restore Failed",
+        message: error?.response?.data?.error ?? "Can't Restore Product",
         color: "red",
       })
     },
   })
-
   const handleOnCancelDeleteProduct = () => {
-    if (deleteMutation.isPending) return
+    if (deleteMutation.isPending || restoreMutation.isPending) return
 
     close()
     setTimeout(() => {
-      setProductForDeletion(undefined)
+      setSelectedProduct(undefined)
     }, 200)
   }
+  const handleOnCancelRestoreProduct = () => {
+    if (deleteMutation.isPending || restoreMutation.isPending) return
 
+    close()
+    setTimeout(() => {
+      setSelectedProduct(undefined)
+    }, 200)
+  }
   const columns: DataTableColumn<IProduct>[] = [
     {
       accessor: "image",
@@ -109,6 +179,16 @@ export const ProductList = () => {
       render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM D, YYYY h:mm A") : "-"),
     },
     {
+      accessor: "deletedAt",
+      title: "Status",
+      textAlign: "center",
+      render: ({ deletedAt }) => (
+        <Badge color={deletedAt ? "gray" : "green"} variant="light">
+          {deletedAt ? "Archived" : "Active"}
+        </Badge>
+      ),
+    },
+    {
       // Required yung 'accessor' kaya nilagyan ko nalang ng value kahit wala sa IProduct na type
       accessor: "actions",
       title: "Actions",
@@ -116,71 +196,125 @@ export const ProductList = () => {
       textAlign: "center",
       render: (product) => (
         <div className="flex justify-center gap-4">
-          <ActionIcon
-            size="lg"
-            variant="light"
-            onClick={() => handleOnEditProduct(product.productSlug)}
-          >
-            <IconEdit size={14} />
-          </ActionIcon>
-
-          <ActionIcon
-            size="lg"
-            color="red"
-            variant="light"
-            onClick={() => handleOnDeleteProduct(product)}
-          >
-            <IconTrashX size={14} />
-          </ActionIcon>
+          {product.deletedAt ? (
+            <ActionIcon
+              size="lg"
+              color="green"
+              variant="light"
+              onClick={() => handleOnRestoreProduct(product)}
+            >
+              <IconRestore size={14} />
+            </ActionIcon>
+          ) : (
+            <>
+              <ActionIcon
+                size="lg"
+                variant="light"
+                onClick={() => handleOnEditProduct(product.productSlug)}
+              >
+                <IconEdit size={14} />
+              </ActionIcon>
+              <ActionIcon
+                size="lg"
+                color="red"
+                variant="light"
+                onClick={() => handleOnDeleteProduct(product)}
+              >
+                <IconArchive size={14} />
+              </ActionIcon>
+            </>
+          )}
         </div>
       ),
     },
   ]
+  if (!havePermissionToEdit) {
+    columns.pop()
+  }
 
   return (
     <Card>
-      <Modal
-        opened={opened}
-        onClose={() => handleOnCancelDeleteProduct()}
-        withCloseButton={false}
-        centered
-        closeOnClickOutside={!deleteMutation.isPending}
-      >
-        <Title order={5} mb={4}>
-          Delete Product
-        </Title>
+      {selectedProduct?.type == "archived" ? (
+        <Modal
+          opened={opened}
+          onClose={() => handleOnCancelDeleteProduct()}
+          withCloseButton={false}
+          centered
+          closeOnClickOutside={!deleteMutation.isPending}
+        >
+          <Title order={5} mb={4}>
+            Archive Product
+          </Title>
 
-        <Text fz={14}>
-          Are you sure you want to delete <b>{productForDeletion?.name}</b>?
-        </Text>
+          <Text fz={14}>
+            Are you sure you want to delete <b>{selectedProduct?.product?.name}</b>?
+          </Text>
 
-        <div className="mt-8 flex justify-end gap-2">
-          <Button
-            variant="light"
-            color="black"
-            onClick={() => handleOnCancelDeleteProduct()}
-            disabled={deleteMutation.isPending}
-          >
-            Cancel
-          </Button>
+          <div className="mt-8 flex justify-end gap-2">
+            <Button
+              variant="light"
+              color="black"
+              onClick={() => handleOnCancelDeleteProduct()}
+              disabled={deleteMutation.isPending}
+            >
+              Cancel
+            </Button>
 
-          <Button
-            color="red"
-            loading={deleteMutation.isPending}
-            onClick={() => deleteMutation.mutate(productForDeletion?.id ?? "")}
-          >
-            Delete
-          </Button>
-        </div>
-      </Modal>
+            <Button
+              color="red"
+              loading={deleteMutation.isPending}
+              onClick={() => deleteMutation.mutate(selectedProduct?.product?.id ?? "")}
+            >
+              Archive
+            </Button>
+          </div>
+        </Modal>
+      ) : (
+        <Modal
+          opened={opened}
+          onClose={() => handleOnCancelRestoreProduct()}
+          withCloseButton={false}
+          centered
+          closeOnClickOutside={!restoreMutation.isPending}
+        >
+          <Title order={5} mb={4}>
+            Restore Product
+          </Title>
+
+          <Text fz={14}>
+            Are you sure you want to restore <b>{selectedProduct?.product?.name}</b>?
+          </Text>
+
+          <div className="mt-8 flex justify-end gap-2">
+            <Button
+              variant="light"
+              color="black"
+              onClick={() => handleOnCancelRestoreProduct()}
+              disabled={restoreMutation.isPending}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              color="green"
+              loading={restoreMutation.isPending}
+              onClick={() => restoreMutation.mutate(selectedProduct?.product.id ?? "")}
+            >
+              Restore
+            </Button>
+          </div>
+        </Modal>
+      )}
 
       <Card.Section px={24} pt={24}>
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Products</h1>
 
-          <Button onClick={() => handleOnCreateProduct()}>
-            <IconPlus size={14} /> <Space w={6} /> Add Product
-          </Button>
+          {havePermissionToEdit ? (
+            <Button onClick={() => handleOnCreateProduct()}>
+              <IconPlus size={14} /> <Space w={6} /> Add Product
+            </Button>
+          ) : null}
         </div>
 
         <ProductFilter filters={filters} onFilter={setFilterValues} />

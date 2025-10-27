@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { deleteUser, getUsers } from "@/services/user.service"
+import { deleteUser, getLoggedInUser, getUsers, restoreUser } from "@/services/user.service"
 import { useFilters } from "@/hooks/useFilters"
 import { IGetUserFilter, IUser, IUserFilters } from "@/types/user.type"
 import {
   ActionIcon,
+  Badge,
   Box,
   Button,
   Card,
@@ -16,16 +17,25 @@ import {
   Tooltip,
 } from "@mantine/core"
 import dayjs from "dayjs"
-import { IconArchive, IconEdit, IconFileTypeXls, IconMoodSad, IconPlus } from "@tabler/icons-react"
+import {
+  IconArchive,
+  IconEdit,
+  IconFileTypeXls,
+  IconMoodSad,
+  IconPlus,
+  IconRestore,
+} from "@tabler/icons-react"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import { useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
 import { useDisclosure } from "@mantine/hooks"
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { notifications } from "@mantine/notifications"
-import Axios from "axios"
+import Axios, { AxiosError } from "axios"
 import { bulkCreateStudent } from "@/services/student.service"
 import { UsersFilter } from "./UsersFilter"
+import { notifyResponseError } from "@/helper/errorNotification"
+import { AuthContext } from "@/contexts/AuthContext"
 
 export const UserList = () => {
   const DEFAULT_PAGE = 1
@@ -36,10 +46,22 @@ export const UserList = () => {
     limit: DEFAULT_LIMIT,
   })
 
+  const { user: currentUser } = useContext(AuthContext)
   const { data: users, isLoading } = useQuery({
     queryKey: [KEY.USERS, filters],
     queryFn: () => getUsers(filters),
   })
+
+  const { data: user, isLoading: iseGettingUser } = useQuery({
+    queryKey: [KEY.ME],
+    queryFn: () => getLoggedInUser(),
+    select: (response) => response.data,
+  })
+  const modulePermission = user?.role.modulePermission.find(
+    (modulePermission) => modulePermission.module == "users",
+  )
+  const haveModuleEditPermission =
+    user?.role.systemTag === "admin" || modulePermission?.permission === "edit"
 
   const navigate = useNavigate()
 
@@ -66,19 +88,8 @@ export const UserList = () => {
       await queryClient.invalidateQueries({ queryKey: [KEY.USERS], exact: false })
     },
 
-    onError: (error) => {
-      let errorMessage = "Upload failed. Please try again."
-
-      if (Axios.isAxiosError(error)) {
-        errorMessage =
-          error.response?.data?.message ?? error.response?.data?.error?.[0]?.message ?? errorMessage
-      }
-
-      notifications.show({
-        title: "Upload Failed",
-        message: errorMessage,
-        color: "red",
-      })
+    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
+      notifyResponseError(error, "Students", "create")
     },
   })
 
@@ -86,6 +97,100 @@ export const UserList = () => {
     bulkUploadMutation.mutate(file)
   }
 
+  const [opened, { open, close }] = useDisclosure(false)
+
+  const [selectUser, setSelectUser] = useState<{ user: IUser; type: "archive" | "restore" }>()
+
+  const handleOnDeleteUser = (userId: string) => {
+    if (currentUser?.id === userId) {
+      notifications.show({
+        title: "You cannot archive yourself",
+        message: "You are not allowed to archive yourself",
+        color: "red",
+      })
+      return
+    }
+    const user = users?.data?.find(({ id }) => id === userId)
+
+    if (user) {
+      setSelectUser({ type: "archive", user })
+      open()
+    }
+  }
+  const handleOnRestoreUser = (userId: string) => {
+    const user = users?.data?.find(({ id }) => id === userId)
+
+    if (user) {
+      setSelectUser({ type: "restore", user })
+      open()
+    }
+  }
+
+  const deleteMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      await deleteUser(userId)
+    },
+    onSuccess: async () => {
+      notifications.show({
+        title: "Archive Success",
+        message: "Successfully Archived User",
+        color: "green",
+      })
+
+      close()
+
+      await queryClient.invalidateQueries({ queryKey: [KEY.USERS] })
+      setSelectUser(undefined)
+    },
+    onError: (error) => {
+      if (Axios.isAxiosError(error)) {
+        notifications.show({
+          title: "Archive Failed",
+          message: error.response?.data.error?.[0]?.message || error.response?.data.error,
+          color: "red",
+        })
+      }
+    },
+  })
+  const restoreMutation = useMutation({
+    mutationFn: (userId: string) => restoreUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [KEY.USERS] })
+
+      notifications.show({
+        title: "Restore Success",
+        message: "Successfully Restore User",
+        color: "green",
+      })
+
+      close()
+      setSelectUser(undefined)
+    },
+    onError: (error: AxiosError<{ message: string; error: string }>) => {
+      notifications.show({
+        title: "Restore Failed",
+        message: error?.response?.data?.error ?? "Can't Restore User",
+        color: "red",
+      })
+    },
+  })
+
+  const handleOnCancelDeleteUser = () => {
+    if (deleteMutation.isPending) return
+
+    close()
+    setTimeout(() => {
+      setSelectUser(undefined)
+    }, 200)
+  }
+  const handleOnCancelRestoreUser = () => {
+    if (deleteMutation.isPending) return
+
+    close()
+    setTimeout(() => {
+      setSelectUser(undefined)
+    }, 200)
+  }
   const columns: DataTableColumn<IUser>[] = [
     {
       accessor: "fullName",
@@ -107,147 +212,160 @@ export const UserList = () => {
       render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM D, YYYY h:mm A") : "-"),
     },
     {
+      accessor: "deletedAt",
+      title: "Status",
+      render: ({ deletedAt }) => (
+        <Badge color={deletedAt ? "gray" : "green"} variant="light">
+          {deletedAt ? "Archived" : "Active"}
+        </Badge>
+      ),
+    },
+    {
       accessor: "actions",
       title: "Actions",
       width: 120,
       textAlign: "center",
-      render: ({ id }) => (
+      render: ({ id, deletedAt }) => (
         <div className="flex justify-center gap-4">
-          <ActionIcon size="lg" variant="light" onClick={() => handleOnEditUser(id)}>
-            <IconEdit size={14} />
-          </ActionIcon>
-
-          <Tooltip label="Archive User">
-            <ActionIcon
-              size="lg"
-              color="red"
-              variant="light"
-              onClick={() => handleOnDeleteUser(id)}
-            >
-              <IconArchive size={14} />
-            </ActionIcon>
-          </Tooltip>
+          {deletedAt ? (
+            <Tooltip label="Restore User">
+              <ActionIcon
+                size="lg"
+                color="green"
+                variant="light"
+                onClick={() => handleOnRestoreUser(id)}
+              >
+                <IconRestore size={14} />
+              </ActionIcon>
+            </Tooltip>
+          ) : (
+            <>
+              <ActionIcon size="lg" variant="light" onClick={() => handleOnEditUser(id)}>
+                <IconEdit size={14} />
+              </ActionIcon>
+              <Tooltip label="Archive User">
+                <ActionIcon
+                  size="lg"
+                  color="red"
+                  variant="light"
+                  onClick={() => handleOnDeleteUser(id)}
+                >
+                  <IconArchive size={14} />
+                </ActionIcon>
+              </Tooltip>
+            </>
+          )}
         </div>
       ),
     },
   ]
-
-  const [opened, { open, close }] = useDisclosure(false)
-
-  const [userForDeletion, setUserForDeletion] = useState<IUser>()
-
-  const handleOnDeleteUser = (userId: string) => {
-    const user = users?.data?.find(({ id }) => id === userId)
-
-    if (user) {
-      setUserForDeletion(user)
-      open()
-    }
-  }
-
-  const deleteMutation = useMutation({
-    mutationFn: async (userId: string) => {
-      await deleteUser(userId)
-    },
-    onSuccess: async () => {
-      notifications.show({
-        title: "Delete Success",
-        message: "Successfully Deleted User",
-        color: "green",
-      })
-
-      close()
-
-      await queryClient.invalidateQueries({ queryKey: [KEY.USERS] })
-      setUserForDeletion(undefined)
-    },
-    onError: (error) => {
-      if (Axios.isAxiosError(error)) {
-        error.response?.data.error?.[0]?.message
-
-        notifications.show({
-          title: "Delete Failed",
-          message: error.response?.data.error?.[0]?.message,
-          color: "red",
-        })
-      }
-    },
-  })
-
-  const handleOnCancelDeleteUser = () => {
-    if (deleteMutation.isPending) return
-
-    close()
-    setTimeout(() => {
-      setUserForDeletion(undefined)
-    }, 200)
+  if (!haveModuleEditPermission) {
+    columns.pop()
   }
 
   return (
     <Card>
-      <Modal
-        opened={opened}
-        onClose={() => handleOnCancelDeleteUser()}
-        withCloseButton={false}
-        centered
-        closeOnClickOutside={!deleteMutation.isPending}
-      >
-        <Title order={5} mb={4}>
-          Delete User
-        </Title>
+      {selectUser?.type == "archive" ? (
+        <Modal
+          opened={opened}
+          onClose={() => handleOnCancelDeleteUser()}
+          withCloseButton={false}
+          centered
+          closeOnClickOutside={!deleteMutation.isPending}
+        >
+          <Title order={5} mb={4}>
+            Archive User
+          </Title>
 
-        <Text fz={14}>
-          Are you sure you want to delete <b>{userForDeletion?.fullName}</b>?
-        </Text>
+          <Text fz={14}>
+            Are you sure you want to archive <b>{selectUser?.user?.fullName}</b>?
+          </Text>
 
-        <div className="mt-8 flex justify-end gap-2">
-          <Button
-            variant="light"
-            color="black"
-            onClick={() => handleOnCancelDeleteUser()}
-            disabled={deleteMutation.isPending}
-          >
-            Cancel
-          </Button>
-
-          <Button
-            color="red"
-            loading={deleteMutation.isPending}
-            onClick={() => deleteMutation.mutate(userForDeletion?.id ?? "")}
-          >
-            Delete
-          </Button>
-        </div>
-      </Modal>
-
-      <Card.Section px={24} pt={24}>
-        <div className="flex items-center justify-between gap-4">
-          <h1 className="text-xl font-bold">Manage Users</h1>
-          <div className="flex">
-            <FileButton
-              onChange={(file) => file && handleOnBulkUploadStudent(file)}
-              accept=".xlsx,.xls"
+          <div className="mt-8 flex justify-end gap-2">
+            <Button
+              variant="light"
+              color="black"
+              onClick={() => handleOnCancelDeleteUser()}
+              disabled={deleteMutation.isPending}
             >
-              {(props) => (
-                <Button variant="light" {...props} loading={bulkUploadMutation.isPending}>
-                  <IconFileTypeXls size={14} /> <Space w={6} />
-                  Bulk Upload Students
-                </Button>
-              )}
-            </FileButton>
+              Cancel
+            </Button>
 
-            <Space w={10} />
-
-            <Button onClick={() => handleOnCreateUser()}>
-              <IconPlus size={14} /> <Space w={6} /> Create User
+            <Button
+              color="red"
+              loading={deleteMutation.isPending}
+              onClick={() => deleteMutation.mutate(selectUser?.user.id ?? "")}
+            >
+              Archive
             </Button>
           </div>
-        </div>
+        </Modal>
+      ) : (
+        <Modal
+          opened={opened}
+          onClose={() => handleOnCancelRestoreUser()}
+          withCloseButton={false}
+          centered
+          closeOnClickOutside={!restoreMutation.isPending}
+        >
+          <Title order={5} mb={4}>
+            Restore User
+          </Title>
+
+          <Text fz={14}>
+            Are you sure you want to restore <b>{selectUser?.user?.fullName}</b>?
+          </Text>
+
+          <div className="mt-8 flex justify-end gap-2">
+            <Button
+              variant="light"
+              color="black"
+              onClick={() => handleOnCancelRestoreUser()}
+              disabled={restoreMutation.isPending}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              color="green"
+              loading={restoreMutation.isPending}
+              onClick={() => restoreMutation.mutate(selectUser?.user.id ?? "")}
+            >
+              Restore
+            </Button>
+          </div>
+        </Modal>
+      )}
+
+      <Card.Section px={24} pt={24}>
+        {haveModuleEditPermission ? (
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="text-xl font-bold">Manage Users</h1>
+            <div className="flex">
+              <FileButton
+                onChange={(file) => file && handleOnBulkUploadStudent(file)}
+                accept=".xlsx,.xls"
+              >
+                {(props) => (
+                  <Button variant="light" {...props} loading={bulkUploadMutation.isPending}>
+                    <IconFileTypeXls size={14} /> <Space w={6} />
+                    Bulk Upload Students
+                  </Button>
+                )}
+              </FileButton>
+
+              <Space w={10} />
+
+              <Button onClick={() => handleOnCreateUser()}>
+                <IconPlus size={14} /> <Space w={6} /> Create User
+              </Button>
+            </div>
+          </div>
+        ) : null}
         <UsersFilter filters={filters} onFilter={setFilterValues} />
       </Card.Section>
 
       <Space h={16} />
-
       <Card.Section px={24} pb={24}>
         <DataTable
           columns={columns}

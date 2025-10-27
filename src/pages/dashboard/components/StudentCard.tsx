@@ -1,6 +1,6 @@
 import { IconCheck, IconCopy, IconUser } from "@tabler/icons-react"
 import { ActionIcon, Badge, Card, CopyButton, Skeleton, Tooltip } from "@mantine/core"
-import { IStudent } from "@/types/user.type"
+import { IStudent } from "@/types/student.type"
 
 interface Props {
   student?: IStudent

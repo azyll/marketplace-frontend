@@ -36,6 +36,7 @@ import AnnualChart from "../../components/AnnualChart"
 import { useEffect, useMemo, useState } from "react"
 import { OrderActions } from "@/pages/dashboard/orders/components/OrderActions"
 import { LogsCard } from "../../components/LogsCard"
+import { getLoggedInUser } from "@/services/user.service"
 
 export const OrdersList = () => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -53,12 +54,28 @@ export const OrdersList = () => {
     status: initialStatus ?? (ORDER_STATUS.ONGOING as IOrderStatusType),
   })
 
+  const { data: user, isLoading: iseGettingUser } = useQuery({
+    queryKey: [KEY.ME],
+    queryFn: () => getLoggedInUser(),
+    select: (response) => response.data,
+  })
+  const modulePermission = user?.role.modulePermission.find(
+    (modulePermission) => modulePermission.module == "orders",
+  )
+  const haveOrderEditPermission =
+    user?.role.systemTag === "admin" || modulePermission?.permission === "edit"
+
+  const navigate = useNavigate()
+
+  if (!modulePermission && user?.role.systemTag === "employee") {
+    navigate(ROUTES.DASHBOARD.PRODUCTS.BASE, {
+      replace: true,
+    })
+  }
   const { data: orders, isLoading } = useQuery({
     queryKey: [KEY.DASHBOARD.ORDERS, filters],
     queryFn: () => getOrders(filters),
   })
-
-  const navigate = useNavigate()
 
   const handleOnCreateOrder = () => {
     navigate(ROUTES.DASHBOARD.ORDERS.ID.replace(":orderId", "create"))
@@ -174,6 +191,9 @@ export const OrdersList = () => {
       ),
     },
   ]
+  // if (!haveOrderEditPermission) {
+  //   columns.shift()
+  // }
 
   const [selectedOrders, setSelectedOrders] = useState<IOrder[]>([])
 
@@ -184,7 +204,7 @@ export const OrdersList = () => {
   const showCheckbox = useMemo(() => {
     const allowedStatus = [ORDER_STATUS.ONGOING, ORDER_STATUS.CONFIRMED]
 
-    return filters.status && allowedStatus.includes(filters.status)
+    return filters.status && allowedStatus.includes(filters.status) && haveOrderEditPermission
   }, [filters.status])
 
   return (
@@ -222,21 +242,23 @@ export const OrdersList = () => {
           <div className="flex h-[36px] items-center justify-between gap-4">
             <h1 className="text-xl font-bold">Manage Orders</h1>
 
-            <div className="flex gap-4">
-              {selectedOrders.length > 0 && (
-                <OrderActions
-                  status={filters?.status as IOrderStatusType}
-                  selectedOrders={selectedOrders}
-                  onSuccess={() => setSelectedOrders([])}
-                />
-              )}
+            {haveOrderEditPermission ? (
+              <div className="flex gap-4">
+                {selectedOrders.length > 0 && (
+                  <OrderActions
+                    status={filters?.status as IOrderStatusType}
+                    selectedOrders={selectedOrders}
+                    onSuccess={() => setSelectedOrders([])}
+                  />
+                )}
 
-              {!selectedOrders.length && (
-                <Button onClick={() => handleOnCreateOrder()}>
-                  <IconPlus size={14} /> <Space w={6} /> Create Order
-                </Button>
-              )}
-            </div>
+                {!selectedOrders.length && (
+                  <Button onClick={() => handleOnCreateOrder()}>
+                    <IconPlus size={14} /> <Space w={6} /> Create Order
+                  </Button>
+                )}
+              </div>
+            ) : null}
           </div>
 
           <OrdersFilter filters={filters} onFilter={setFilterValues} />

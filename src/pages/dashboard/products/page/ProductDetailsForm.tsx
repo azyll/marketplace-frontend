@@ -25,7 +25,7 @@ interface Props {
 export const ProductDetailsForm = ({ disabled, ref, imageDefaultValue }: Props) => {
   const { data: departmentOptions, isLoading: isDepartmentLoading } = useQuery({
     queryKey: [KEY.PRODUCT_DEPARTMENTS],
-    queryFn: () => getProductDepartments(),
+    queryFn: () => getProductDepartments({ all: false, page: 1, limit: 100 }),
     select: (departments) => departments?.map(({ name, id }) => ({ label: name, value: id })),
   })
 

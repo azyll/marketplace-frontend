@@ -16,7 +16,7 @@ export const theme = createTheme({
     Button: Button.extend({
       styles: {
         root: {
-          borderWidth: 0,
+          // borderWidth: 0,
         },
       },
     }),

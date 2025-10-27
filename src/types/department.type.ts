@@ -1,3 +1,4 @@
+import { IPagination } from "./common.type"
 import { IProgram } from "./program.type"
 
 export interface IDepartment {
@@ -9,3 +10,18 @@ export interface IDepartment {
   deletedAt: Date | null
   updatedAt: Date | null
 }
+export interface IGetDepartmentFilters extends IPagination {
+  all: boolean
+  status?: "archived" | "active"
+}
+
+export interface IDepartmentsFilter extends IPagination {
+  search?: string
+  status?: "archived" | "active"
+}
+export interface ICreateDepartmentInput {
+  name: string
+  acronym: string
+}
+
+export type IUpdateDepartmentInput = Partial<ICreateDepartmentInput>

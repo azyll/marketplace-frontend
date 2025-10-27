@@ -43,7 +43,7 @@ export default function FilterBar({ onCategorySelect, onProgramSelect, departmen
 
   const { data: departmentOptions, isLoading: isDepartmentLoading } = useQuery({
     queryKey: [KEY.PRODUCT_DEPARTMENTS],
-    queryFn: () => getProductDepartments(),
+    queryFn: () => getProductDepartments({ all: false, page: 1, limit: 100 }),
     select: (departments) =>
       departments
         ?.map(({ name, id, program }) => ({

@@ -31,7 +31,7 @@ export const SalesTrendCard = () => {
   const color = isIncrease ? "green" : "red"
 
   return (
-    <Card p="lg" className="h-[146px] w-full max-w-lg transition-all hover:shadow-md">
+    <Card p="lg" className="h-[47%] w-full transition-all hover:shadow-md">
       <Stack gap="xs">
         <Text fw={600}>Total Sales (This Month)</Text>
 

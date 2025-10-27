@@ -26,7 +26,7 @@ export const UsersFilter = ({ filters, onFilter, disabled }: Props) => {
     queryFn: () => getRoles(filters),
     select: (res) =>
       res?.data.map((role: IRole) => ({
-        value: role.systemTag,
+        value: role.id,
         label: role.name,
       })),
   })

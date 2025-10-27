@@ -3,6 +3,7 @@ export interface INotification {
   title: string
   message: string
   type: "order" | "announcement"
+  notificationReceiver: INotificationReceiver[]
   createdAt: Date
   deletedAt: Date | null
   updatedAt: Date | null
@@ -11,12 +12,25 @@ export interface INotification {
 export interface INotificationReceiver {
   id: string
   isRead: boolean
-  notification: INotification
   userId: string
   notificationId: string
+  readAt: Date | null
   createdAt: Date
   deletedAt: Date | null
   updatedAt: Date | null
+}
+
+interface IPaginatedResponseMeta {
+  currentPage?: number
+  itemsPerPage?: number
+  totalItems: number
+  unread: number
+}
+
+export interface IPaginatedNotificationResponse {
+  message: string
+  data: INotification[]
+  meta: IPaginatedResponseMeta
 }
 
 export interface ILog {
