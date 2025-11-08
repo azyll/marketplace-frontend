@@ -12,16 +12,17 @@ import {
   Grid,
   Group,
   Image,
+  Loader,
   NumberFormatter,
   Stack,
   Text,
   Title,
 } from "@mantine/core"
 import { IconMoodSad, IconTrash } from "@tabler/icons-react"
-import { useContext, useState } from "react"
+import { useContext, useEffect, useMemo, useState } from "react"
 import CartItemSkeleton from "./components/CartItemSkeleton"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { useDisclosure } from "@mantine/hooks"
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query"
+import { useDisclosure, useInViewport } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { useNavigate } from "react-router"
 import QuantityInput from "../products/components/QuantityInput"
@@ -39,19 +40,40 @@ export default function Cart() {
   // State for selected items
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set())
 
-  // Fetch cart items - gets ALL items, no limit
-  const { data: cart, isLoading } = useQuery({
+  const {
+    data: cartData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+  } = useInfiniteQuery({
     queryKey: [KEY.CART, user?.id],
-    queryFn: () => getItems(user!.id),
+    queryFn: async ({ pageParam }) => await getItems(user!.id, { page: pageParam, limit: 10 }),
+    initialPageParam: 1,
     enabled: !!user?.id,
-    select: (response) => response.data,
+    getNextPageParam: (lastPage) => {
+      const currentPage = lastPage.meta.currentPage
+      const totalPages = Math.ceil(lastPage.meta.totalItems / lastPage.meta.itemsPerPage)
+      return currentPage < totalPages ? currentPage + 1 : undefined
+    },
   })
+  const cartItems = useMemo(() => cartData?.pages.flatMap((page) => page.data) || [], [cartData])
+  const totalItems = useMemo(() => cartData?.pages[0].meta.totalItems || 0, [cartData])
+
+  const { ref, inViewport: inView } = useInViewport()
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage])
 
   // Remove item mutation
   const removeMutation = useMutation({
     mutationFn: (variantId: string) => removeItem(user!.id, variantId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [KEY.CART, user?.id] })
+      queryClient.invalidateQueries({ queryKey: [KEY.CART, user?.id, KEY.CART_TOTAL] })
     },
     onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
       notifyResponseError(error, "Cart", "remove")
@@ -63,6 +85,7 @@ export default function Cart() {
     mutationFn: (cartId: number) => addItemQuantity(user!.id, cartId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [KEY.CART, user?.id] })
+      queryClient.invalidateQueries({ queryKey: [KEY.CART, user?.id, KEY.CART_TOTAL] })
     },
     onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
       notifyResponseError(error, "Cart", "create")
@@ -74,6 +97,7 @@ export default function Cart() {
     mutationFn: (cartId: number) => deductItemQuantity(user!.id, cartId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [KEY.CART, user?.id] })
+      queryClient.invalidateQueries({ queryKey: [KEY.CART, user?.id, KEY.CART_TOTAL] })
     },
     onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
       notifyResponseError(error, "Cart", "remove")
@@ -83,10 +107,11 @@ export default function Cart() {
   // Create order mutation
   const createOrderMutation = useMutation({
     mutationFn: () => {
-      if (!cart || !user?.id) throw new Error("Missing cart or user data")
+      if (!cartData || error || cartItems.length <= 0 || !user?.id)
+        throw new Error("Missing cart or user data")
 
       // Only create order for selected items
-      const selectedCartItems = cart.filter((item: ICart) => selectedItems.has(item.id))
+      const selectedCartItems = cartItems.filter((item: ICart) => selectedItems.has(item.id))
 
       if (selectedCartItems.length === 0) {
         throw new Error("Please select at least one item to order")
@@ -111,6 +136,7 @@ export default function Cart() {
 
       navigate(`/order/${order.data.id}?orderType=cart`)
       queryClient.invalidateQueries({ queryKey: [KEY.CART, user?.id] })
+      queryClient.invalidateQueries({ queryKey: [KEY.CART, user?.id, KEY.CART_TOTAL] })
     },
     onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
       notifyResponseError(error, "Order", "create")
@@ -157,10 +183,10 @@ export default function Cart() {
   }
 
   const handleSelectAll = () => {
-    if (!cart) return
-
+    if (!cartData && cartItems.length < 0) return
     // Filter out items that are out of stock
-    const availableItems = cart.filter(
+
+    const availableItems = cartItems.filter(
       (item: ICart) => item.productVariant.stockCondition !== "out-of-stock",
     )
     const availableItemIds = availableItems.map((item: ICart) => item.id)
@@ -173,19 +199,51 @@ export default function Cart() {
       setSelectedItems(new Set(availableItemIds))
     }
   }
+  const isSelectAllChecked = () => {
+    if (!cartData) return false
+
+    // Get all items (filter out out-of-stock items)
+    const allItems = cartItems.filter(
+      (item: ICart) => item.productVariant.stockCondition !== "out-of-stock",
+    )
+    const allItemIds = allItems.map((item: ICart) => item.id)
+
+    // If all available items are selected, return true
+    return selectedItems.size === allItemIds.length
+  }
+
+  const isSelectAllIndeterminate = () => {
+    if (!cartData) return false
+
+    // Get all items (filter out out-of-stock items)
+    const allItems = cartItems.filter(
+      (item: ICart) => item.productVariant.stockCondition !== "out-of-stock",
+    )
+    const allItemIds = allItems.map((item: ICart) => item.id)
+
+    // If some, but not all, items are selected
+    return selectedItems.size > 0 && selectedItems.size < allItemIds.length
+  }
 
   // Calculate total for selected items only
-  const selectedTotal = cart
-    ? cart
-        .filter((item: ICart) => selectedItems.has(item.id))
-        .reduce((sum: number, item: any) => sum + item.productVariant.price * item.quantity, 0)
-    : 0
+  const selectedTotal =
+    cartData && cartItems.length > 0 && !error
+      ? cartItems.reduce(
+          (sum: number, item: any) => sum + item.productVariant.price * item.quantity,
+          0,
+        )
+      : 0
 
   // Get selected cart items for order summary
-  const selectedCartItems = cart?.filter((item: ICart) => selectedItems.has(item.id)) || []
+  const selectedCartItems = cartItems.filter((item: ICart) => selectedItems.has(item.id)) || []
 
   return (
     <main className="relative mx-auto max-w-[1200px]">
+      {error ? (
+        <Badge variant="light" color="red">
+          error {error.message}
+        </Badge>
+      ) : null}
       <Grid gutter="xl" mt="md" px={{ base: 16, sm: "xl", xl: 0 }}>
         {/* Cart items */}
         <Grid.Col span={{ base: 12, md: 6 }}>
@@ -193,16 +251,30 @@ export default function Cart() {
             <Stack gap="md">
               <Group gap={8} align="center">
                 <Title order={4}>My Cart</Title>
-                <Badge>{cart?.length}</Badge>
+                <Badge>{totalItems}</Badge>
               </Group>
 
-              {cart && cart.length > 0 && (
-                <Checkbox
-                  label="Select All"
-                  checked={cart.length > 0 && selectedItems.size === cart.length}
-                  indeterminate={selectedItems.size > 0 && selectedItems.size < cart.length}
-                  onChange={handleSelectAll}
-                />
+              {cartData && !error && totalItems > 0 && (
+                <>
+                  <Checkbox
+                    label="Select All"
+                    checked={isSelectAllChecked()}
+                    indeterminate={isSelectAllIndeterminate()}
+                    onChange={handleSelectAll}
+                  />
+                  {totalItems > 10 && (
+                    <Text size="xs" c={"gray"}>
+                      Scroll down to load all items before selecting all. Currently loaded:{" "}
+                      <strong>{cartItems.length}</strong>.
+                      {isSelectAllIndeterminate() && (
+                        <Text size="xs" c="red" component="span">
+                          {" "}
+                          Some items are not yet loaded, so the checkbox may not be fully updated.
+                        </Text>
+                      )}
+                    </Text>
+                  )}
+                </>
               )}
 
               {/* Scrollable container */}
@@ -210,8 +282,8 @@ export default function Cart() {
                 <Stack gap="md">
                   {isLoading && !user ? (
                     Array.from({ length: 2 }).map((_, i) => <CartItemSkeleton key={i} />)
-                  ) : cart && cart.length > 0 ? (
-                    cart.map((data: ICart) => (
+                  ) : cartData && !error && totalItems > 0 && cartItems.length > 0 ? (
+                    cartItems.map((data: ICart) => (
                       <Card
                         key={data.id}
                         withBorder
@@ -307,7 +379,7 @@ export default function Cart() {
                         </Group>
                       </Card>
                     ))
-                  ) : cart && cart.length === 0 ? (
+                  ) : cartData && totalItems === 0 ? (
                     <Card h={300} w="100%" bg="#e9edf3" padding="sm" radius="md">
                       <div className="flex h-full flex-col items-center justify-center">
                         <IconMoodSad color="gray" size={32} stroke={1.5} />
@@ -322,6 +394,14 @@ export default function Cart() {
                       </div>
                     </Card>
                   ) : null}
+                  {hasNextPage ? (
+                    <div
+                      ref={ref}
+                      className="flex h-10 flex-col items-center justify-center text-center"
+                    >
+                      {isFetchingNextPage && <Loader />}
+                    </div>
+                  ) : null}
                 </Stack>
               </div>
             </Stack>
@@ -329,7 +409,7 @@ export default function Cart() {
         </Grid.Col>
 
         {/* Order summary */}
-        {!cart || cart.length === 0 ? null : (
+        {!cartData || error || totalItems === 0 ? null : (
           <Grid.Col span={{ base: 12, md: 6 }}>
             <Card withBorder radius="md" padding="lg" mih={250}>
               <Title order={4} mb="xs">

@@ -76,10 +76,10 @@ export default function HeroCarousel() {
                 />
               )}
 
-              {item.title && item.message ? (
+              {item.title || item.message ? (
                 <div className="bg-opacity-50 absolute bottom-2 left-2 rounded-md bg-black p-2 text-white">
-                  {item.title && <Text size="xl">{item.title}</Text>}
-                  {item.message && <Text size="sm">{item.message}</Text>}
+                  {item?.title && <Text size="xl">{item.title}</Text>}
+                  {item?.message && <Text size="sm">{item.message}</Text>}
                 </div>
               ) : null}
             </div>
