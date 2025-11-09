@@ -1,13 +1,14 @@
+import { Module } from "@/constants/dashboard-modules"
 import { KEY } from "@/constants/key"
 import { ROUTES } from "@/constants/routes"
 import { getLoggedInUser } from "@/services/user.service"
-import { IRole, IRoleAccessModule, Module } from "@/types/role.type"
+import { IRole, IRoleAccessModule } from "@/types/role.type"
 import { useQuery } from "@tanstack/react-query"
 import { Navigate, Outlet, useLocation } from "react-router"
 
 const REDIRECT = {
-  admin: ROUTES.DASHBOARD.USER.BASE,
-  employee: ROUTES.DASHBOARD.USER.BASE,
+  admin: ROUTES.DASHBOARD.BASE,
+  employee: ROUTES.DASHBOARD.BASE,
   student: "/",
 }
 // Helper function to map a route path to a module name
@@ -23,19 +24,30 @@ export const getModuleFromPathname = (pathname: string): Module | null => {
 
     // Map the path segment to the Module enum value
     switch (moduleSegment) {
-    case "sales":
-        return Module.Sales
-      case "orders":
-        return Module.Orders
-      case "inventory":
-        return Module.Inventory
-      case "return-items":
-        return Module.ReturnItems
-      case "users":
+      case Module.Users:
         return Module.Users
-          case "products":
+      case Module.Roles:
+        return Module.Roles
+      case Module.Departments:
+        return Module.Departments
+      case Module.Program:
+        return Module.Program
+      case Module.Products:
         return Module.Products
-
+      case Module.Orders:
+        return Module.Orders
+      case Module.Sales:
+        return Module.Sales
+      case Module.Inventory:
+        return Module.Inventory
+      case Module.ReturnItems:
+        return Module.ReturnItems
+      case Module.AnnouncementCarousel:
+        return Module.AnnouncementCarousel
+      case Module.ActivityLogs:
+        return Module.ActivityLogs
+      case Module.Reports:
+        return Module.Reports
       default:
         return null // Not a protected module route
     }

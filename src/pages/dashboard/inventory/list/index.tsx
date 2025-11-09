@@ -86,7 +86,7 @@ export const InventoryList = () => {
     user?.role.systemTag === "admin" || moduleReturnItem?.permission === "edit"
   const navigate = useNavigate()
   if (!modulePermission && user?.role.systemTag === "employee") {
-    navigate(ROUTES.DASHBOARD.PRODUCTS.BASE, {
+    navigate(ROUTES.DASHBOARD.HOME, {
       replace: true,
     })
   }
@@ -347,6 +347,9 @@ export const InventoryList = () => {
       ),
     },
   ]
+  if (!haveInventoryModuleEditPermission && !haveReturnItemModuleEditPermission) {
+    variantColumns.pop()
+  }
 
   return (
     <>

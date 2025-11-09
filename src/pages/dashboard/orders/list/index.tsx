@@ -68,7 +68,7 @@ export const OrdersList = () => {
   const navigate = useNavigate()
 
   if (!modulePermission && user?.role.systemTag === "employee") {
-    navigate(ROUTES.DASHBOARD.PRODUCTS.BASE, {
+    navigate(ROUTES.DASHBOARD.HOME, {
       replace: true,
     })
   }

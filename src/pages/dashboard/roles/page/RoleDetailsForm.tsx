@@ -1,5 +1,6 @@
+import { dashboardModules, Module } from "@/constants/dashboard-modules"
 import { createRoleSchema, updateRoleSchema } from "@/schema/role.schema"
-import { ICreateRoleInput, IRole, IRoleAccessModule, Module } from "@/types/role.type"
+import { ICreateRoleInput, IRole, IRoleAccessModule } from "@/types/role.type"
 import { Checkbox, Grid, Group, Radio, Select, Text, TextInput, Title } from "@mantine/core"
 import { useForm, UseFormReturnType } from "@mantine/form"
 import { zod4Resolver } from "mantine-form-zod-resolver"
@@ -30,14 +31,6 @@ interface Props {
   initialValues?: Partial<IRole>
 }
 
-const modulesOption = [
-  { value: "products", name: "Products" },
-  { value: "sales", name: "Sales" },
-  { value: "orders", name: "Orders" },
-  { value: "inventory", name: "Inventory" },
-  { value: "return-items", name: "Return Items" },
-]
-
 const permissionOptions = ["edit", "view"]
 export const RoleDetailsForm = ({ ref, isEmployee, disabled, role, initialValues }: Props) => {
   const isUpdate = useMemo(() => !!role, [role])
@@ -47,10 +40,10 @@ export const RoleDetailsForm = ({ ref, isEmployee, disabled, role, initialValues
       name: initialValues?.name ?? undefined,
       systemTag: initialValues?.systemTag,
       modulePermission:
-        isEmployee &&
-        (!initialValues?.modulePermission || initialValues?.modulePermission.length === 0)
-          ? ([{ module: "users", permission: "view" }] as IRoleAccessModule[]) // Type assertion here
-          : (initialValues?.modulePermission ?? []),
+        (isEmployee &&
+          (!initialValues?.modulePermission || initialValues?.modulePermission.length === 0) &&
+          (initialValues?.modulePermission ?? [])) ||
+        [],
     },
     validate: zod4Resolver(isUpdate ? updateRoleSchema : createRoleSchema),
   })
@@ -67,20 +60,10 @@ export const RoleDetailsForm = ({ ref, isEmployee, disabled, role, initialValues
     form.setFieldValue("modulePermission", (prevPermissions) => {
       let newPermissions = [...(prevPermissions ?? [])]
 
-      // Always ensure "users" module is included with "view" permission
-      const usersPermission = newPermissions.find((perm) => perm.module === "users")
-      if (!usersPermission) {
-        // @ts-ignore
-        newPermissions.push({ module: "users", permission: "view" })
-      }
-
-      // Now handle the other modules
-      if (module !== "users") {
-        if (checked) {
-          newPermissions.push({ module: module as Module, permission: "view" }) // Default to 'view' permission
-        } else {
-          newPermissions = newPermissions.filter((permission) => permission.module !== module)
-        }
+      if (checked) {
+        newPermissions.push({ module: module as Module, permission: "view" }) // Default to 'view' permission
+      } else {
+        newPermissions = newPermissions.filter((permission) => permission.module !== module)
       }
 
       return newPermissions
@@ -138,7 +121,7 @@ export const RoleDetailsForm = ({ ref, isEmployee, disabled, role, initialValues
             {/* Module Selection and Permission Assignment */}
             <Grid.Col span={12}>
               <Group>
-                {modulesOption.map((module) => {
+                {dashboardModules.map((module) => {
                   const modulePermission = form.values.modulePermission?.find(
                     (perm) => perm.module === module.value,
                   )

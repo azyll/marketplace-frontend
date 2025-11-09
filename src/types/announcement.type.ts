@@ -23,4 +23,5 @@ export type IUpdateAnnouncementInput = Partial<ICreateAnnouncementInput>
 export interface IGetAnnouncementFilters {
   all?: boolean
   status?: "active" | "archived"
+  search?: string
 }

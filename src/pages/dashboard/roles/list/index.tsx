@@ -31,6 +31,7 @@ import { DataTable, DataTableColumn } from "mantine-datatable"
 import { useState } from "react"
 import { useNavigate } from "react-router"
 import { RoleFilter } from "./RoleFilter"
+import { getLoggedInUser } from "@/services/user.service"
 
 export const RoleList = () => {
   const DEFAULT_PAGE = 1
@@ -45,7 +46,23 @@ export const RoleList = () => {
     queryKey: [KEY.ROLES, filters],
     queryFn: () => getRoles(filters),
   })
+  const { data: user, isLoading: iseGettingUser } = useQuery({
+    queryKey: [KEY.ME],
+    queryFn: () => getLoggedInUser(),
+    select: (response) => response.data,
+  })
+  const modulePermission = user?.role.modulePermission.find(
+    (modulePermission) => modulePermission.module == "roles",
+  )
+  const haveRolesModuleEditPermission =
+    user?.role.systemTag === "admin" || modulePermission?.permission === "edit"
   const navigate = useNavigate()
+  if (!modulePermission && user?.role.systemTag === "employee") {
+    navigate(ROUTES.DASHBOARD.HOME, {
+      replace: true,
+    })
+  }
+
   const [opened, { open, close }] = useDisclosure(false)
   const [selectRole, setSelectRole] = useState<{ role: IRole; type: "restore" | "archived" }>()
   const queryClient = useQueryClient()
@@ -166,6 +183,7 @@ export const RoleList = () => {
         </Badge>
       ),
     },
+
     {
       accessor: "actions",
       title: "Actions",
@@ -205,6 +223,9 @@ export const RoleList = () => {
       ),
     },
   ]
+  if (!haveRolesModuleEditPermission) {
+    columns.pop()
+  }
 
   return (
     <Card>
@@ -283,9 +304,11 @@ export const RoleList = () => {
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Roles</h1>
           <div className="flex">
-            <Button onClick={() => handleOnCreateRole()}>
-              <IconShieldPlus size={14} /> <Space w={6} /> Create Role
-            </Button>
+            {haveRolesModuleEditPermission ? (
+              <Button onClick={() => handleOnCreateRole()}>
+                <IconShieldPlus size={14} /> <Space w={6} /> Create Role
+              </Button>
+            ) : null}
           </div>
         </div>
         <RoleFilter filters={filters} onFilter={setFilterValues} />
@@ -296,7 +319,7 @@ export const RoleList = () => {
           columns={columns}
           records={roles?.data ?? []}
           // State
-          fetching={isLoading}
+          fetching={isLoading || iseGettingUser}
           noRecordsIcon={
             <Box p={4} mb={4}>
               <IconMoodSad size={36} strokeWidth={1.5} />

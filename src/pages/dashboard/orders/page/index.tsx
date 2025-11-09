@@ -15,6 +15,7 @@ import { OrderItem, OrderItemSkeleton } from "@/pages/dashboard/orders/page/Orde
 import { OrderActions } from "@/pages/dashboard/orders/components/OrderActions"
 import { formatDate } from "@/helper/formatDate"
 import { downloadOrderSlip } from "@/pages/order/pdf/OrderSlipPDF"
+import { getLoggedInUser } from "@/services/user.service"
 
 export const OrdersPage = () => {
   const { orderId } = useParams<{ orderId: string }>()
@@ -46,7 +47,17 @@ export const OrdersPage = () => {
 
   const student = useMemo(() => order?.student, [order?.student])
 
-  if (!order && !isLoading) return null
+  const { data: user, isLoading: iseGettingUser } = useQuery({
+    queryKey: [KEY.ME],
+    queryFn: () => getLoggedInUser(),
+    select: (response) => response.data,
+  })
+
+  const ordersModulePermission = user?.role.modulePermission.find(
+    (modulePermission) => modulePermission.module == "orders",
+  )
+
+  if (!order && !isLoading && !iseGettingUser) return null
 
   return (
     <Card pos="relative" mih={400}>
@@ -73,7 +84,7 @@ export const OrdersPage = () => {
               )}
             </div>
 
-            {isLoading ? (
+            {isLoading || iseGettingUser ? (
               <Skeleton w={200} h={22} mt={4} />
             ) : (
               <Text c="dimmed">{dayjs(order?.createdAt).format("MMMM DD YYYY • hh:mm A")}</Text>
@@ -90,14 +101,17 @@ export const OrdersPage = () => {
               Download Order Slip
             </Button>
           </div>
-          {order && <OrderActions status={order?.status} selectedOrders={[order]} />}
+          {order &&
+            (ordersModulePermission?.permission === "edit" || user?.role.systemTag === "admin") && (
+              <OrderActions status={order?.status} selectedOrders={[order]} />
+            )}
         </div>
       </Card.Section>
 
       <Card.Section px={24} py={12}>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <StudentCard student={student} isLoading={isLoading} />
-          <TotalCard order={order} isLoading={isLoading} />
+          <StudentCard student={student} isLoading={isLoading || iseGettingUser} />
+          <TotalCard order={order} isLoading={isLoading || iseGettingUser} />
         </div>
       </Card.Section>
 
@@ -115,7 +129,7 @@ export const OrdersPage = () => {
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {isLoading ? (
+          {isLoading || iseGettingUser ? (
             <>
               <OrderItemSkeleton />
               <OrderItemSkeleton />

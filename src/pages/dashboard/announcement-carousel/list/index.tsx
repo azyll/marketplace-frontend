@@ -35,8 +35,12 @@ import { ImageUpload } from "@/components/ImageUpload"
 import { useDisclosure } from "@mantine/hooks"
 import { AnnouncementFilter } from "./AnnouncementFilter"
 import { KEY } from "@/constants/key"
+import { getLoggedInUser } from "@/services/user.service"
+import { useNavigate } from "react-router"
+import { ROUTES } from "@/constants/routes"
 
 interface IAnnouncementFilters {
+  search?: string
   status?: "active" | "archived"
   page?: number
   limit?: number
@@ -53,7 +57,23 @@ export function AnnouncementCarouselList() {
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
   })
+  const navigate = useNavigate()
+  const { data: user, isLoading: iseGettingUser } = useQuery({
+    queryKey: [KEY.ME],
+    queryFn: () => getLoggedInUser(),
+    select: (response) => response.data,
+  })
+  const modulePermission = user?.role.modulePermission.find(
+    (modulePermission) => modulePermission.module == "announcement-carousel",
+  )
+  const haveEditPermission =
+    user?.role.systemTag === "admin" || modulePermission?.permission === "edit"
 
+  if (!modulePermission && user?.role.systemTag === "employee") {
+    navigate(ROUTES.DASHBOARD.HOME, {
+      replace: true,
+    })
+  }
   const [uploadModalOpened, { open: openUploadModal, close: closeUploadModal }] =
     useDisclosure(false)
 
@@ -73,11 +93,12 @@ export function AnnouncementCarouselList() {
   const [viewingImage, setViewingImage] = useState<string>("")
 
   const { data, isLoading, error } = useQuery({
-    queryKey: [KEY.ANNOUNCEMENTS, filters.status],
+    queryKey: [KEY.ANNOUNCEMENTS, { ...filters }],
     queryFn: () =>
       getAnnouncements({
         all: true,
         status: filters.status,
+        search: filters?.search,
       }),
   })
 
@@ -297,6 +318,10 @@ export function AnnouncementCarouselList() {
     },
   ]
 
+  if (!haveEditPermission) {
+    columns.pop()
+  }
+
   if (error) {
     return (
       <Card>
@@ -431,9 +456,11 @@ export function AnnouncementCarouselList() {
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Announcement Images</h1>
 
-          <Button onClick={openUploadModal}>
-            <IconPhotoPlus size={14} /> <Space w={6} /> Add Carousel Image
-          </Button>
+          {haveEditPermission ? (
+            <Button onClick={openUploadModal}>
+              <IconPhotoPlus size={14} /> <Space w={6} /> Add Carousel Image
+            </Button>
+          ) : null}
         </div>
 
         <AnnouncementFilter filters={filters} onFilter={handleOnFilter} />
@@ -444,7 +471,7 @@ export function AnnouncementCarouselList() {
           columns={columns}
           records={announcements}
           // State
-          fetching={isLoading}
+          fetching={isLoading || iseGettingUser}
           noRecordsText="No announcements found"
           // Styling
           verticalSpacing="md"
