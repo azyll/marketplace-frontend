@@ -77,12 +77,14 @@ export function AnnouncementCarouselList() {
   }>()
 
   const { data, isLoading, error } = useQuery({
-    queryKey: [KEY.ANNOUNCEMENTS, { ...filters }],
+    queryKey: [KEY.ANNOUNCEMENTS, filters],
     queryFn: () =>
       getAnnouncements({
         all: true,
         status: filters.status,
         search: filters?.search,
+        limit: filters.limit,
+        page: filters.page,
       }),
   })
 
@@ -155,6 +157,7 @@ export function AnnouncementCarouselList() {
   const handleOnCreateAnnouncement = () => {
     navigate(ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.ID.replace(":announcementId", "create"))
   }
+  console.log(filters)
   const handleOnFilter = (newFilters: Partial<IAnnouncementFilters>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }))
   }
@@ -196,6 +199,7 @@ export function AnnouncementCarouselList() {
     {
       accessor: "message",
       title: "Message",
+      width: 120,
     },
     {
       accessor: "product.name",
