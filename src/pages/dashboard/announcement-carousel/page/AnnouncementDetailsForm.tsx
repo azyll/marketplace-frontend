@@ -5,6 +5,7 @@ import {
   ActionIcon,
   Badge,
   Box,
+  Button,
   Card,
   Grid,
   Group,
@@ -26,7 +27,7 @@ import { IInventoryFilter, IProduct, IProductListFilters } from "@/types/product
 import { useQuery } from "@tanstack/react-query"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import { getImage } from "@/services/media.service"
-import { IconMoodSad, IconSelect } from "@tabler/icons-react"
+import { IconMoodSad, IconSelect, IconX } from "@tabler/icons-react"
 import { ProductFilter } from "../../components/ProductFilter"
 
 export interface AnnouncementDetailsFormRef {
@@ -77,6 +78,10 @@ export const AnnouncementDetailsForm = ({
     queryKey: [KEY.PRODUCTS, filters],
     queryFn: () => getInventoryProducts(filters),
   })
+  const selectedProductId = useMemo(() => form.getValues().productId, [form.getValues().productId])
+  const selectedProduct = useMemo(() => {
+    return products?.data.find((product) => product.id === selectedProductId)
+  }, [selectedProductId])
   const columns: DataTableColumn<IProduct>[] = [
     {
       accessor: "image",
@@ -96,22 +101,30 @@ export const AnnouncementDetailsForm = ({
       textAlign: "center",
       render: (product) => (
         <div className="flex justify-center gap-4">
-          <ActionIcon
-            size="lg"
-            variant="light"
-            onClick={() => form.setFieldValue("productId", product.id)}
-            disabled={disabled}
-          >
-            <IconSelect size={14} />
-          </ActionIcon>
+          {selectedProductId == product.id ? (
+            <ActionIcon
+              size="lg"
+              color="red"
+              variant="light"
+              onClick={() => form.setFieldValue("productId", null)}
+              disabled={disabled}
+            >
+              <IconX size={14} />
+            </ActionIcon>
+          ) : (
+            <ActionIcon
+              size="lg"
+              variant="light"
+              onClick={() => form.setFieldValue("productId", product.id)}
+              disabled={disabled}
+            >
+              <IconSelect size={14} />
+            </ActionIcon>
+          )}
         </div>
       ),
     },
   ]
-  const selectedProductId = useMemo(() => form.getValues().productId, [form.getValues().productId])
-  const selectedProduct = useMemo(() => {
-    return products?.data.find((product) => product.id === selectedProductId)
-  }, [products?.data, selectedProductId])
 
   return (
     <div>
