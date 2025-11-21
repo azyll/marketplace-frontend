@@ -46,8 +46,7 @@ export const getModuleFromPathname = (pathname: string): Module | null => {
         return Module.AnnouncementCarousel
       case Module.ActivityLogs:
         return Module.ActivityLogs
-      case Module.Reports:
-        return Module.Reports
+ 
       default:
         return null // Not a protected module route
     }

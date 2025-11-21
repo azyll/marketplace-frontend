@@ -10,7 +10,7 @@ export const dashboardModules = [
   { value: "return-items", name: "Return Items" },
   { value: "announcement-carousel", name: "Announcement Carousel" },
   { value: "activity-logs", name: "Activity Logs" },
-  { value: "reports", name: "Reports" },
+
 ]
 export enum Module {
   Users = "users",
@@ -24,5 +24,5 @@ export enum Module {
   ReturnItems = "return-items",
   AnnouncementCarousel = "announcement-carousel",
   ActivityLogs = "activity-logs",
-  Reports = "reports",
+
 }

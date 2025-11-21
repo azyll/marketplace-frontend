@@ -95,3 +95,13 @@ export interface IInventoryFilter extends IPagination {
   status?: "archived" | "active"
   all: boolean
 }
+export interface IInventoryFilterReport {
+  sex?: "male" | "female"
+  department?: string
+  stock_condition?: "low-stock" | "in-stock" | "out-of-stock"
+  name?: string
+  category?: string
+  search?: string
+  status?: "archived" | "active"
+  all: boolean
+}

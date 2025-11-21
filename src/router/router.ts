@@ -37,7 +37,6 @@ import { ActivityLogList } from "@/pages/dashboard/activity-logs/list"
 import { AnnouncementCarouselList } from "@/pages/dashboard/announcement-carousel/list"
 import { createProtectedRoute } from "./components/ProtectedRoute"
 import { DashboardHomePage } from "@/pages/dashboard/home/DashboardHome"
-import ReportsPage from "@/pages/dashboard/reports/Reports"
 import AnnouncementCarouselPage from "@/pages/dashboard/announcement-carousel/page"
 
 export const router = createBrowserRouter([
@@ -222,10 +221,10 @@ export const router = createBrowserRouter([
                 Component: AnnouncementCarouselPage,
               },
               // Reports
-              {
-                path: ROUTES.DASHBOARD.REPORTS.BASE,
-                Component: ReportsPage,
-              },
+              // {
+              //   path: ROUTES.DASHBOARD.REPORTS.BASE,
+              //   Component: ReportsPage,
+              // },
             ],
           },
         ],

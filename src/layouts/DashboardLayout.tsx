@@ -164,13 +164,13 @@ export const DashboardLayout = () => {
       indicator: false,
       count: 0,
     },
-    {
-      label: "Reports",
-      path: ROUTES.DASHBOARD.REPORTS.BASE,
-      icon: <IconReport size={14} />,
-      indicator: false,
-      count: 0,
-    },
+    // {
+    //   label: "Reports",
+    //   path: ROUTES.DASHBOARD.REPORTS.BASE,
+    //   icon: <IconReport size={14} />,
+    //   indicator: false,
+    //   count: 0,
+    // },
     {
       label: "Activity Logs",
       path: ROUTES.DASHBOARD.ACTIVITY_LOG.BASE,
