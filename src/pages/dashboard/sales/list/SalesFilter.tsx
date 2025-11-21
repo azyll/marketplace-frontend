@@ -4,13 +4,9 @@ import { DatePickerInput, DatesRangeValue } from "@mantine/dates"
 import { IconCalendar, IconSearch } from "@tabler/icons-react"
 import { ISalesFilter } from "@/types/sales.type"
 import dayjs from "dayjs"
+import { dateFormat, DEFAULT_DATE_RANGE } from "@/constants/default-date"
 
-const dateFormat = "YYYY-MM-DD"
 
-const DEFAULT_DATE_RANGE = {
-  from: dayjs().subtract(1, "month").format(dateFormat),
-  to: dayjs().format(dateFormat),
-}
 
 interface Props {
   filters: Partial<ISalesFilter>

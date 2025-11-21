@@ -38,6 +38,7 @@ import { AnnouncementCarouselList } from "@/pages/dashboard/announcement-carouse
 import { createProtectedRoute } from "./components/ProtectedRoute"
 import { DashboardHomePage } from "@/pages/dashboard/home/DashboardHome"
 import ReportsPage from "@/pages/dashboard/reports/Reports"
+import AnnouncementCarouselPage from "@/pages/dashboard/announcement-carousel/page"
 
 export const router = createBrowserRouter([
   {
@@ -215,6 +216,10 @@ export const router = createBrowserRouter([
               {
                 path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
                 Component: AnnouncementCarouselList,
+              },
+              {
+                path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.ID,
+                Component: AnnouncementCarouselPage,
               },
               // Reports
               {

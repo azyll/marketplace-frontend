@@ -42,6 +42,7 @@ export const ROUTES = {
     },
     ANNOUNCEMENT_CAROUSEL: {
       BASE: "/dashboard/announcement-carousel",
+      ID: "/dashboard/announcement-carousel/:announcementId",
     },
     REPORTS: {
       BASE: "/dashboard/reports",

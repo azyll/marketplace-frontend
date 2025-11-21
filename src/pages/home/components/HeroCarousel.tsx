@@ -66,13 +66,15 @@ export default function HeroCarousel() {
                     src={getImage(item.image)}
                     alt={`Announcement ${item.id}`}
                     className="md:!rounded-xl"
+                    fallbackSrc="https://www.sti.edu/images/2022/fbimages/omnibus.jpg"
                   />
                 </NavLink>
               ) : (
                 <Image
                   src={getImage(item.image)}
                   alt={`Announcement ${item.id}`}
-                  className="md:!rounded-xl"
+                  className="max-h-[590px] w-full max-w-[1180px] object-contain md:!rounded-xl" // Added Tailwind classes
+                  fallbackSrc={getImage("carousel/default-image.png")}
                 />
               )}
 

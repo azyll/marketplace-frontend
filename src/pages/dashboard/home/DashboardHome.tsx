@@ -24,7 +24,7 @@ export const DashboardHomePage = () => {
   )
   return (
     <main className="mx-auto flex max-w-[1200px] flex-col">
-      <Text fw={"bold"} my={"sm"}>
+      <Text fw={"bold"} my={"sm"} size="lg">
         Home Dashboard
       </Text>
       {iseGettingUser ? <Loader /> : null}

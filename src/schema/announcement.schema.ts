@@ -5,9 +5,9 @@ export const createAnnouncementSchema = z.object({
     .file()
     .max(5 * 1024 ** 2, { message: "Image size is too large (max 5mb)" })
     .optional(),
-  productId: z.string().min(1, { message: "Product  is required" }).optional(),
-  title: z.string().min(1, { message: "Title is required" }).optional(),
-  content: z.string().min(1, { message: "Content is required" }).optional(),
+  productId: z.string().optional(),
+  title: z.string().min(1, { message: "Title is required" }),
+  message: z.string().nullable().optional(),
 })
 
 export const updateAnnouncementSchema = createAnnouncementSchema.partial()

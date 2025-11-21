@@ -13,7 +13,7 @@ export interface IAnnouncement {
 }
 
 export interface ICreateAnnouncementInput {
-  image: File | null
+  image?: File | undefined
   title?: string | null
   message?: string | null
   productId?: string | null
