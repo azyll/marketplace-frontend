@@ -2,7 +2,6 @@ import { getImage } from "@/services/media.service"
 import {
   getAnnouncements,
   deleteAnnouncement,
-  createAnnouncement,
   restoreArchivedAnnouncement,
 } from "@/services/announcement.service"
 import {
@@ -10,7 +9,6 @@ import {
   Image,
   ActionIcon,
   Text,
-  Loader,
   Center,
   Button,
   Space,
@@ -18,25 +16,25 @@ import {
   Title,
   Tooltip,
   Badge,
-  Grid,
-  TextInput,
-  Flex,
 } from "@mantine/core"
 import { DataTable, DataTableColumn } from "mantine-datatable"
-import { IconPhotoPlus, IconRestore, IconArchive, IconEye } from "@tabler/icons-react"
+import { IconPhotoPlus, IconRestore, IconArchive, IconEdit } from "@tabler/icons-react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { notifications } from "@mantine/notifications"
 import { useState } from "react"
-import { IAnnouncement, IUpdateAnnouncementInput } from "@/types/announcement.type"
+import { IAnnouncement } from "@/types/announcement.type"
 import { AxiosError } from "axios"
 import { notifyResponseError } from "@/helper/errorNotification"
 import { formatDate } from "@/helper/formatDate"
-import { ImageUpload } from "@/components/ImageUpload"
 import { useDisclosure } from "@mantine/hooks"
 import { AnnouncementFilter } from "./AnnouncementFilter"
 import { KEY } from "@/constants/key"
+import { getLoggedInUser } from "@/services/user.service"
+import { useNavigate } from "react-router"
+import { ROUTES } from "@/constants/routes"
 
 interface IAnnouncementFilters {
+  search?: string
   status?: "active" | "archived"
   page?: number
   limit?: number
@@ -53,31 +51,40 @@ export function AnnouncementCarouselList() {
     page: DEFAULT_PAGE,
     limit: DEFAULT_LIMIT,
   })
+  const navigate = useNavigate()
+  const { data: user, isLoading: iseGettingUser } = useQuery({
+    queryKey: [KEY.ME],
+    queryFn: () => getLoggedInUser(),
+    select: (response) => response.data,
+  })
+  const modulePermission = user?.role.modulePermission.find(
+    (modulePermission) => modulePermission.module == "announcement-carousel",
+  )
+  const haveEditPermission =
+    user?.role.systemTag === "admin" || modulePermission?.permission === "edit"
 
-  const [uploadModalOpened, { open: openUploadModal, close: closeUploadModal }] =
-    useDisclosure(false)
-
+  if (!modulePermission && user?.role.systemTag === "employee") {
+    navigate(ROUTES.DASHBOARD.HOME, {
+      replace: true,
+    })
+  }
   const [actionModalOpened, { open: openActionModal, close: closeActionModal }] =
     useDisclosure(false)
-
-  const [imageModalOpened, { open: openImageModal, close: closeImageModal }] = useDisclosure(false)
-  const [title, setTitle] = useState<string>()
-  const [message, setMessage] = useState<string>()
-  const [announcementImage, setAnnouncementImage] = useState<File>()
 
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<{
     announcement: IAnnouncement
     type: "archive" | "restore"
   }>()
 
-  const [viewingImage, setViewingImage] = useState<string>("")
-
   const { data, isLoading, error } = useQuery({
-    queryKey: [KEY.ANNOUNCEMENTS, filters.status],
+    queryKey: [KEY.ANNOUNCEMENTS, filters],
     queryFn: () =>
       getAnnouncements({
         all: true,
         status: filters.status,
+        search: filters?.search,
+        limit: filters.limit,
+        page: filters.page,
       }),
   })
 
@@ -120,23 +127,6 @@ export function AnnouncementCarouselList() {
     },
   })
 
-  // Upload mutation
-  const uploadMutation = useMutation({
-    mutationFn: createAnnouncement,
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: [KEY.ANNOUNCEMENTS] })
-      notifications.show({
-        title: "Upload Success",
-        message: response.message || "Announcement image uploaded successfully",
-        color: "green",
-      })
-      closeUploadModal()
-    },
-    onError: (error: AxiosError<{ message: string; error: string | any[] }>) => {
-      notifyResponseError(error, "Announcement Carousel", "create")
-    },
-  })
-
   const handleOnArchive = (id: string) => {
     const announcement = announcements.find((a) => a.id === id)
     if (announcement) {
@@ -160,45 +150,14 @@ export function AnnouncementCarouselList() {
       setSelectedAnnouncement(undefined)
     }, 200)
   }
-  const handleOnSaveAnnouncement = () => {
-    const formData = new FormData()
 
-    formData.append("image", announcementImage as File)
-
-    if (title) {
-      formData.append("title", title)
-    }
-    if (message) {
-      formData.append("message", message)
-    }
-    if (!announcementImage) {
-      notifications.show({
-        title: "Announcement image is required",
-        message: "Fields required",
-        color: "red",
-      })
-      return
-    }
-    // formData.append("productId", announcementImage)
-
-    uploadMutation.mutate(formData as any)
+  const handleOnEditAnnouncement = (announcementId: string) => {
+    navigate(ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.ID.replace(":announcementId", announcementId))
   }
-
-  const handleOnImageUpload = async (files: File[]) => {
-    if (files.length === 0) return
-
-    const file = files[0]
-
-    setAnnouncementImage(file)
+  const handleOnCreateAnnouncement = () => {
+    navigate(ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.ID.replace(":announcementId", "create"))
   }
-
-  const handleViewAnnouncement = (announcement: IUpdateAnnouncementInput & { image: string }) => {
-    setViewingImage(announcement.image)
-    setTitle(announcement.title ?? "")
-    setMessage(announcement.message ?? "")
-    openImageModal()
-  }
-
+  console.log(filters)
   const handleOnFilter = (newFilters: Partial<IAnnouncementFilters>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }))
   }
@@ -208,16 +167,30 @@ export function AnnouncementCarouselList() {
       accessor: "image",
       title: "Preview",
       width: 150,
-      render: (record) => (
-        <Image
-          src={getImage(record.image)}
-          alt="Announcement"
-          height={60}
-          width={100}
-          fit="cover"
-          radius="sm"
-        />
-      ),
+      render: (record) =>
+        record.image == null || record.image == "" ? (
+          <a href={getImage("carousel/default-image.png")} target="_blank">
+            <Image
+              src={getImage("carousel/default-image.png")}
+              alt="Announcement"
+              height={60}
+              width={100}
+              fit="cover"
+              radius="sm"
+            />
+          </a>
+        ) : (
+          <a href={getImage(record.image)} target="_blank">
+            <Image
+              src={getImage(record.image)}
+              alt="Announcement"
+              height={60}
+              width={100}
+              fit="cover"
+              radius="sm"
+            />
+          </a>
+        ),
     },
     {
       accessor: "title",
@@ -226,6 +199,7 @@ export function AnnouncementCarouselList() {
     {
       accessor: "message",
       title: "Message",
+      width: 120,
     },
     {
       accessor: "product.name",
@@ -253,22 +227,6 @@ export function AnnouncementCarouselList() {
       textAlign: "center",
       render: (record) => (
         <div className="flex justify-center gap-4">
-          <ActionIcon
-            size="lg"
-            variant="light"
-            color="blue"
-            onClick={() =>
-              handleViewAnnouncement({
-                // @ts-ignore
-                image: getImage(record.image || "") as string,
-                title: record.title,
-                message: record.message,
-              })
-            }
-          >
-            <IconEye size={16} />
-          </ActionIcon>
-
           {record.deletedAt ? (
             <Tooltip label="Restore Announcement">
               <ActionIcon
@@ -281,21 +239,35 @@ export function AnnouncementCarouselList() {
               </ActionIcon>
             </Tooltip>
           ) : (
-            <Tooltip label="Archive Announcement">
+            <>
               <ActionIcon
                 size="lg"
                 variant="light"
-                color="red"
-                onClick={() => handleOnArchive(record.id)}
+                color="blue"
+                onClick={() => handleOnEditAnnouncement(record.id)}
               >
-                <IconArchive size={16} />
+                <IconEdit size={16} />
               </ActionIcon>
-            </Tooltip>
+              <Tooltip label="Archive Announcement">
+                <ActionIcon
+                  size="lg"
+                  variant="light"
+                  color="red"
+                  onClick={() => handleOnArchive(record.id)}
+                >
+                  <IconArchive size={16} />
+                </ActionIcon>
+              </Tooltip>
+            </>
           )}
         </div>
       ),
     },
   ]
+
+  if (!haveEditPermission) {
+    columns.pop()
+  }
 
   if (error) {
     return (
@@ -309,55 +281,6 @@ export function AnnouncementCarouselList() {
 
   return (
     <Card>
-      {/* Image Preview Modal */}
-      <Modal
-        opened={imageModalOpened}
-        onClose={closeImageModal}
-        centered
-        size="xl"
-        withCloseButton
-        title="Announcement Image"
-      >
-        <Image src={viewingImage} alt="Announcement Preview" fit="contain" radius="md" />
-      </Modal>
-
-      {/* Upload Modal */}
-      <Modal
-        opened={uploadModalOpened}
-        onClose={closeUploadModal}
-        centered
-        withCloseButton={false}
-        size="xl"
-        closeOnClickOutside={!uploadMutation.isPending}
-      >
-        <Title order={5}>Upload Announcement Image</Title>
-
-        <Text size="sm" mb={16}>
-          Recommended Size: 1200 × 600 pixels
-        </Text>
-
-        <ImageUpload maxFiles={1} multiple={false} onDrop={handleOnImageUpload} />
-
-        <Flex direction={{ base: "column" }}>
-          <TextInput label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-
-          {/*  Acronym */}
-          <TextInput label="Message" value={message} onChange={(e) => setMessage(e.target.value)} />
-        </Flex>
-
-        <div className="mt-4 flex items-end justify-end">
-          <Button onClick={() => handleOnSaveAnnouncement()}>Save</Button>
-        </div>
-        {uploadMutation.isPending && (
-          <Center mt={16}>
-            <Loader size="sm" />
-            <Text ml={8} size="sm">
-              Uploading...
-            </Text>
-          </Center>
-        )}
-      </Modal>
-
       {/* Archive/Restore Confirmation Modal */}
       {selectedAnnouncement?.type === "archive" ? (
         <Modal
@@ -431,9 +354,11 @@ export function AnnouncementCarouselList() {
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Announcement Images</h1>
 
-          <Button onClick={openUploadModal}>
-            <IconPhotoPlus size={14} /> <Space w={6} /> Add Carousel Image
-          </Button>
+          {haveEditPermission ? (
+            <Button onClick={handleOnCreateAnnouncement}>
+              <IconPhotoPlus size={14} /> <Space w={6} /> Add Carousel Image
+            </Button>
+          ) : null}
         </div>
 
         <AnnouncementFilter filters={filters} onFilter={handleOnFilter} />
@@ -444,7 +369,7 @@ export function AnnouncementCarouselList() {
           columns={columns}
           records={announcements}
           // State
-          fetching={isLoading}
+          fetching={isLoading || iseGettingUser}
           noRecordsText="No announcements found"
           // Styling
           verticalSpacing="md"
@@ -454,7 +379,7 @@ export function AnnouncementCarouselList() {
           borderRadius={6}
           minHeight={340}
           // Pagination
-          totalRecords={data?.meta.totalItems ?? 0}
+          totalRecords={totalRecords}
           recordsPerPage={filters.limit ?? DEFAULT_LIMIT}
           page={filters.page ?? DEFAULT_PAGE}
           onPageChange={(p) => handleOnFilter({ page: p })}

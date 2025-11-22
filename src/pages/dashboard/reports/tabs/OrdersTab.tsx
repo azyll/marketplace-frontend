@@ -17,19 +17,16 @@ import { DataTable, DataTableColumn } from "mantine-datatable"
 import {
   IconCheck,
   IconCopy,
-  IconEdit,
+  IconDownload,
   IconMoodSad,
   IconNotes,
   IconPlus,
-  IconTrashX,
 } from "@tabler/icons-react"
 import { ORDER_STATUS, orderStatusColor, orderStatusLabel } from "@/constants/order"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
-import { getProductList } from "@/services/products.service"
 import { getAnnualOrders, getOrders } from "@/services/order.service"
 import dayjs from "dayjs"
-import { useClipboard } from "@mantine/hooks"
 import { useNavigate, useSearchParams } from "react-router"
 import { ROUTES } from "@/constants/routes"
 import AnnualChart from "../../components/AnnualChart"
@@ -37,8 +34,9 @@ import { useEffect, useMemo, useState } from "react"
 import { OrderActions } from "@/pages/dashboard/orders/components/OrderActions"
 import { LogsCard } from "../../components/LogsCard"
 import { getLoggedInUser } from "@/services/user.service"
-
-export const OrdersList = () => {
+import { getOrderReport } from "@/services/report.service"
+import { ReportDownloader } from "../ReportDownloader"
+export default function OrdersTab() {
   const [searchParams, setSearchParams] = useSearchParams()
   const initialStatus = useMemo(
     () => searchParams.get("status") as IOrderStatusType,
@@ -74,7 +72,7 @@ export const OrdersList = () => {
   }
   const { data: orders, isLoading } = useQuery({
     queryKey: [KEY.DASHBOARD.ORDERS, filters],
-    queryFn: () => getOrders(filters),
+    queryFn: () => getOrderReport(filters),
   })
 
   const handleOnCreateOrder = () => {
@@ -102,7 +100,7 @@ export const OrdersList = () => {
       ),
     },
     {
-      accessor: "student.user",
+      accessor: "student.user.fullName",
       title: "Student",
       render: ({ student }) => (
         <div className="flex flex-col text-sm">
@@ -173,27 +171,7 @@ export const OrdersList = () => {
       title: "Date",
       render: ({ createdAt }) => (createdAt ? dayjs(createdAt).format("MMM D, YYYY h:mm A") : "-"),
     },
-    {
-      accessor: "view",
-      title: "View",
-      width: 120,
-      textAlign: "center",
-      render: (order) => (
-        <div className="flex justify-center gap-4">
-          <ActionIcon
-            size="lg"
-            variant="light"
-            onClick={() => navigate(ROUTES.DASHBOARD.ORDERS.ID.replace(":orderId", order.id))}
-          >
-            <IconNotes size={14} />
-          </ActionIcon>
-        </div>
-      ),
-    },
   ]
-  // if (!haveOrderEditPermission) {
-  //   columns.shift()
-  // }
 
   const [selectedOrders, setSelectedOrders] = useState<IOrder[]>([])
 
@@ -209,56 +187,22 @@ export const OrdersList = () => {
 
   return (
     <>
-      <Flex align="flex-start" justify="flex-start" wrap="wrap" gap="lg">
-        <Card style={{ flex: "1 1 calc(60% - 0.75rem)" }}>
-          <Card.Section px={24} pt={24}>
-            <h1 className="text-sm font-semibold">Orders Per Month</h1>
-          </Card.Section>
-
-          <Space h={20} />
-
-          <AnnualChart
-            queryKey="annual-orders"
-            queryFn={getAnnualOrders}
-            label="Orders"
-            dataKey="orders"
-          />
-        </Card>
-
-        {/* Activity Logs */}
-        <Card style={{ flex: "1 1 calc(40% - 0.75rem)" }}>
-          <Card.Section px={24} pt={24} pb={12}>
-            <h1 className="text-sm font-semibold">Orders Activity</h1>
-          </Card.Section>
-
-          <LogsCard type="order" />
-        </Card>
-      </Flex>
-
-      <Space h={16} />
-
       <Card>
         <Card.Section px={24} pt={24}>
           <div className="flex h-[36px] items-center justify-between gap-4">
-            <h1 className="text-xl font-bold">Manage Orders</h1>
+            <h1 className="text-xl font-bold">View Orders</h1>
 
-            {haveOrderEditPermission ? (
-              <div className="flex gap-4">
-                {selectedOrders.length > 0 && (
-                  <OrderActions
-                    status={filters?.status as IOrderStatusType}
-                    selectedOrders={selectedOrders}
-                    onSuccess={() => setSelectedOrders([])}
-                  />
-                )}
-
-                {!selectedOrders.length && (
-                  <Button onClick={() => handleOnCreateOrder()}>
-                    <IconPlus size={14} /> <Space w={6} /> Create Order
-                  </Button>
-                )}
-              </div>
-            ) : null}
+            <ReportDownloader
+              data={orders?.data ?? []}
+              columns={columns}
+              header={{
+                title: "Orders Report",
+                subtitle: "Orders Report",
+              }}
+              filename="Orders Report-report"
+              sheetName="Orders Report"
+              pdfOrientation="portrait"
+            />
           </div>
 
           <OrdersFilter filters={filters} onFilter={setFilterValues} />

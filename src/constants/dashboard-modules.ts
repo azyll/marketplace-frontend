@@ -1,0 +1,28 @@
+export const dashboardModules = [
+  { value: "users", name: "Users" },
+  { value: "roles", name: "Roles" },
+  { value: "departments", name: "Departments" },
+  { value: "programs", name: "Programs" },
+  { value: "products", name: "Products" },
+  { value: "orders", name: "Orders" },
+  { value: "sales", name: "Sales" },
+  { value: "inventory", name: "Inventory" },
+  { value: "return-items", name: "Return Items" },
+  { value: "announcement-carousel", name: "Announcement Carousel" },
+  { value: "activity-logs", name: "Activity Logs" },
+
+]
+export enum Module {
+  Users = "users",
+  Roles = "roles",
+  Departments = "departments",
+  Program = "programs",
+  Products = "products",
+  Orders = "orders",
+  Sales = "sales",
+  Inventory = "inventory",
+  ReturnItems = "return-items",
+  AnnouncementCarousel = "announcement-carousel",
+  ActivityLogs = "activity-logs",
+
+}

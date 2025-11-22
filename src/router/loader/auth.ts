@@ -20,8 +20,8 @@ export const dashboardLoader = async () => {
 }
 
 const REDIRECT = {
-  admin: ROUTES.DASHBOARD.USER.BASE,
-  employee: ROUTES.DASHBOARD.PRODUCTS.BASE,
+  admin: ROUTES.DASHBOARD.HOME,
+  employee: ROUTES.DASHBOARD.HOME,
   student: "/",
 }
 

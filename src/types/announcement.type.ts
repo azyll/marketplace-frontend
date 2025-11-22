@@ -1,3 +1,4 @@
+import { IPagination } from "./common.type"
 import { IProduct } from "./product.type"
 
 export interface IAnnouncement {
@@ -13,14 +14,15 @@ export interface IAnnouncement {
 }
 
 export interface ICreateAnnouncementInput {
-  image: File | null
+  image?: File | undefined
   title?: string | null
   message?: string | null
   productId?: string | null
 }
 export type IUpdateAnnouncementInput = Partial<ICreateAnnouncementInput>
 
-export interface IGetAnnouncementFilters {
+export interface IGetAnnouncementFilters extends IPagination {
   all?: boolean
   status?: "active" | "archived"
+  search?: string
 }

@@ -65,21 +65,23 @@ export default function HeroCarousel() {
                   <Image
                     src={getImage(item.image)}
                     alt={`Announcement ${item.id}`}
-                    className="md:!rounded-xl"
+                    className="h-[590px] max-h-[590px] w-full max-w-[1180px] object-contain md:!rounded-xl"
+                    fallbackSrc={getImage("carousel/default-image.png")}
                   />
                 </NavLink>
               ) : (
                 <Image
                   src={getImage(item.image)}
                   alt={`Announcement ${item.id}`}
-                  className="md:!rounded-xl"
+                  className="h-[590px] max-h-[590px] w-full max-w-[1180px] object-contain md:!rounded-xl" // Added Tailwind classes
+                  fallbackSrc={getImage("carousel/default-image.png")}
                 />
               )}
 
-              {item.title && item.message ? (
+              {item.title || item.message ? (
                 <div className="bg-opacity-50 absolute bottom-2 left-2 rounded-md bg-black p-2 text-white">
-                  {item.title && <Text size="xl">{item.title}</Text>}
-                  {item.message && <Text size="sm">{item.message}</Text>}
+                  {item?.title && <Text size="xl">{item.title}</Text>}
+                  {item?.message && <Text size="sm">{item.message}</Text>}
                 </div>
               ) : null}
             </div>

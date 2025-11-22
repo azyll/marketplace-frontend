@@ -176,7 +176,11 @@ export const DepartmentPage = () => {
             overlayProps={{ radius: "sm" }}
             mih={220}
           />
-          <DepartmentDetailsForm ref={departmentFormRef} department={department} />
+          <DepartmentDetailsForm
+            ref={departmentFormRef}
+            department={department}
+            disabled={isFormSubmitting}
+          />
         </Box>
       </Card.Section>
     </Card>

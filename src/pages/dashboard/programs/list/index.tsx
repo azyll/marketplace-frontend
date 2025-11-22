@@ -31,6 +31,7 @@ import { useDisclosure } from "@mantine/hooks"
 import { useState } from "react"
 import { notifications } from "@mantine/notifications"
 import Axios, { AxiosError } from "axios"
+import { getLoggedInUser } from "@/services/user.service"
 
 export const ProgramList = () => {
   const DEFAULT_PAGE = 1
@@ -48,6 +49,22 @@ export const ProgramList = () => {
   })
 
   const navigate = useNavigate()
+  const { data: user, isLoading: iseGettingUser } = useQuery({
+    queryKey: [KEY.ME],
+    queryFn: () => getLoggedInUser(),
+    select: (response) => response.data,
+  })
+  const modulePermission = user?.role.modulePermission.find(
+    (modulePermission) => modulePermission.module == "programs",
+  )
+  const haveEditPermission =
+    user?.role.systemTag === "admin" || modulePermission?.permission === "edit"
+
+  if (!modulePermission && user?.role.systemTag === "employee") {
+    navigate(ROUTES.DASHBOARD.HOME, {
+      replace: true,
+    })
+  }
   const [opened, { open, close }] = useDisclosure(false)
   const [selectedProgram, setSelectedProgram] = useState<{
     program: IProgram
@@ -216,6 +233,9 @@ export const ProgramList = () => {
       ),
     },
   ]
+  if (!haveEditPermission) {
+    columns.pop()
+  }
 
   return (
     <Card>
@@ -295,9 +315,11 @@ export const ProgramList = () => {
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Program</h1>
           <div className="flex">
-            <Button onClick={() => handleOnCreateProgram()}>
-              <IconBookUpload size={14} /> <Space w={6} /> Create Program
-            </Button>
+            {haveEditPermission ? (
+              <Button onClick={() => handleOnCreateProgram()}>
+                <IconBookUpload size={14} /> <Space w={6} /> Create Program
+              </Button>
+            ) : null}
           </div>
         </div>
         <ProgramFilter filters={filters} onFilter={setFilterValues} />

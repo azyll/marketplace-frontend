@@ -1,7 +1,7 @@
 import { IRoleFilters } from "@/types/role.type"
-import { CloseButton, Group, Input } from "@mantine/core"
+import { CloseButton, Group, Input, Select } from "@mantine/core"
 import { IconSearch } from "@tabler/icons-react"
-import { KeyboardEvent, useState } from "react"
+import { KeyboardEvent, useMemo, useState } from "react"
 
 interface Props {
   filters: Partial<IRoleFilters>

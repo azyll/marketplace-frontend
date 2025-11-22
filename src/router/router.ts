@@ -36,6 +36,8 @@ import { ReturnItemList } from "@/pages/dashboard/return-item/list"
 import { ActivityLogList } from "@/pages/dashboard/activity-logs/list"
 import { AnnouncementCarouselList } from "@/pages/dashboard/announcement-carousel/list"
 import { createProtectedRoute } from "./components/ProtectedRoute"
+import { DashboardHomePage } from "@/pages/dashboard/home/DashboardHome"
+import AnnouncementCarouselPage from "@/pages/dashboard/announcement-carousel/page"
 
 export const router = createBrowserRouter([
   {
@@ -101,12 +103,12 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            loader: () => redirect(ROUTES.DASHBOARD.USER.BASE),
+            loader: () => redirect(ROUTES.DASHBOARD.HOME),
           },
 
           //Admin Only
           {
-            Component: createProtectedRoute(["admin"]),
+            Component: createProtectedRoute(["admin", "employee"]),
             children: [
               // Roles
               {
@@ -150,6 +152,10 @@ export const router = createBrowserRouter([
           {
             Component: createProtectedRoute(["admin", "employee"]),
             children: [
+              {
+                path: ROUTES.DASHBOARD.HOME,
+                Component: DashboardHomePage,
+              },
               // Users
               {
                 path: ROUTES.DASHBOARD.USER.BASE,
@@ -210,6 +216,15 @@ export const router = createBrowserRouter([
                 path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.BASE,
                 Component: AnnouncementCarouselList,
               },
+              {
+                path: ROUTES.DASHBOARD.ANNOUNCEMENT_CAROUSEL.ID,
+                Component: AnnouncementCarouselPage,
+              },
+              // Reports
+              // {
+              //   path: ROUTES.DASHBOARD.REPORTS.BASE,
+              //   Component: ReportsPage,
+              // },
             ],
           },
         ],
