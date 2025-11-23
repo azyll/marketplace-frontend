@@ -228,10 +228,9 @@ export default function Cart() {
   // Calculate total for selected items only
   const selectedTotal =
     cartData && cartItems.length > 0 && !error
-      ? cartItems.reduce(
-          (sum: number, item: any) => sum + item.productVariant.price * item.quantity,
-          0,
-        )
+      ? cartItems
+          .filter((item: ICart) => selectedItems.has(item.id))
+          .reduce((sum: number, item: any) => sum + item.productVariant.price * item.quantity, 0)
       : 0
 
   // Get selected cart items for order summary
