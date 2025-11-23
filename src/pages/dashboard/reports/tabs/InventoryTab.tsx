@@ -11,6 +11,7 @@ import {
   Grid,
   Stack,
   Tooltip,
+  Button,
 } from "@mantine/core"
 import {
   IconEdit,
@@ -21,11 +22,17 @@ import {
   IconNewSection,
   IconPlus,
   IconTruckReturn,
+  IconDownload,
 } from "@tabler/icons-react"
 import { DataTable, DataTableColumn } from "mantine-datatable"
 import dayjs from "dayjs"
 import { useState, useMemo } from "react"
-import { IProductVariant, IInventoryFilter, IProduct } from "@/types/product.type"
+import {
+  IProductVariant,
+  IInventoryFilter,
+  IProduct,
+  IInventoryFilterReport,
+} from "@/types/product.type"
 import { useFilters } from "@/hooks/useFilters"
 import { useQuery } from "@tanstack/react-query"
 import { KEY } from "@/constants/key"
@@ -36,37 +43,24 @@ import {
 } from "@/services/products.service"
 import { getImage } from "@/services/media.service"
 import { stockConditionColor, stockConditionLabel } from "@/constants/stock"
-import { LogsCard } from "../../components/LogsCard"
-import { useDisclosure } from "@mantine/hooks"
-import { EditStockModal } from "./EditStockModal"
+
 import { PRODUCT_SIZE } from "@/constants/product"
-import { AlertsCard } from "./AlertsCard"
-import { InventoryFilter } from "./InventoryFilters"
-import { MarkAsReturnItemModal } from "./MarkAsReturnItemModal"
+
 import { getLoggedInUser } from "@/services/user.service"
 import { ROUTES } from "@/constants/routes"
-import { Navigate, useNavigate } from "react-router"
+import { useNavigate } from "react-router"
+import { InventoryFilter } from "../../inventory/list/InventoryFilters"
+import { getInventoryReport } from "@/services/report.service"
+import { ReportDownloader } from "../ReportDownloader"
 
-export const InventoryList = () => {
-  const DEFAULT_PAGE = 1
-  const DEFAULT_LIMIT = 20
-
-  const [filters, setFilters, setFilterValues] = useFilters<IInventoryFilter>({
-    page: DEFAULT_PAGE,
-    limit: DEFAULT_LIMIT,
+export default function InventoryTab() {
+  const [filters, setFilters, setFilterValues] = useFilters<IInventoryFilterReport>({
     all: false,
   })
 
   const sizeOrder = Object.keys(PRODUCT_SIZE)
 
   const [expandedRecordIds, setExpandedRecordIds] = useState<string[]>([])
-  const [opened, { open, close }] = useDisclosure(false)
-  const [selectedVariant, setSelectedVariant] = useState<{
-    id: string
-    type: "stock-update" | "mark-item-as-return"
-    stockQuantity?: number
-    name?: string
-  }>()
 
   const { data: user, isLoading: iseGettingUser } = useQuery({
     queryKey: [KEY.ME],
@@ -93,17 +87,12 @@ export const InventoryList = () => {
 
   const { data: products, isLoading } = useQuery({
     queryKey: [KEY.PRODUCTS, filters],
-    queryFn: () => getInventoryProducts(filters),
+    queryFn: () => getInventoryReport(filters),
   })
 
   const { data: inventoryValues } = useQuery({
     queryKey: [KEY.PRODUCTS, "inventory-values"],
     queryFn: () => getInventoryValue(),
-  })
-
-  const { data: inventoryAlertData, isLoading: isAlertsLoading } = useQuery({
-    queryKey: [KEY.PRODUCTS, "inventory-alerts"],
-    queryFn: () => getInventoryAlerts(),
   })
 
   // Helper function to get stock status for a product
@@ -153,22 +142,6 @@ export const InventoryList = () => {
 
     return map
   }, [inventoryValues])
-
-  const handleOnEditProduct = (
-    productVariantId: string,
-    type: "stock-update" | "mark-item-as-return",
-    stockQuantity?: number,
-    variantName?: string,
-  ) => {
-    console.log("Opening modal for variant:", productVariantId)
-    setSelectedVariant({
-      id: productVariantId,
-      type,
-      stockQuantity,
-      name: variantName,
-    })
-    open()
-  }
 
   const isRowExpanded = (productId: string) => expandedRecordIds.includes(productId)
 
@@ -307,114 +280,22 @@ export const InventoryList = () => {
         </Badge>
       ),
     },
-    {
-      accessor: "actions",
-      title: "Actions",
-      width: 100,
-      textAlign: "center",
-      render: (variant) => (
-        <div className="space-x-2">
-          {haveInventoryModuleEditPermission ? (
-            <Tooltip label="Update Stock Quantity">
-              <ActionIcon
-                size="lg"
-                variant="light"
-                onClick={() =>
-                  handleOnEditProduct(
-                    variant.id,
-                    "stock-update",
-                    variant.stockQuantity,
-                    `${variant.name} - ${variant.size}`,
-                  )
-                }
-              >
-                <IconEdit size={14} />
-              </ActionIcon>
-            </Tooltip>
-          ) : null}
-          {haveReturnItemModuleEditPermission ? (
-            <Tooltip label="Mark item as return item">
-              <ActionIcon
-                size="lg"
-                variant="light"
-                onClick={() => handleOnEditProduct(variant.id, "mark-item-as-return")}
-              >
-                <IconTruckReturn size={14} />
-              </ActionIcon>
-            </Tooltip>
-          ) : null}
-        </div>
-      ),
-    },
   ]
   if (!haveInventoryModuleEditPermission && !haveReturnItemModuleEditPermission) {
     variantColumns.pop()
   }
-
   return (
     <>
-      {selectedVariant && selectedVariant.type === "stock-update" && (
-        <EditStockModal
-          opened={opened}
-          onClose={close}
-          variantId={selectedVariant.id}
-          currentStock={selectedVariant.stockQuantity}
-          variantName={selectedVariant.name}
-        />
-      )}
-      {selectedVariant && selectedVariant.type === "mark-item-as-return" && (
-        <MarkAsReturnItemModal opened={opened} onClose={close} variantId={selectedVariant.id} />
-      )}
-
-      <Grid grow gutter="lg" align="stretch">
-        <Grid.Col span={5}>
-          {/* Alerts */}
-          <Stack gap="lg" style={{ height: "100%" }}>
-            <AlertsCard
-              title="No Stock"
-              data={inventoryAlertData?.data?.[0]}
-              isLoading={isAlertsLoading || iseGettingUser}
-              description="Item needs to be restocked"
-            />
-
-            <AlertsCard
-              title="Low Stock"
-              data={inventoryAlertData?.data?.[1]}
-              isLoading={isAlertsLoading || iseGettingUser}
-              description="Item has less than 20 stock"
-            />
-
-            <AlertsCard
-              title="In Stock"
-              data={inventoryAlertData?.data?.[2]}
-              isLoading={isAlertsLoading || iseGettingUser}
-              description="Items have enough stock"
-            />
-          </Stack>
-        </Grid.Col>
-
-        <Grid.Col span={7}>
-          {/* Activity Logs */}
-          <Card withBorder>
-            <Card.Section px={24} pt={24} pb={12}>
-              <h1 className="text-xl font-bold">Inventory Activity</h1>
-            </Card.Section>
-
-            <LogsCard type="inventory" />
-          </Card>
-        </Grid.Col>
-      </Grid>
-
-      <Space h="lg" />
-
       {/* Table */}
       <Card>
         <Card.Section px={24} pt={24}>
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <h1 className="text-xl font-bold">Manage Inventory</h1>
+          <div className="flex flex-col gap-4">
+            <div className="flex justify-end">
+              <Button leftSection={<IconDownload size={16} />}>Download Report (PDF)</Button>
+             
+            </div>
+            <InventoryFilter filters={filters} onFilter={setFilterValues} />
           </div>
-
-          <InventoryFilter filters={filters} onFilter={setFilterValues} />
         </Card.Section>
 
         <Space h={16} />
@@ -436,10 +317,6 @@ export const InventoryList = () => {
             striped
             borderRadius={6}
             minHeight={340}
-            totalRecords={products?.meta?.totalItems ?? 0}
-            recordsPerPage={filters.limit ?? DEFAULT_LIMIT}
-            page={filters.page ?? DEFAULT_PAGE}
-            onPageChange={(p) => setFilters("page", p)}
             rowExpansion={{
               allowMultiple: true,
               expanded: {

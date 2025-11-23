@@ -27,6 +27,8 @@ import {
   IconTruckReturn,
   IconActivity,
   IconCarouselHorizontal,
+  IconDashboard,
+  IconReport,
 } from "@tabler/icons-react"
 import { ROUTES } from "@/constants/routes"
 import { useQuery } from "@tanstack/react-query"
@@ -82,6 +84,13 @@ export const DashboardLayout = () => {
   const inventoryCount = (criticalStock?.noStock || 0) + (criticalStock?.lowStock || 0)
 
   const items = [
+    {
+      label: "Home",
+      path: ROUTES.DASHBOARD.HOME,
+      icon: <IconDashboard size={14} />,
+      indicator: false,
+      count: 0,
+    },
     //Admin Only
     {
       label: "Users",
@@ -89,7 +98,6 @@ export const DashboardLayout = () => {
       icon: <IconUser size={14} />,
       indicator: false,
       count: 0,
-      roles: ["admin", "employee"],
     },
     {
       label: "Roles",
@@ -97,7 +105,6 @@ export const DashboardLayout = () => {
       icon: <IconShield size={14} />,
       indicator: false,
       count: 0,
-      roles: ["admin"],
     },
     {
       label: "Department",
@@ -105,7 +112,6 @@ export const DashboardLayout = () => {
       icon: <IconLibrary size={14} />,
       indicator: false,
       count: 0,
-      roles: ["admin"],
     },
     {
       label: "Program",
@@ -113,7 +119,6 @@ export const DashboardLayout = () => {
       icon: <IconBook size={14} />,
       indicator: false,
       count: 0,
-      roles: ["admin"],
     },
 
     //Employee & Admin
@@ -123,7 +128,6 @@ export const DashboardLayout = () => {
       icon: <IconBuildingStore size={14} />,
       indicator: false,
       count: 0,
-      roles: ["admin", "employee"],
     },
     {
       label: "Orders",
@@ -131,7 +135,6 @@ export const DashboardLayout = () => {
       icon: <IconShoppingBagCheck size={14} />,
       indicator: totalOrdersCount > 0,
       count: totalOrdersCount,
-      roles: ["admin", "employee"],
     },
     {
       label: "Sales",
@@ -139,7 +142,6 @@ export const DashboardLayout = () => {
       icon: <IconReportMoney size={14} />,
       indicator: false,
       count: 0,
-      roles: ["admin", "employee"],
     },
     {
       label: "Inventory",
@@ -147,7 +149,6 @@ export const DashboardLayout = () => {
       icon: <IconBuildingWarehouse size={14} />,
       indicator: criticalStock?.hasAlerts,
       count: inventoryCount,
-      roles: ["admin", "employee"],
     },
     {
       label: "Returned Items",
@@ -155,7 +156,6 @@ export const DashboardLayout = () => {
       icon: <IconTruckReturn size={14} />,
       indicator: false,
       count: 0,
-      roles: ["admin", "employee"],
     },
     {
       label: "Announcement Carousel",
@@ -163,28 +163,29 @@ export const DashboardLayout = () => {
       icon: <IconCarouselHorizontal size={14} />,
       indicator: false,
       count: 0,
-      roles: ["admin", "employee"],
     },
-
+    // {
+    //   label: "Reports",
+    //   path: ROUTES.DASHBOARD.REPORTS.BASE,
+    //   icon: <IconReport size={14} />,
+    //   indicator: false,
+    //   count: 0,
+    // },
     {
       label: "Activity Logs",
       path: ROUTES.DASHBOARD.ACTIVITY_LOG.BASE,
       icon: <IconActivity size={14} />,
       indicator: false,
       count: 0,
-      roles: ["admin"],
     },
   ]
 
   const filteredItems = useMemo(
     () =>
       items.filter((item) => {
-        if (!item?.roles || !user) return false
+        if (!user) return false
 
         const userRoleTag = user.role.systemTag
-
-        // 1. High-level Role Check: Filter out links not allowed for the user's general role
-        if (!item.roles.includes(userRoleTag)) return false
 
         // 2. Granular Module Check: ONLY apply for the 'employee' systemTag
         if (userRoleTag === "employee") {

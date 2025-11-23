@@ -51,8 +51,6 @@ export const ProductPage = () => {
     select: (response) => response.data,
   })
 
-
-
   const [simpleProduct, setSimpleProduct] = useState<boolean>(true)
   const [imageDefaultValue, setImageDefaultValue] = useState<string>()
 
@@ -121,7 +119,7 @@ export const ProductPage = () => {
     const multipleVariantForm = multipleVariantFormRef.current?.form
 
     if (!productDetailsForm || !singleVariantForm || !multipleVariantForm) return
-
+    KEY.ANNOUNCEMENTS
     const hasErrors = validateForms()
 
     if (!hasErrors) {

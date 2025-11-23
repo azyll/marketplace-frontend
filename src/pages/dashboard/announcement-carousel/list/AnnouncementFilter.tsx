@@ -1,10 +1,12 @@
-import { Group, Select } from "@mantine/core"
-import { useMemo } from "react"
+import { CloseButton, Group, Input, Select } from "@mantine/core"
+import { IconSearch } from "@tabler/icons-react"
+import { KeyboardEvent, useMemo, useState } from "react"
 
 interface IAnnouncementFilters {
   status?: "active" | "archived"
   page?: number
   limit?: number
+  search?: string
 }
 
 interface Props {
@@ -19,6 +21,18 @@ export const AnnouncementFilter = ({ filters, onFilter, disabled }: Props) => {
       [key]: value,
       page: 1,
     })
+  }
+  const [search, setSearch] = useState(filters?.search ?? "")
+
+  const handleOnSearch = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleOnFilter("search", search)
+    }
+  }
+
+  const handleOnClearSearch = () => {
+    setSearch("")
+    handleOnFilter("search", undefined)
   }
 
   const statusOptions = useMemo(() => {
@@ -42,6 +56,23 @@ export const AnnouncementFilter = ({ filters, onFilter, disabled }: Props) => {
       className="hide-scrollbar mt-4 overflow-x-auto"
     >
       <div className="flex gap-3">
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={handleOnSearch}
+          placeholder="Title / Message"
+          w={280}
+          rightSectionPointerEvents="all"
+          rightSection={
+            <CloseButton
+              aria-label="Clear input"
+              onClick={handleOnClearSearch}
+              style={{ display: search ? undefined : "none" }}
+            />
+          }
+          leftSection={<IconSearch size={14} />}
+          disabled={disabled}
+        />
         <Select
           placeholder="Select Status"
           data={statusOptions}

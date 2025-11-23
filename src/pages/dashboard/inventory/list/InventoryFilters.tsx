@@ -91,7 +91,7 @@ export const InventoryFilter = ({ filters, onFilter, disabled }: Props) => {
       gap="sm"
       justify="space-between"
       wrap="nowrap"
-      className="hide-scrollbar mt-4 overflow-x-auto"
+      className="hide-scrollbar overflow-x-auto"
     >
       <div className="flex gap-2">
         {stockConditionOptions.map((option) => (

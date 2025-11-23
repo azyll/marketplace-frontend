@@ -1,3 +1,4 @@
+import { Module } from "@/constants/dashboard-modules"
 import { IPagination } from "@/types/common.type"
 
 export type IRoleSystemTag = "student" | "admin" | "employee"
@@ -12,14 +13,7 @@ export interface IRole {
   deletedAt: Date
 }
 
-export enum Module {
-  Sales = "sales",
-  Orders = "orders",
-  Inventory = "inventory",
-  ReturnItems = "return-items",
-  Users = "users",
-  Products = "products",
-}
+
 
 export interface IRoleAccessModule {
   module: Module

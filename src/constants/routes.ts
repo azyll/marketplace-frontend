@@ -1,6 +1,7 @@
 export const ROUTES = {
   DASHBOARD: {
     BASE: "/dashboard",
+    HOME: "/dashboard/home",
     USER: {
       BASE: "/dashboard/users",
       ID: "/dashboard/users/:userId",
@@ -41,6 +42,10 @@ export const ROUTES = {
     },
     ANNOUNCEMENT_CAROUSEL: {
       BASE: "/dashboard/announcement-carousel",
+      ID: "/dashboard/announcement-carousel/:announcementId",
+    },
+    REPORTS: {
+      BASE: "/dashboard/reports",
     },
   },
   AUTH: {

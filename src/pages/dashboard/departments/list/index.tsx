@@ -34,6 +34,7 @@ import { DataTable, DataTableColumn } from "mantine-datatable"
 import { useState } from "react"
 import { useNavigate } from "react-router"
 import { DepartmentFilter } from "./DepartmentFilter"
+import { getLoggedInUser } from "@/services/user.service"
 
 export const DepartmentList = () => {
   const DEFAULT_PAGE = 1
@@ -50,6 +51,23 @@ export const DepartmentList = () => {
   })
 
   const navigate = useNavigate()
+  const { data: user, isLoading: iseGettingUser } = useQuery({
+    queryKey: [KEY.ME],
+    queryFn: () => getLoggedInUser(),
+    select: (response) => response.data,
+  })
+  const modulePermission = user?.role.modulePermission.find(
+    (modulePermission) => modulePermission.module == "departments",
+  )
+  const haveEditPermission =
+    user?.role.systemTag === "admin" || modulePermission?.permission === "edit"
+
+  if (!modulePermission && user?.role.systemTag === "employee") {
+    navigate(ROUTES.DASHBOARD.HOME, {
+      replace: true,
+    })
+  }
+
   const [opened, { open, close }] = useDisclosure(false)
   const [selectedDepartment, setSelectDepartment] = useState<{
     department: IDepartment
@@ -214,6 +232,9 @@ export const DepartmentList = () => {
       ),
     },
   ]
+  if (!haveEditPermission) {
+    columns.pop()
+  }
   return (
     <Card>
       {selectedDepartment?.type == "archive" ? (
@@ -291,9 +312,11 @@ export const DepartmentList = () => {
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Manage Department</h1>
           <div className="flex">
-            <Button onClick={() => handleOnCreateDepartment()}>
-              <IconLibraryPlus size={14} /> <Space w={6} /> Create Department
-            </Button>
+            {haveEditPermission ? (
+              <Button onClick={() => handleOnCreateDepartment()}>
+                <IconLibraryPlus size={14} /> <Space w={6} /> Create Department
+              </Button>
+            ) : null}
           </div>
         </div>
         <DepartmentFilter filters={filters} onFilter={setFilterValues} />
@@ -304,7 +327,7 @@ export const DepartmentList = () => {
           columns={columns}
           records={departments?.data ?? []}
           // State
-          fetching={isLoading}
+          fetching={isLoading || iseGettingUser}
           noRecordsIcon={
             <Box p={4} mb={4}>
               <IconMoodSad size={36} strokeWidth={1.5} />

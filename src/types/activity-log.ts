@@ -11,5 +11,7 @@ export interface IActivityLog {
 export interface IActivityLogFilters extends IPagination {
   search?: string
   type?: "user" | "system" | "inventory" | "sales" | "order"
+  from?: string
+  to?: string
 }
 export interface IGetActivityLogFilters extends IPagination {}

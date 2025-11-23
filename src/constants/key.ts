@@ -9,6 +9,9 @@ export const KEY = {
   SALES: "sales",
   PRODUCT_ATTRIBUTES: "product-attributes",
   PRODUCT_DEPARTMENTS: "product-departments",
+  CART: "cart",
+  CART_TOTAL: "cart-total",
+  ANNOUNCEMENTS: "announcements",
   DASHBOARD: {
     ORDERS: "dashboard-orders",
     ORDER: "dashboard-order",

@@ -26,9 +26,10 @@ import { AuthContext } from "@/contexts/AuthContext"
 import { notifications } from "@mantine/notifications"
 import { ENDPOINT } from "@/constants/endpoints"
 import { ROUTES } from "@/constants/routes"
-import { useQuery } from "@tanstack/react-query"
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { getItems } from "@/services/cart.service"
 import NotificationButton from "./NotificationButton"
+import { KEY } from "@/constants/key"
 
 export default function Header() {
   const navigate = useNavigate()
@@ -39,12 +40,12 @@ export default function Header() {
   )
 
   const { data: cart } = useQuery({
-    queryKey: ["cart", user?.id],
+    queryKey: [KEY.CART, user?.id, KEY.CART_TOTAL],
     queryFn: () => getItems(user!.id),
     enabled: !!user?.id && !isAdmin,
   })
 
-  const cartCount = cart?.data.length ?? 0
+  const cartCount = cart?.meta.totalItems ?? 0
 
   return (
     <nav className="h-14">
