@@ -70,7 +70,7 @@ export const OrdersFilter = ({ filters, onFilter, disabled }: Props) => {
   )
 
   const handleOnSetStatus = (value: OrderFilterStatusType) => {
-    onFilter({ status: value === "all" ? undefined : value })
+    onFilter({ status: value === "all" ? undefined : value, page: 1 })
     setStatus(value)
     setSearchParams({ status: value })
   }
